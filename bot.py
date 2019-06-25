@@ -4,7 +4,7 @@ from discord.ext import commands
 
 client = commands.Bot(command_prefix = '+')
 
-MY_ID =
+MY_ID = 0
 BOT_TOKEN = ''
 
 @client.event
