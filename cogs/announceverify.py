@@ -23,7 +23,11 @@ class AnnounceVerify(commands.Cog):
 
             await ctx.send(embed = embed)
         else:
-            await ctx.send('You don\'t have the permissions to do that!')
+            embed = discord.Embed(
+                title = 'Sorry, you don\'t have permission to do that!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
 
 def setup(client):
     client.add_cog(AnnounceVerify(client))

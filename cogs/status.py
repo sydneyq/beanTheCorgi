@@ -8,10 +8,14 @@ class Status(commands.Cog):
 
     @commands.command()
     async def status(self, ctx, *, msg):
-        if 'mods' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
+        if '*' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
             await self.client.change_presence(status=discord.Status.online, activity=discord.Game(msg))
         else:
-            await ctx.send('You don\'t have the permissions to do that!')
+            embed = discord.Embed(
+                title = 'Sorry, you don\'t have permission to do that!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
 
 def setup(client):
     client.add_cog(Status(client))

@@ -11,7 +11,7 @@ class Cmd(commands.Cog):
         if 'mods' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
             embed = discord.Embed(
                 title = 'Command List',
-                description = '`<Required>, [Optional]`\n`[M]` = Mods+, `[E]` = Everyone\nPrefix: `+`',
+                description = '`<Required>, [Optional]`\n`[A]` = Admins, `[M]` = Mods+, `[E]` = Everyone\nPrefix: `+`',
                 color = discord.Color.teal()
             )
 
@@ -23,10 +23,10 @@ class Cmd(commands.Cog):
             embed.add_field(name = 'Meta',
             value = '`[M] cmd` - This! (commands, command, cmds)\n`[E] info` - Bot information.\n`[E] ping` - Pings the bot instance.\n', inline = True)
             embed.add_field(name = 'Mod',
-            value = '`[M] status <message>` - Changes the bot\'s activity status.', inline = True)
+            value = '`[A] status <message>` - Changes the bot\'s activity status.', inline = True)
 
             embed.add_field(name = 'Echo',
-            value = 'Active in the `#echo` channel. \nUse `+setEchoChannel [#channel]` to specify a channel to send the echoes to.\nSends the specified message from the bot into the channel.', inline = False)
+            value = '`[A] echo <#channel> <message>` - Uses the bot to send the message to the specified channel.', inline = False)
             embed.add_field(name = 'ModMail',
             value = 'Value', inline = False)
             embed.add_field(name = 'Support',
@@ -34,7 +34,11 @@ class Cmd(commands.Cog):
 
             await ctx.send(embed = embed)
         else:
-            await ctx.send('You don\'t have the permissions to do that!')
+            embed = discord.Embed(
+                title = 'Sorry, you don\'t have permission to do that!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
 
 def setup(client):
     client.add_cog(Cmd(client))
