@@ -34,8 +34,6 @@ class ModMail(commands.Cog):
             return
 
         if isinstance(message.channel, discord.DMChannel):
-            #await message.author.dm_channel.send(':x: Sorry, but I don\'t accept commands through direct messages! Please use the `#bots` channel of your corresponding server!')
-
             #check if Modmail category has a channel of them already
             guild = self.client.get_guild(257751892241809408) #Mind Café
             category = 0
@@ -52,6 +50,12 @@ class ModMail(commands.Cog):
 
             userChannel = 0
 
+            embed = discord.Embed(
+                title = message.author.name + ' says:',
+                description = message.content,
+                color = discord.Color.teal()
+            )
+
             for channel in channels:
                 if channel.name.endswith(str(message.author.id)):
                     userChannel = channel.id
@@ -61,13 +65,14 @@ class ModMail(commands.Cog):
             if userChannel != 0:
                 #await message.author.dm_channel.send('I\'m sending into an existing channel.')
                 chn = guild.get_channel(userChannel)
-                await chn.send(message.content)
+                await chn.send(embed = embed)
             #if not, create new channel then send msg
             else:
                 #await message.author.dm_channel.send('I\'m creating a new channel.')
                 newChannel = await guild.create_text_channel('MM-' + message.author.name + '-' + str(message.author.id), category = category)
-                await newChannel.send('__New ModMail ticket created by **' + message.author.name + '**.__')
-                await newChannel.send(message.content)
+                await newChannel.send('__New ModMail ticket created by **' + message.author.name + '**.__ <@&592070664169455616>')
+                
+                await newChannel.send(embed = embed)
         elif not(message.content.startswith('+')) and (message.channel.name.startswith('mm-') and ('mods' in [role.name for role in message.author.roles] or 'mechanic' in [role.name for role in message.author.roles])):
             channel = message.channel
             userID = int(channel.name[channel.name.rfind('-')+1:])
@@ -76,13 +81,18 @@ class ModMail(commands.Cog):
             #user = discord.Client.get_user(userID, userID)
             user = discord.utils.get(self.client.get_all_members(), id=userID)
 
+            embed = discord.Embed(
+                title = 'A Mind Café Staff Member says:',
+                description = message.content,
+                color = discord.Color.teal()
+            )
             #if (user == None):
             #    await message.author.dm_channel.send('No user found: ' + str(userID))
             #else:
             #    await self.send_message(user, "A message for you")
             #await client.send_message(some_user, "content")
 
-            await user.send(message.content)
+            await user.send(embed = embed)
             #await message.author.dm_channel.send('userID: ' + str(userID))
 
 
