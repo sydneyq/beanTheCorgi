@@ -9,7 +9,16 @@ class Actions(commands.Cog):
 
     @commands.command()
     async def blep(self, ctx):
-        responses = ['https://media1.tenor.com/images/abf08100392109094617cb59eb159486/tenor.gif?itemid=3437296']
+        responses = ['https://media1.tenor.com/images/abf08100392109094617cb59eb159486/tenor.gif?itemid=3437296',
+        'https://media2.giphy.com/media/SewaEY6yMH6x2/giphy.gif',
+        'https://media1.giphy.com/media/muPGAcnm1YCoZA50jQ/giphy.gif',
+        'https://66.media.tumblr.com/493e8df5839f92e8b5632050797c23a8/tumblr_pml5x2Dm7f1w9j4ono1_540.gif',
+        'https://thumbs.gfycat.com/DentalDarlingCardinal-size_restricted.gif',
+        'https://thumbs.gfycat.com/AntiqueGrayHyrax-size_restricted.gif',
+        'http://cdn.funnyisms.com/24ce5866-24d1-4fc7-8ac4-92111f4e5d95.gif',
+        'http://the.earth.li/~jon/junk/blep.gif',
+        'https://s.mltshp.com/r/1F8ND',
+        'https://media.giphy.com/media/Y9MJ0otgR03yE/giphy.gif']
         embed = discord.Embed(
             title = 'mlem',
             color = discord.Color.teal()

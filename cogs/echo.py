@@ -11,13 +11,14 @@ class Echo(commands.Cog):
     @commands.command()
     async def echo(self, ctx, channel: discord.TextChannel, *, message):
         if '*' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
+            '''
             embed = discord.Embed(
                 title = 'A Mind Café Staff Member Says:',
                 description = message,
                 color = discord.Color.teal()
             )
-
-            await channel.send("**A Mind Café Staff Member Says:**\n" + message)#[1:])
+            '''
+            await channel.send("**Staff Member:** " + message)
             #self.client.send_message(channel, embed=embed)
             #await ctx.send(embed = embed)
         else:
