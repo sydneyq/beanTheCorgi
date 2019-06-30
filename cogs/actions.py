@@ -28,7 +28,7 @@ class Actions(commands.Cog):
         await ctx.send(embed = embed)
 
     @commands.command(pass_context=True)
-    async def hug(self, ctx, *, user: discord.Member = None):
+    async def hug(self, ctx, user: discord.Member = None, *, msg):
         responses = ['https://media1.giphy.com/media/Lb3vIJjaSIQWA/source.gif',
         'https://treasuredscriptcom.files.wordpress.com/2018/09/hiro-hugging-baymax1.gif',
         'https://media.giphy.com/media/17Q92poP1qJwI/giphy.gif',

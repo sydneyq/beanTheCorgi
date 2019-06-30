@@ -8,7 +8,7 @@ class Status(commands.Cog):
 
     @commands.command()
     async def status(self, ctx, *, msg):
-        if '*' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
+        if 'halo' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
             await self.client.change_presence(status=discord.Status.online, activity=discord.Game(msg))
         else:
             embed = discord.Embed(
