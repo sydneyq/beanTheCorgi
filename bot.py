@@ -31,7 +31,7 @@ async def load(ctx, extension):
 @client.command()
 async def unload(ctx, extension):
     if ctx.message.author.id == MY_ID:
-        client.unload_extension(f'cogs.{extension}')
+        client.load_extension(f'cogs.{extension}')
         await ctx.send('Cog unloaded!')
     else:
         await ctx.send('You don\'t have the permissions to do that!')
