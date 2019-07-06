@@ -10,7 +10,7 @@ class Echo(commands.Cog):
 
     @commands.command()
     async def echo(self, ctx, channel: discord.TextChannel, *, message):
-        if 'halo' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
+        if 'Halo' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
 
             embed = discord.Embed(
                 title = 'A Mind Café Staff Member Says:',

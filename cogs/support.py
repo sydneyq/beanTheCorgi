@@ -7,10 +7,47 @@ class Support(commands.Cog):
     def __init__(self, client):
         self.client = client
 
+    #support-ticket archive channel
+    @commands.command(aliases=['archiveSupport', 'archiveS'])
+    async def archiveST(self, ctx):
+        channel = ctx.message.channel
+        guild = self.client.get_guild(257751892241809408)
+        userID = int(channel.name[channel.name.rfind('-')+1:])
+
+        if ctx.message.author.id == userID or 'Angels' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
+            if channel.name.startswith('s-'):
+                for ch in guild.text_channels:
+                    if ch.name.lower() == 'log':
+                        log = guild.get_channel(ch.id)
+                        await log.send('Support Ticket [**' + channel.name + '**] has been archived.')
+                        break
+
+                guild = self.client.get_guild(257751892241809408) #Mind Café
+                category = 0
+
+                for c in guild.categories:
+                    if c.name.lower() == 'archive':
+                        category = c #Archive
+
+                #ctx.message.channel.category = 596988830435770368
+                await ctx.message.channel.edit(category = category, sync_permissions = True)
+            else:
+                embed = discord.Embed(
+                    title = 'This doesn\'t seem to be a Support Ticket channel...',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+        else:
+            embed = discord.Embed(
+                title = 'Sorry, you don\'t have permission to do that!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+
     #support-ticket close channel
-    @commands.command(aliases=['closeSupport', 'closeST', 'close'])
-    async def closeTicket(self, ctx):
-        if 'mods' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
+    @commands.command(aliases=['closeSupport', 'closeS'])
+    async def closeST(self, ctx):
+        if 'Halo' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
             channel = ctx.message.channel
             guild = self.client.get_guild(257751892241809408)
 
@@ -37,12 +74,13 @@ class Support(commands.Cog):
 
     #support-ticket create channel
     @commands.command()
-    async def support(self, ctx):
-        if (ctx.message.channel.name == 'cmd'):
+    async def support(self, ctx, sfw = '', *, topic = ''):
+        if (ctx.message.channel.name == 'support-requests'):
             channel = ctx.message.channel
             guild = self.client.get_guild(257751892241809408) #Mind Café
             category = 0
             log = 0
+            message = ctx.message
 
             #finding log channel
             for ch in guild.text_channels:
@@ -60,6 +98,7 @@ class Support(commands.Cog):
                 await log.send('I can\'t seem to find Support-Tickets.')
                 return
 
+            '''
             #creating the ticket
                 #
             #0[name] 1[pm/channel] 2[advice?] 3[topic]
@@ -77,63 +116,59 @@ class Support(commands.Cog):
 
             await ctx.send(embed = embed)
 
-            if ('Bean the Corgi' in [role.name for role in channel.last_message.author.roles]):
-                await log.send('Found support message ID.')
+            if ('Bots' in [role.name for role in channel.last_message.author.roles]):
                 botmessage = channel.last_message
+                await log.send('Found support message ID: ' + str(botmessage.id))
             else:
                 await log.send('Support message ID not found.')
-
-            await log.send('Entering emoji loop.')
-            for emoji in discord.Client.emojis:
-                if emoji.name == '{Warning}':
-                    await log.send('Found emoji.')
-                    await botmessage.add_reaction(emoji)
-
-            '''
-            emoji = discord.utils.get(discord.Client.get_all_emojis(), id=469334117020991508)
-            #get(ctx.get_all_emojis(), name='🌧')
-            await message.add_reaction(message, emoji)
-            emoji = get(self.client.get_all_emojis(), name='⚠')
-            await message.add_reaction(message, emoji)
-            emoji = get(self.client.get_all_emojis(), name='💕')
-            await message.add_reaction(message, emoji)
-            emoji = get(self.client.get_all_emojis(), name='📋')
-            await message.add_reaction(message, emoji)
-            emoji = get(self.client.get_all_emojis(), name='🌽')
-            await message.add_reaction(message, emoji)
-            '''
-            #while True:
-            #reaction = await bot.wait_for_reaction(emoji=['🌧','⛔','💕','💵','🍵'], message=message)
-
-            #PM
-
-
-            '''
-                #pm/public
-            embed.add_field(name = 'I would like to be supported in...',
-            value = '🤝 Private messages with a listener\n👑 A public support channel')
-
-            await ctx.send(embed = embed)
-            if ('Bean the Corgi' in [role.name for role in channel.last_message.author]):
-                message = channel.last_message
-                emoji = get(self.client.get_all_emojis(), name='🤝')
-                await message.add_reaction(message, emoji)
-                emoji = get(self.client.get_all_emojis(), name='👑')
-                await message.add_reaction(message, emoji)
-                while True:
-                reaction = await bot.wait_for_reaction(emoji=['🤝','👑'], message=message)
-                #PM
-                if (reaction.emoji == '🤝'):
-
             '''
 
+            #if (type == None or sfw == None):
+            if (sfw == ''):
+                embed = discord.Embed(
+                    title = 'Support Ticket Setup',
+                    description = 'Please use the following command syntax:',
+                    color = discord.Color.teal()
+                )
 
-            #logging a support channel being made
-            if log != 0:
-                #newChannelName = 's-' + message.author.name
-                #newChannel = await guild.create_text_channel(newChannelName, category = category)
-                #await newChannel.send('')
-                await log.send('Support Ticket for [**' + ctx.message.author.name + '**] has been created.')
+                #embed.add_field(name = '+support <DM/CHANNEL> <NSFW/SFW> [SupportTopic]',
+                #value = 'For example, `+support CHANNEL SFW Relationships`')
+
+                embed.add_field(name = '+support <NSFW/SFW> [SupportTopic]',
+                value = 'For example, `+support SFW Relationships`')
+
+                await ctx.send(embed = embed)
+            else:
+                #if (type.toLower() == 'dm'):
+
+                embed = discord.Embed(
+                    title = 'Support Ticket Setup',
+                    description = 'Gotcha! ✅',
+                    color = discord.Color.teal()
+                )
+
+                await ctx.send(embed = embed)
+
+                newChannel = await guild.create_text_channel('s-' + message.author.name + '-' + sfw + '-' + str(message.author.id), category = category)
+
+                if (topic != ''):
+                    await newChannel.edit(topic = topic)
+
+                if (sfw.lower() == 'nsfw'):
+                    await newChannel.edit(nsfw = True)
+                    role = guild.get_role(257751892241809408)
+                    nsfwRole = guild.get_role(445667601386045450)
+                    await newChannel.set_permissions(role, read_messages=False)
+                    await newChannel.set_permissions(message.author, read_messages=True)
+                    await newChannel.set_permissions(nsfwRole, read_messages=True)
+
+                await newChannel.send('__New Support Ticket created by **<@' + str(message.author.id) + '>**.__ <@&300743585584906240>')
+
+                await log.send('New Support Ticket created by <@' + str(message.author.id) + '>. ' + '<#' + str(newChannel.id) + '>')
+                if (topic != ''):
+                    await newChannel.send("Topic: " + topic)
+
+                #elif (type.toLower() == 'channel' or type.toLower() == 'c' or type.toLower() == 'public' or type.toLower() == 'chn'):
 
 
 def setup(client):

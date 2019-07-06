@@ -6,10 +6,38 @@ class ModMail(commands.Cog):
     def __init__(self, client):
         self.client = client
 
+    #modmail archive channel
+    @commands.command()
+    async def archiveMM(self, ctx):
+        if 'Angels' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
+            channel = ctx.message.channel
+            if channel.name.startswith('mm-'):
+                guild = self.client.get_guild(257751892241809408) #Mind Café
+                category = 0
+
+                for c in guild.categories:
+                    if c.name.lower() == 'archive':
+                        category = c #Archive
+
+                #ctx.message.channel.category = 596988830435770368
+                await ctx.message.channel.edit(category = category, sync_permissions = True)
+            else:
+                embed = discord.Embed(
+                    title = 'This doesn\'t seem to be a ModMail channel...',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+        else:
+            embed = discord.Embed(
+                title = 'Sorry, you don\'t have permission to do that!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+
     #modmail close channel
     @commands.command()
-    async def closeDM(self, ctx):
-        if 'angels' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
+    async def closeMM(self, ctx):
+        if 'Halo' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
             channel = ctx.message.channel
             if channel.name.startswith('mm-'):
                 await ctx.message.channel.delete(reason='ModMail Ticket Closed')
@@ -30,7 +58,7 @@ class ModMail(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         #the bot itself
-        if (message.author.id == 592436047175221259):
+        if (message.author.id == 592436047175221259 or message.author.id == 432038389663924225):
             return
 
         if isinstance(message.channel, discord.DMChannel):
@@ -71,9 +99,9 @@ class ModMail(commands.Cog):
                 #await message.author.dm_channel.send('I\'m creating a new channel.')
                 newChannel = await guild.create_text_channel('MM-' + message.author.name + '-' + str(message.author.id), category = category)
                 await newChannel.send('__New ModMail ticket created by **' + message.author.name + '**.__ <@&592070664169455616>')
-                
+
                 await newChannel.send(embed = embed)
-        elif not(message.content.startswith('+')) and (message.channel.name.startswith('mm-') and ('mods' in [role.name for role in message.author.roles] or 'mechanic' in [role.name for role in message.author.roles])):
+        elif not(message.content.startswith('+')) and not(message.content.startswith('=')) and (message.channel.name.startswith('mm-') and ('Angels' in [role.name for role in message.author.roles] or 'mechanic' in [role.name for role in message.author.roles])):
             channel = message.channel
             userID = int(channel.name[channel.name.rfind('-')+1:])
 

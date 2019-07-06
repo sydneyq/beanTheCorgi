@@ -8,18 +8,41 @@ class Triggers(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        '''
-        embed = discord.Embed(
-            title = 'Bot Info',
-            description = 'Created by sydney#9966 in June of 2019 for Mind Café.',
-            color = discord.Color.teal()
-        )
-        embed.set_thumbnail(url = 'https://cdn.discordapp.com/emojis/592855049403891713.png')
-        embed.add_field(name = 'Hello!',
-        value = 'My name is Bean! I\'m a fluffy corgi who\'s here to help the server with lots of stuffies.\nI\'m currently in alpha development, so please forgive me if I start barking in the wrong direction!', inline = True)
+        if ('i am satisfied with my care' in message.content.lower() or 'i\'m satisfied with my care' in message.content.lower()):
+            guild = self.client.get_guild(257751892241809408)
+            channel = message.channel
 
-        await ctx.send(embed = embed)
-        '''
+            if channel.name.startswith('s-'):
+                userID = int(channel.name[channel.name.rfind('-')+1:])
+                if (userID == message.author.id):
+                    for ch in guild.text_channels:
+                        if ch.name.lower() == 'log':
+                            log = guild.get_channel(ch.id)
+                            await log.send('Support Ticket [**' + channel.name + '**] has been archived.')
+                            break
+
+                    guild = self.client.get_guild(257751892241809408) #Mind Café
+                    category = 0
+
+                    for c in guild.categories:
+                        if c.name.lower() == 'archive':
+                            category = c #Archive
+
+                    #ctx.message.channel.category = 596988830435770368
+                    await message.channel.edit(category = category, sync_permissions = True)
+                else:
+                    embed = discord.Embed(
+                        title = 'Sorry, you don\'t have permission to do that!',
+                        color = discord.Color.teal()
+                    )
+                    await ctx.send(embed = embed)
+            else:
+                embed = discord.Embed(
+                    title = 'This doesn\'t seem to be a Support Ticket channel...',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+
 
 def setup(client):
     client.add_cog(Triggers(client))
