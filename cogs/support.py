@@ -8,13 +8,67 @@ class Support(commands.Cog):
         self.client = client
 
     #support-ticket archive channel
+    @commands.command(aliases=['swapST'])
+    async def switchST(self, ctx):
+        channel = ctx.message.channel
+        guild = self.client.get_guild(257751892241809408)
+        userID = int(channel.name[channel.name.rfind('-')+1:])
+
+        if ctx.message.author.id == userID or 'Mods' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
+            if channel.name.startswith('s-'):
+                channel = ctx.message.channel
+                guild = self.client.get_guild(257751892241809408) #Mind Café
+                userID = int(channel.name[channel.name.rfind('-')+1:])
+                category = 0
+                log = 0
+                message = ctx.message
+
+                #finding log channel
+                for ch in guild.text_channels:
+                    if ch.name.lower() == 'log':
+                        log = guild.get_channel(ch.id)
+                        break
+
+                newChannel = channel
+                await channel.edit(name = ('s-' + self.client.get_user(userID).name + '-' + 'nsfw' + '-' + str(userID)))
+
+                await newChannel.edit(nsfw = True)
+                role = guild.get_role(257751892241809408)
+                spiritsRole = guild.get_role(591398086635552788)
+                nsfwRole = guild.get_role(445667601386045450)
+                await newChannel.set_permissions(role, read_messages=False)
+                await newChannel.set_permissions(spiritsRole, read_messages=False)
+                await newChannel.set_permissions(self.client.get_user(userID), read_messages=True)
+                await newChannel.set_permissions(nsfwRole, read_messages=True)
+
+                await log.send('<@' + str(message.author.id) + '> has switched ' + '<#' + str(newChannel.id) + '> to NSFW.')
+
+                embed = discord.Embed(
+                    title = 'Switched support channel to NSFW! ✅',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+            else:
+                embed = discord.Embed(
+                    title = 'This doesn\'t seem to be a Support Ticket channel...',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+        else:
+            embed = discord.Embed(
+                title = 'Sorry, you don\'t have permission to do that!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+
+    #support-ticket archive channel
     @commands.command(aliases=['archiveSupport', 'archiveS'])
     async def archiveST(self, ctx):
         channel = ctx.message.channel
         guild = self.client.get_guild(257751892241809408)
         userID = int(channel.name[channel.name.rfind('-')+1:])
 
-        if ctx.message.author.id == userID or 'Angels' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
+        if ctx.message.author.id == userID or 'Mods' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
             if channel.name.startswith('s-'):
                 for ch in guild.text_channels:
                     if ch.name.lower() == 'log':
