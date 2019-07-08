@@ -201,7 +201,7 @@ class Announce(commands.Cog):
             value = 'Please do not have any conversations in these channels, for that is not the purpose of them.')
 
             embed.add_field(name = '11) Support channels',
-            value = 'When asking for public support, the topic cannot be about or relating to anyone else in the server who can possibly see your conversation. Those support requests should be through DM only. Any venting, upsetting, or support topics should be in support channels (channels in the Support categories) only.')
+            value = 'When asking for public support, the topic cannot be about or relating to anyone else in the server who can possibly see your conversation. Those support requests should be through DM only. Any venting, upsetting, or support topics should be in support channels (channels in the Support-Tickets category) only. Want public support? Head over to <#597026335835291659> and use the `+support [topic]` or `+supportNSFW [topic]` commands.')
 
             embed.add_field(name = '12) If you are in a crisis, seek professional help',
             value = 'We are not a replacement for trained, professional resources. If you find yourself in danger of harming yourself or others, or being harmed by others, please contact your [local emergency services](https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers).')

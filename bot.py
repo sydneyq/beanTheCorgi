@@ -2,9 +2,9 @@ import discord
 import os
 from discord.ext import commands
 
-client = commands.Bot(command_prefix = '+')
+client = commands.Bot(command_prefix = '=')
 
-MY_ID = 0
+MY_ID = 212723958313779201
 BOT_TOKEN = ''
 
 @client.event
@@ -31,7 +31,7 @@ async def load(ctx, extension):
 @client.command()
 async def unload(ctx, extension):
     if ctx.message.author.id == MY_ID:
-        client.load_extension(f'cogs.{extension}')
+        client.unload_extension(f'cogs.{extension}')
         await ctx.send('Cog unloaded!')
     else:
         await ctx.send('You don\'t have the permissions to do that!')

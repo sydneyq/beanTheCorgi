@@ -30,7 +30,7 @@ class Echo(commands.Cog):
 
     @commands.command()
     async def bean(self, ctx, channel: discord.TextChannel, *, message):
-        if 'mechanic' in [role.name for role in ctx.message.author.roles]:
+        if ctx.message.author.id == 212723958313779201: #if 'mechanic' in [role.name for role in ctx.message.author.roles]:
 
             embed = discord.Embed(
                 description = message,
