@@ -7,6 +7,41 @@ class Actions(commands.Cog):
     def __init__(self, client):
         self.client = client
 
+    @commands.command(pass_context=True)
+    async def pat(self, ctx, user: discord.Member = None, *, msg = ''):
+        responses = ['https://cdn.discordapp.com/attachments/257751892241809408/597979644725166097/unknown.gif',
+        'https://i.gifer.com/7A80.gif',
+        'https://media1.tenor.com/images/9bd2eb038544102aa4bb36fb8b0d01f9/tenor.gif?itemid=12437651',
+        'https://25.media.tumblr.com/14be64e13a802d9b16063411134f29b7/tumblr_mfz90qdzaV1r4az5so1_400.gif',
+        'https://media.tenor.com/images/dfe3267cca9596be840fbf9d5e86b747/tenor.gif',
+        'https://media1.tenor.com/images/d6a91b652fd260f7d063bee23cd7f9ee/tenor.gif?itemid=8102480',
+        'https://data.whicdn.com/images/38611077/original.gif',
+        'https://media1.tenor.com/images/ca552807b4720928130e5f188cfbe2c9/tenor.gif?itemid=8061431',
+        'https://media.giphy.com/media/Epd1qTKdonBhC/giphy-downsized-large.gif',
+        'https://thumbs.gfycat.com/AlarmedAmpleFox-size_restricted.gif',
+        'https://media1.tenor.com/images/b89e2aa380639d37b9521b72a266d498/tenor.gif?itemid=4215410']
+
+        actionName = 'patted'
+
+        if (user != None):
+            embed = discord.Embed(
+                color = discord.Color.teal(),
+                title = '**' + user.name + '**, you\'ve just been ' + actionName + '!'
+            )
+            embed.set_image(url = random.choice(responses))
+
+            await ctx.send(embed = embed)
+
+        else:
+            embed = discord.Embed(
+                color = discord.Color.teal(),
+                title = 'pat pat'
+            )
+            embed.set_image(url = random.choice(responses))
+
+            await ctx.send(embed = embed)
+
+
     @commands.command()
     async def blep(self, ctx):
         responses = ['https://media1.tenor.com/images/abf08100392109094617cb59eb159486/tenor.gif?itemid=3437296',
