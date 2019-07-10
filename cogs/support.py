@@ -7,8 +7,256 @@ class Support(commands.Cog):
     def __init__(self, client):
         self.client = client
 
+    #support-ticket certified only
+    @commands.command(aliases=['Reset', 'resetST'])
+    async def reset(self, ctx):
+        channel = ctx.message.channel
+        guild = self.client.get_guild(257751892241809408)
+        userID = int(channel.name[channel.name.rfind('-')+1:])
+
+        if ctx.message.author.id == userID or 'Mods' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
+            if channel.name.startswith('s-'):
+                channel = ctx.message.channel
+                guild = self.client.get_guild(257751892241809408) #Mind Café
+                userID = int(channel.name[channel.name.rfind('-')+1:])
+                category = 0
+                log = 0
+                message = ctx.message
+
+                #finding log channel
+                for ch in guild.text_channels:
+                    if ch.name.lower() == 'log':
+                        log = guild.get_channel(ch.id)
+                        break
+
+                await channel.edit(sync_permissions = True)
+
+                embed = discord.Embed(
+                    title = 'Channel reset! ✅',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+            else:
+                embed = discord.Embed(
+                    title = 'This doesn\'t seem to be a Support Ticket channel...',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+        else:
+            embed = discord.Embed(
+                title = 'Sorry, you don\'t have permission to do that!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+
+    #support-ticket certified only
+    @commands.command(aliases=['Remove', 'deny', 'Deny'])
+    async def remove(self, ctx, member: discord.Member = None):
+        channel = ctx.message.channel
+        guild = self.client.get_guild(257751892241809408)
+        userID = int(channel.name[channel.name.rfind('-')+1:])
+
+        if ctx.message.author.id == userID or 'Mods' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
+            if channel.name.startswith('s-'):
+                channel = ctx.message.channel
+                guild = self.client.get_guild(257751892241809408) #Mind Café
+                userID = int(channel.name[channel.name.rfind('-')+1:])
+                category = 0
+                log = 0
+                message = ctx.message
+
+                #finding log channel
+                for ch in guild.text_channels:
+                    if ch.name.lower() == 'log':
+                        log = guild.get_channel(ch.id)
+                        break
+
+                newChannel = channel
+
+                if (member != None):
+                    await newChannel.set_permissions(member, send_messages=False)
+
+                    embed = discord.Embed(
+                        title = 'Removed ' + str(member.name) + '! ✅',
+                        color = discord.Color.teal()
+                    )
+                    await ctx.send(embed = embed)
+                else:
+                    embed = discord.Embed(
+                        title = 'Please pass in a member you\'d like to remove.',
+                        color = discord.Color.teal()
+                    )
+                    await ctx.send(embed = embed)
+            else:
+                embed = discord.Embed(
+                    title = 'This doesn\'t seem to be a Support Ticket channel...',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+        else:
+            embed = discord.Embed(
+                title = 'Sorry, you don\'t have permission to do that!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+
+    #support-ticket certified only
+    @commands.command(aliases=['Add', 'invite', 'Invite'])
+    async def add(self, ctx, member: discord.Member = None):
+        channel = ctx.message.channel
+        guild = self.client.get_guild(257751892241809408)
+        userID = int(channel.name[channel.name.rfind('-')+1:])
+
+        if ctx.message.author.id == userID or 'Mods' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
+            if channel.name.startswith('s-'):
+                channel = ctx.message.channel
+                guild = self.client.get_guild(257751892241809408) #Mind Café
+                userID = int(channel.name[channel.name.rfind('-')+1:])
+                category = 0
+                log = 0
+                message = ctx.message
+
+                #finding log channel
+                for ch in guild.text_channels:
+                    if ch.name.lower() == 'log':
+                        log = guild.get_channel(ch.id)
+                        break
+
+                newChannel = channel
+
+                if (member != None):
+                    await newChannel.set_permissions(member, read_messages=True, send_messages=True)
+
+                    embed = discord.Embed(
+                        title = 'Added ' + str(member.name) + '! ✅',
+                        color = discord.Color.teal()
+                    )
+                    await ctx.send(embed = embed)
+                else:
+                    embed = discord.Embed(
+                        title = 'Please pass in a member you\'d like to invite.',
+                        color = discord.Color.teal()
+                    )
+                    await ctx.send(embed = embed)
+            else:
+                embed = discord.Embed(
+                    title = 'This doesn\'t seem to be a Support Ticket channel...',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+        else:
+            embed = discord.Embed(
+                title = 'Sorry, you don\'t have permission to do that!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+
+    #support-ticket lockdown
+    @commands.command(aliases=['Lock', 'lockdown', 'Lockdown', 'lockST', 'lockdownST'])
+    async def lock(self, ctx):
+        channel = ctx.message.channel
+        guild = self.client.get_guild(257751892241809408)
+        userID = int(channel.name[channel.name.rfind('-')+1:])
+
+        if ctx.message.author.id == userID or 'Mods' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
+            if channel.name.startswith('s-'):
+                channel = ctx.message.channel
+                guild = self.client.get_guild(257751892241809408) #Mind Café
+                userID = int(channel.name[channel.name.rfind('-')+1:])
+                category = 0
+                log = 0
+                message = ctx.message
+
+                #finding log channel
+                for ch in guild.text_channels:
+                    if ch.name.lower() == 'log':
+                        log = guild.get_channel(ch.id)
+                        break
+
+                newChannel = channel
+
+                role = guild.get_role(257751892241809408)
+                spiritsRole = guild.get_role(591398086635552788)
+                certifiedRole = guild.get_role(597781064718745660)
+                await newChannel.set_permissions(role, read_messages=False)
+                await newChannel.set_permissions(spiritsRole, read_messages=True, send_messages=False)
+                await newChannel.set_permissions(self.client.get_user(userID), read_messages=True, send_messages=True)
+                await newChannel.set_permissions(certifiedRole, read_messages=True, send_messages=False)
+
+                await log.send('<@' + str(message.author.id) + '> has switched ' + '<#' + str(newChannel.id) + '> to Lockdown.')
+
+                embed = discord.Embed(
+                    title = 'Channel is on Lockdown! ✅',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+            else:
+                embed = discord.Embed(
+                    title = 'This doesn\'t seem to be a Support Ticket channel...',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+        else:
+            embed = discord.Embed(
+                title = 'Sorry, you don\'t have permission to do that!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+
+    #support-ticket certified only
+    @commands.command(aliases=['Certified', 'certifiedST'])
+    async def certified(self, ctx):
+        channel = ctx.message.channel
+        guild = self.client.get_guild(257751892241809408)
+        userID = int(channel.name[channel.name.rfind('-')+1:])
+
+        if ctx.message.author.id == userID or 'Mods' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
+            if channel.name.startswith('s-'):
+                channel = ctx.message.channel
+                guild = self.client.get_guild(257751892241809408) #Mind Café
+                userID = int(channel.name[channel.name.rfind('-')+1:])
+                category = 0
+                log = 0
+                message = ctx.message
+
+                #finding log channel
+                for ch in guild.text_channels:
+                    if ch.name.lower() == 'log':
+                        log = guild.get_channel(ch.id)
+                        break
+
+                newChannel = channel
+
+                role = guild.get_role(257751892241809408)
+                spiritsRole = guild.get_role(591398086635552788)
+                certifiedRole = guild.get_role(597781064718745660)
+                await newChannel.set_permissions(role, read_messages=False)
+                await newChannel.set_permissions(spiritsRole, read_messages=True, send_messages=False)
+                await newChannel.set_permissions(self.client.get_user(userID), read_messages=True, send_messages=True)
+                await newChannel.set_permissions(certifiedRole, read_messages=True, send_messages=True)
+
+                await log.send('<@' + str(message.author.id) + '> has switched ' + '<#' + str(newChannel.id) + '> to Certified.')
+
+                embed = discord.Embed(
+                    title = 'Channel is now Certified-only! ✅',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+            else:
+                embed = discord.Embed(
+                    title = 'This doesn\'t seem to be a Support Ticket channel...',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+        else:
+            embed = discord.Embed(
+                title = 'Sorry, you don\'t have permission to do that!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+
     #support-ticket archive channel
-    @commands.command(aliases=['swapST'])
+    @commands.command(aliases=['swapST', 'swap', 'swapst', 'SwapST', 'switch', 'switchst'])
     async def switchST(self, ctx):
         channel = ctx.message.channel
         guild = self.client.get_guild(257751892241809408)
@@ -62,7 +310,7 @@ class Support(commands.Cog):
             await ctx.send(embed = embed)
 
     #support-ticket archive channel
-    @commands.command(aliases=['archiveSupport', 'archiveS'])
+    @commands.command(aliases=['archiveSupport', 'archiveS', 'archivest', 'archive'])
     async def archiveST(self, ctx):
         channel = ctx.message.channel
         guild = self.client.get_guild(257751892241809408)
@@ -99,7 +347,7 @@ class Support(commands.Cog):
             await ctx.send(embed = embed)
 
     #support-ticket close channel
-    @commands.command(aliases=['closeSupport', 'closeS'])
+    @commands.command(aliases=['closeSupport', 'closeS', 'close', 'closest'])
     async def closeST(self, ctx):
         if 'Halo' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
             channel = ctx.message.channel
@@ -152,15 +400,15 @@ class Support(commands.Cog):
                 await log.send('I can\'t seem to find Support-Tickets.')
                 return
 
+            newChannel = await guild.create_text_channel('s-' + message.author.name + '-' + 'sfw' + '-' + str(message.author.id), category = category)
+
             embed = discord.Embed(
                 title = 'Support Ticket Setup',
-                description = 'Gotcha! ✅',
+                description = 'Gotcha! ✅\n<#' + newChannel.id + '>',
                 color = discord.Color.teal()
             )
 
             await ctx.send(embed = embed)
-
-            newChannel = await guild.create_text_channel('s-' + message.author.name + '-' + 'sfw' + '-' + str(message.author.id), category = category)
 
             if (topic != ''):
                 await newChannel.edit(topic = topic)
@@ -172,7 +420,7 @@ class Support(commands.Cog):
                 await newChannel.send("Topic: " + topic)
 
     #support-ticket create channel
-    @commands.command()
+    @commands.command(aliases = ['supportnsfw'])
     async def supportNSFW(self, ctx, *, topic = ''):
         if (ctx.message.channel.name == 'support'):
             channel = ctx.message.channel
