@@ -5,7 +5,7 @@ from discord.ext import commands
 client = commands.Bot(command_prefix = '=')
 
 MY_ID = 212723958313779201
-BOT_TOKEN = ''
+BOT_TOKEN = 'NDMyMDM4Mzg5NjYzOTI0MjI1.XRrsHA.vvYZtBgWNB3wH1Kp5LXn_hV6MUc'
 
 @client.event
 async def on_ready():

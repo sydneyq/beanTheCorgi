@@ -18,7 +18,7 @@ class Timers(commands.Cog):
         await self.client.wait_until_ready()
 
         guild = self.client.get_guild(257751892241809408)
-        channel = guild.get_channel(594657206251814963)#298245133038649345)
+        channel = guild.get_channel(298245133038649345)
         members = guild.members
 
         #await channel.send('Ready!')
@@ -40,7 +40,11 @@ class Timers(commands.Cog):
 
         while True:
             member = random.choice(members)
-            await channel.send('__Hello, **<@' + str(member.id) + '>!**__\nYou\'re today\'s chosen one! Just a little reminder that you\'re amazing.')
+
+            while (member.bot):
+                member = random.choice(members)
+
+            await channel.send('__**Hello, <@' + str(member.id) + '>!**__\nYou\'re today\'s chosen one! Just a little reminder that you\'re amazing.')
 
             embed = discord.Embed(
                 title = random.choice(msgs),
@@ -50,7 +54,7 @@ class Timers(commands.Cog):
             await channel.send(embed = embed)
 
             members = guild.members
-            await asyncio.sleep(60) #86400
+            await asyncio.sleep(86400)
 
 
 def setup(client):
