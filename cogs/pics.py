@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 
 import json
+import random
 from random import randint
 
 import aiohttp
@@ -15,6 +16,19 @@ class Pics(commands.Cog):
 
     def __init__(self, client):
         self.client = client
+
+    @commands.command(alises=['breath', 'anxiety'])
+    async def breathe(self, ctx):
+        responses = ['https://3.bp.blogspot.com/-CPo9Wmvy3nk/WOor5x_RuvI/AAAAAAABIPU/TwjI_F_ltc8alkqgGOMC3gLv76n2mc5-ACLcB/s640/1ninetymileshD6nE1u3bq3no1_500.gif',
+        'https://media0.giphy.com/media/zzwt3TRTaULv2/source.gif',
+        'https://media.giphy.com/media/krP2NRkLqnKEg/giphy.gif']
+        embed = discord.Embed(
+            title = 'Take a minute to breathe.',
+            color = discord.Color.teal()
+        )
+        embed.set_image(url = random.choice(responses))
+
+        await ctx.send(embed = embed)
 
     @commands.command(pass_context=True)
     async def dog(self, ctx):

@@ -178,10 +178,12 @@ class Support(commands.Cog):
                 role = guild.get_role(257751892241809408)
                 spiritsRole = guild.get_role(591398086635552788)
                 certifiedRole = guild.get_role(597781064718745660)
+                modRole = guild.get_role(592070664169455616)
                 await newChannel.set_permissions(role, read_messages=False)
                 await newChannel.set_permissions(spiritsRole, read_messages=True, send_messages=False)
                 await newChannel.set_permissions(self.client.get_user(userID), read_messages=True, send_messages=True)
                 await newChannel.set_permissions(certifiedRole, read_messages=True, send_messages=False)
+                await newChannel.set_permissions(modRole, read_messages=True, send_messages=True)
 
                 await log.send('<@' + str(message.author.id) + '> has switched ' + '<#' + str(newChannel.id) + '> to Lockdown.')
 
@@ -230,10 +232,12 @@ class Support(commands.Cog):
                 role = guild.get_role(257751892241809408)
                 spiritsRole = guild.get_role(591398086635552788)
                 certifiedRole = guild.get_role(597781064718745660)
+                modRole = guild.get_role(592070664169455616)
                 await newChannel.set_permissions(role, read_messages=False)
                 await newChannel.set_permissions(spiritsRole, read_messages=True, send_messages=False)
                 await newChannel.set_permissions(self.client.get_user(userID), read_messages=True, send_messages=True)
                 await newChannel.set_permissions(certifiedRole, read_messages=True, send_messages=True)
+                await newChannel.set_permissions(modRole, read_messages=True, send_messages=True)
 
                 await log.send('<@' + str(message.author.id) + '> has switched ' + '<#' + str(newChannel.id) + '> to Certified.')
 
@@ -377,6 +381,14 @@ class Support(commands.Cog):
     #support-ticket create channel
     @commands.command()
     async def support(self, ctx, *, topic = ''):
+        if (594008586779361311 in [role.id for role in ctx.message.author.roles]):
+            embed = discord.Embed(
+                title = 'Sorry, those with the Blindfolded role are not able to create support channels.',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
+
         if (ctx.message.channel.name == 'support'):
             channel = ctx.message.channel
             guild = self.client.get_guild(257751892241809408) #Mind Café
@@ -404,7 +416,7 @@ class Support(commands.Cog):
 
             embed = discord.Embed(
                 title = 'Support Ticket Setup',
-                description = 'Gotcha! ✅\n<#' + newChannel.id + '>',
+                description = 'Gotcha! ✅\n<#' + str(newChannel.id) + '>',
                 color = discord.Color.teal()
             )
 
@@ -422,6 +434,14 @@ class Support(commands.Cog):
     #support-ticket create channel
     @commands.command(aliases = ['supportnsfw'])
     async def supportNSFW(self, ctx, *, topic = ''):
+        if (594008586779361311 in [role.id for role in ctx.message.author.roles]):
+            embed = discord.Embed(
+                title = 'Sorry, those with the Blindfolded role are not able to create support channels.',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
+
         if (ctx.message.channel.name == 'support'):
             channel = ctx.message.channel
             guild = self.client.get_guild(257751892241809408) #Mind Café
@@ -445,15 +465,15 @@ class Support(commands.Cog):
                 await log.send('I can\'t seem to find Support-Tickets.')
                 return
 
+            newChannel = await guild.create_text_channel('s-' + message.author.name + '-' + 'nsfw' + '-' + str(message.author.id), category = category)
+
             embed = discord.Embed(
                 title = 'NSFW Support Ticket Setup',
-                description = 'Gotcha! ✅',
+                description = 'Gotcha! ✅\n<#' + str(newChannel.id) + '>',
                 color = discord.Color.teal()
             )
 
             await ctx.send(embed = embed)
-
-            newChannel = await guild.create_text_channel('s-' + message.author.name + '-' + 'nsfw' + '-' + str(message.author.id), category = category)
 
             if (topic != ''):
                 await newChannel.edit(topic = topic)
@@ -476,6 +496,15 @@ class Support(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         if (message.channel.name == 'support' and (message.content.lower() == 'ow' or ' oww' in message.content.lower())):
+
+            if (594008586779361311 in [role.id for role in message.author.roles]):
+                embed = discord.Embed(
+                    title = 'Sorry, those with the Blindfolded role are not able to create support channels.',
+                    color = discord.Color.teal()
+                )
+                await message.channel.send(embed = embed)
+                return
+
             channel = message.channel
             guild = self.client.get_guild(257751892241809408) #Mind Café
             category = 0
@@ -497,15 +526,15 @@ class Support(commands.Cog):
                 await log.send('I can\'t seem to find Support-Tickets.')
                 return
 
+            newChannel = await guild.create_text_channel('s-' + message.author.name + '-' + 'sfw' + '-' + str(message.author.id), category = category)
+
             embed = discord.Embed(
                 title = 'Support Ticket Setup',
-                description = 'Gotcha! ✅',
+                description = 'Gotcha! ✅\n<#' + str(newChannel.id) + '>',
                 color = discord.Color.teal()
             )
 
             await message.channel.send(embed = embed)
-
-            newChannel = await guild.create_text_channel('s-' + message.author.name + '-' + 'sfw' + '-' + str(message.author.id), category = category)
 
             await newChannel.send('__Hi there, **<@' + str(message.author.id) + '>**.__ I was alerted to the need for medical attention when you said, \"ow.\" \n<@&300743585584906240>')
 

@@ -6,6 +6,15 @@ class Triggers(commands.Cog):
     def __init__(self, client):
         self.client = client
 
+    @commands.command()
+    async def hotlines(self, ctx):
+        embed = discord.Embed(
+            title = 'Hotlines and Resources',
+            description = '[Click here for hotlines in the USA.](https://www.dosomething.org/us/about/hotline-list)\n[Click here for a list of emergency telephone numbers for all areas.](https://en.wikipedia.org/wiki/List_of_emergency_telephone_numbers)',
+            color = discord.Color.teal()
+        )
+        await ctx.send(embed = embed)
+
     @commands.Cog.listener()
     async def on_message(self, message):
         return
@@ -14,7 +23,57 @@ class Triggers(commands.Cog):
     async def on_member_update(self, before, after):
         guild = self.client.get_guild(257751892241809408)
         casual = guild.get_channel(257751892241809408)
-        
+        heaven = guild.get_channel(594657206251814963)
+
+        events = guild.get_channel(594641130545741834)
+        mods = guild.get_channel(592030367796690975)
+        marketing = guild.get_channel(594641226330800153)
+
+        #angel
+        if (257755582662967305 in [role.id for role in after.roles]) and (257755582662967305 not in [role.id for role in before.roles]):
+            embed = discord.Embed(
+                title = after.name + ' has been given the Angel role!',
+                description = '<@' + str(after.id) + '>, when you\'re able, please take a moment to check the pins of this channel and your respective team\'s channels.',
+                color = discord.Color.gold()
+            )
+
+            embed.set_author(name = 'Mind Café', icon_url = 'https://cdn.discordapp.com/emojis/593214693573787654.png')
+            embed.set_footer(text = 'Congratulations! 🎉')
+            await heaven.send(embed = embed)
+        #mod
+        if (592070664169455616 in [role.id for role in after.roles]) and (592070664169455616 not in [role.id for role in before.roles]):
+            embed = discord.Embed(
+                title = after.name + ' has been given the Mod role!',
+                description = '<@' + str(after.id) + '>, when you\'re able, please take a moment to check the pins of this channel. Ask your teammates if you have any questions.',
+                color = discord.Color.blue()
+            )
+
+            embed.set_author(name = 'Mind Café', icon_url = 'https://cdn.discordapp.com/emojis/593214693573787654.png')
+            embed.set_footer(text = 'Congratulations! 🎉')
+            await mods.send(embed = embed)
+        #event-coord
+        if (594642605862682672 in [role.id for role in after.roles]) and (594642605862682672 not in [role.id for role in before.roles]):
+            embed = discord.Embed(
+                title = after.name + ' has been given the Events Coordinator role!',
+                description = '<@' + str(after.id) + '>, when you\'re able, please take a moment to check the pins of this channel. Ask your teammates if you have any questions.',
+                color = discord.Color.red()
+            )
+
+            embed.set_author(name = 'Mind Café', icon_url = 'https://cdn.discordapp.com/emojis/593214693573787654.png')
+            embed.set_footer(text = 'Congratulations! 🎉')
+            await events.send(embed = embed)
+        #marketing
+        if (594642783160107186 in [role.id for role in after.roles]) and (594642783160107186 not in [role.id for role in before.roles]):
+            embed = discord.Embed(
+                title = after.name + ' has been given the Marketing Officer role!',
+                description = '<@' + str(after.id) + '>, when you\'re able, please take a moment to check the pins of this channel. Ask your teammates if you have any questions.',
+                color = discord.Color.green()
+            )
+
+            embed.set_author(name = 'Mind Café', icon_url = 'https://cdn.discordapp.com/emojis/593214693573787654.png')
+            embed.set_footer(text = 'Congratulations! 🎉')
+            await marketing.send(embed = embed)
+
         #certified-listener
         if (597781064718745660 in [role.id for role in after.roles]) and (597781064718745660 not in [role.id for role in before.roles]):
             embed = discord.Embed(
