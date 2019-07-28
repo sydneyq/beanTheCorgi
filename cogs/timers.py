@@ -11,7 +11,7 @@ class Timers(commands.Cog):
 
     def __init__(self, client):
         self.client = client
-        self.client.loop.create_task(self.dailyHello())
+        #self.client.loop.create_task(self.dailyHello())
 
     @commands.Cog.listener()
     async def dailyHello(self):

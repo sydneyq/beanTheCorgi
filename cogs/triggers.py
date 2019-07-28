@@ -29,7 +29,7 @@ class Triggers(commands.Cog):
         mods = guild.get_channel(592030367796690975)
         marketing = guild.get_channel(594641226330800153)
 
-        #angel
+        #angel added
         if (257755582662967305 in [role.id for role in after.roles]) and (257755582662967305 not in [role.id for role in before.roles]):
             embed = discord.Embed(
                 title = after.name + ' has been given the Angel role!',
@@ -39,6 +39,14 @@ class Triggers(commands.Cog):
 
             embed.set_author(name = 'Mind Café', icon_url = 'https://cdn.discordapp.com/emojis/593214693573787654.png')
             embed.set_footer(text = 'Congratulations! 🎉')
+            await heaven.send(embed = embed)
+        #angel removed
+        if (257755582662967305 in [role.id for role in before.roles]) and (257755582662967305 not in [role.id for role in after.roles]):
+            embed = discord.Embed(
+                title = after.name + ' has been removed from the Angel role.',
+                color = discord.Color.gold()
+            )
+
             await heaven.send(embed = embed)
         #mod
         if (592070664169455616 in [role.id for role in after.roles]) and (592070664169455616 not in [role.id for role in before.roles]):
