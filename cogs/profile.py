@@ -11,6 +11,7 @@ class Profile(commands.Cog):
         self.dbConnection = database
         self.meta = meta
 
+    '''
     async def get_profile(member: discord.Member = None):
         if member is None:
             return
@@ -23,9 +24,105 @@ class Profile(commands.Cog):
             profile = self.dbConnection.findProfile({"id": id})
 
         return profile
+    '''
+
+    @commands.command(aliases=[])
+    async def giveSquad(self, ctx, squad, amt):
+        if not self.meta.isAdmin(member):
+            return
+
+        squadDocs = self.dbConnection.findProfiles({'squad' : squad})
+
+        for doc in squadDocs:
+            self.dbConnection.updateProfile({'id': doc['id']}, {"$set": {"coins": (doc['coins']+amt)}})
+
+        embed = discord.Embed(
+            title = 'Consider it done! ✅',
+            color = discord.Color.teal()
+        )
+        await ctx.send(embed = embed)
+
+    @commands.command(aliases=['squads', 'squadcount', 's', 'leaderboard'])
+    async def squadCount(self, ctx):
+        embed = discord.Embed(
+            title = 'Squad Count',
+            color = discord.Color.teal()
+        )
+
+        #tea
+        #total members
+        tea = self.dbConnection.findProfiles({'squad' : 'Tea'})
+        teaMembers = tea.count()
+
+        #total helped
+        teaHelped = 0
+
+        #top squad member
+        teaTop = ''
+        teaTopHelped = 0
+
+        for doc in tea:
+            teaHelped += doc['helped']
+            if doc['helped'] > teaTopHelped:
+                teaTop = '<@' + str(doc['id']) + '> (' + str(doc['helped']) + ')'
+                teaTopHelped = doc['helped']
+            elif doc['helped'] == teaTopHelped:
+                teaTop += '\n<@' + str(doc['id']) + '> (' + str(doc['helped']) + ')'
+
+        teaStr = '`' + str(teaMembers) + '` Members\n`' + str(teaHelped) + '` Helped\nMost Helpful Member(s):\n' + teaTop
+
+        #coffee
+        #tea
+        #total members
+        coffee = self.dbConnection.findProfiles({'squad' : 'Coffee'})
+        coffeeMembers = coffee.count()
+
+        #total helped
+        coffeeHelped = 0
+
+        #top squad member
+        coffeeTop = ''
+        coffeeTopHelped = 0
+
+        for doc in coffee:
+            coffeeHelped += doc['helped']
+            if doc['helped'] > coffeeTopHelped:
+                coffeeTop = '<@' + str(doc['id']) + '> (' + str(doc['helped']) + ')'
+                coffeeTopHelped = doc['helped']
+            elif doc['helped'] == coffeeTopHelped:
+                coffeeTop += '\n<@' + str(doc['id']) + '> (' + str(doc['helped']) + ')'
+
+        coffeeStr = '`' + str(coffeeMembers) + '` Members\n`' + str(coffeeHelped) + '` Helped\nMost Helpful Member(s):\n' + coffeeTop
+
+        #emojis
+        teaName = 'Tea Squad '
+        coffeeName = 'Coffee Squad '
+
+        if teaMembers > coffeeMembers:
+            teaName = teaName + '🙌🏻'
+        elif teaHelped < coffeeHelped:
+            coffeeName = coffeeName + '🙌🏻'
+        if teaHelped > coffeeHelped:
+            teaName = teaName + '🏅'
+        elif teaHelped < coffeeHelped:
+            coffeeName = coffeeName + '🏅'
+
+
+        embed.add_field(name=teaName,value=teaStr)
+        embed.add_field(name=coffeeName,value=coffeeStr, inline=False)
+
+        await ctx.send(embed = embed)
+        return
 
     @commands.command()
     async def squad(self, ctx, *, squad):
+        if squad is None:
+            embed = discord.Embed(
+                description = 'Correct Usage: `+squad coffee/tea`',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
         squad = squad.lower()
         # see whats in the message -> adjust the specific persons profile based  on it
         # .update "updates" the profile $ must be used to keep old items

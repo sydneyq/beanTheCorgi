@@ -21,6 +21,9 @@ class Database:
     def findProfile(self, findCriteria):
         return self.db.profile.find_one(findCriteria)
 
+    def findProfiles(self, findCriteria):
+        return self.db.profile.find(findCriteria)
+
     def updateProfile(self, updateCritera, change):
         self.db.profile.update(updateCritera, change)
 
@@ -28,3 +31,6 @@ class Database:
         profile = self.dbConnection.findProfile({"id": id})
         if profile is not None:
             self.db.profile.remove(toRemove)
+
+    def count(self, findCriteria):
+        return self.db.profile.count(findCriteria)

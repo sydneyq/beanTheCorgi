@@ -14,6 +14,15 @@ class Currency(commands.Cog):
     async def store(self, ctx):
         id = ctx.author.id
         user = self.dbConnection.findProfile({"id": id})
+
+        if user is None:
+            embed = discord.Embed(
+                title = 'Sorry, you don\'t have a profile yet! You can make one by using +profile.',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
+
         helped = user['helped']
         coins = user['coins']
 
@@ -70,6 +79,15 @@ class Currency(commands.Cog):
     async def buy(self, ctx, *, companion):
         id = ctx.author.id
         user = self.dbConnection.findProfile({"id": id})
+
+        if user is None:
+            embed = discord.Embed(
+                title = 'Sorry, you don\'t have a profile yet! You can make one by using +profile.',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
+
         coins = user['coins']
         switcher = {
             'Bulbasaur':50,
@@ -117,6 +135,15 @@ class Currency(commands.Cog):
     async def resetCompanion(self, ctx):
         id = ctx.author.id
         user = self.dbConnection.findProfile({"id": id})
+
+        if user is None:
+            embed = discord.Embed(
+                title = 'Sorry, you don\'t have a profile yet! You can make one by using +profile.',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
+
         self.dbConnection.updateProfile({"id": id}, {"$set": {"companion": ''}})
         embed = discord.Embed(
             title = 'You released your companion!',
@@ -128,6 +155,15 @@ class Currency(commands.Cog):
     async def set(self, ctx, *, companion):
         id = ctx.author.id
         user = self.dbConnection.findProfile({"id": id})
+
+        if user is None:
+            embed = discord.Embed(
+                title = 'Sorry, you don\'t have a profile yet! You can make one by using +profile.',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
+
         helped = user['helped']
 
         switcher = {
@@ -172,7 +208,7 @@ class Currency(commands.Cog):
             return
 
     @commands.command()
-    async def give(self, ctx, member: discord.Member, amt):
+    async def give(self, ctx, member: discord.Member, amt, *, reason = ''):
         if not self.meta.isAdmin(ctx.author):
             return
 
@@ -188,8 +224,21 @@ class Currency(commands.Cog):
         )
         await ctx.send(embed = embed)
 
+        #finding log channel
+        guild = ctx.guild
+        for ch in guild.text_channels:
+            if ch.name.lower() == 'log':
+                log = guild.get_channel(ch.id)
+                break
+
+        msg = '**<@' + str(member.id) + '>** was given ' + str(amt) + ' coins by <@' + str(ctx.author.id) + '>.'
+        if (reason != ''):
+            msg += '\n```' + reason + '```'
+
+        await log.send(msg)
+
     @commands.command()
-    async def take(self, ctx, member: discord.Member, amt):
+    async def take(self, ctx, member: discord.Member, amt, *, reason = ''):
         if not self.meta.isAdmin(ctx.author):
             return
 
@@ -204,6 +253,19 @@ class Currency(commands.Cog):
             color = discord.Color.teal()
         )
         await ctx.send(embed = embed)
+
+        #finding log channel
+        guild = ctx.guild
+        for ch in guild.text_channels:
+            if ch.name.lower() == 'log':
+                log = guild.get_channel(ch.id)
+                break
+
+        msg = '**<@' + str(member.id) + '>** lost ' + str(amt) + ' coins by <@' + str(ctx.author.id) + '>.'
+        if (reason != ''):
+            msg += '\n```' + reason + '```'
+
+        await log.send(msg)
 
     @commands.command(aliases=['rep', 'helpedby', 'thanks'])
     async def helpedBy(self, ctx, member: discord.Member = None):
@@ -224,6 +286,15 @@ class Currency(commands.Cog):
         else:
             id = member.id
             user = self.dbConnection.findProfile({"id": id})
+
+            if user is None:
+                embed = discord.Embed(
+                    title = 'Sorry, they don\'t have a profile yet! They can make one by using +profile.',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+                return
+
             helped = user['helped']
             helped = helped + 1
             self.dbConnection.updateProfile({"id": id}, {"$set": {"helped": helped}})
@@ -233,6 +304,17 @@ class Currency(commands.Cog):
                 color = discord.Color.teal()
             )
             await ctx.send(embed = embed)
+
+        #finding log channel
+        guild = ctx.guild
+        for ch in guild.text_channels:
+            if ch.name.lower() == 'log':
+                log = guild.get_channel(ch.id)
+                break
+
+        msg = '**<@' + str(member.id) + '>** was repped by <@' + str(ctx.author.id) + '>.'
+
+        await log.send(msg)
 
 
     @commands.command(aliases=['derep'])
@@ -250,6 +332,15 @@ class Currency(commands.Cog):
         else:
             id = member.id
             user = self.dbConnection.findProfile({"id": id})
+
+            if user is None:
+                embed = discord.Embed(
+                    title = 'Sorry, they don\'t have a profile yet! They can make one by using +profile.',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+                return
+
             helped = user['helped']
             helped = helped - 1
             self.dbConnection.updateProfile({"id": id}, {"$set": {"helped": helped}})
@@ -259,6 +350,17 @@ class Currency(commands.Cog):
                 color = discord.Color.teal()
             )
             await ctx.send(embed = embed)
+
+        #finding log channel
+        guild = ctx.guild
+        for ch in guild.text_channels:
+            if ch.name.lower() == 'log':
+                log = guild.get_channel(ch.id)
+                break
+
+        msg = '**<@' + str(member.id) + '>** was derepped by <@' + str(ctx.author.id) + '>.'
+
+        await log.send(msg)
 
 def setup(client):
     database_connection = Database()
