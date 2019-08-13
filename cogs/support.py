@@ -335,6 +335,21 @@ class Support(commands.Cog):
                     if c.name.lower() == 'archive':
                         category = c #Archive
 
+                if channel.name.startswith('s-'):
+                    user = discord.utils.get(self.client.get_all_members(), id=userID)
+
+                    embed = discord.Embed(
+                        title = 'Thanks for talking with us!',
+                        description = 'If you felt a Listener was supportive, you can use the command `+helpedby @user` in #botspam to show them how much you appreciated their help!',
+                        color = discord.Color.teal()
+                    )
+                    embed.set_thumbnail(url = 'https://cdn.discordapp.com/emojis/602887275289772052.png?v=1')
+
+                    try:
+                        await user.send(embed = embed)
+                    except:
+                        print('Could not send private message.')
+
                 await ctx.message.channel.edit(name = 'archived-'+ self.client.get_user(userID).name)
                 #ctx.message.channel.category = 596988830435770368
                 await ctx.message.channel.edit(category = category, sync_permissions = True)

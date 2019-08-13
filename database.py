@@ -28,7 +28,7 @@ class Database:
         self.db.profile.update(updateCritera, change)
 
     def removeProfile(self, toRemove):
-        profile = self.dbConnection.findProfile({"id": id})
+        profile = findProfile({"id": id})
         if profile is not None:
             self.db.profile.remove(toRemove)
 
