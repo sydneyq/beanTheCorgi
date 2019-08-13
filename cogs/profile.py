@@ -42,7 +42,7 @@ class Profile(commands.Cog):
         )
         await ctx.send(embed = embed)
 
-    @commands.command(aliases=['squads', 'squadcount', 's', 'leaderboard'])
+    @commands.command(aliases=['squads', 'squadcount', 's', 'sq', 'leaderboard'])
     async def squadCount(self, ctx):
         embed = discord.Embed(
             title = 'Squad Count',
