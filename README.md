@@ -8,8 +8,12 @@ This bot was made specifically for the Mind Café server, which aims to be a men
 
 Because this bot was made for a specific server and functionality in mind, you may have to swap some IDs around for personal testing.
 
-Create your own file named `secret.py`; this should hold the `BOT_TOKEN` and your own `BOT_OWNER_ID`.
+Create your own file named `secret.py`; this should hold the hardcoded keys and IDs.
 
 ## Contributing
 
 Pull requests are welcome for those who understand the already-existing code. Please be sure to thoroughly explain your changes.
+
+## Special Thanks
+
+- [Kironb](https://kironb.github.io/) - Initial database and profile code

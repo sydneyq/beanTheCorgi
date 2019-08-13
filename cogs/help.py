@@ -1,13 +1,14 @@
 import discord
 from discord.ext import commands
 
-class Info(commands.Cog):
+class Help(commands.Cog):
 
     def __init__(self, client):
         self.client = client
-
+        client.remove_command('help')
+        
     @commands.command()
-    async def info(self, ctx):
+    async def help(self, ctx):
         embed = discord.Embed(
             title = 'Bot Info',
             description = 'Created by sydney#9966 in June of 2019 for Mind Café.',
@@ -20,4 +21,4 @@ class Info(commands.Cog):
         await ctx.send(embed = embed)
 
 def setup(client):
-    client.add_cog(Info(client))
+    client.add_cog(Help(client))

@@ -1,9 +1,16 @@
 import discord
 import os
 from discord.ext import commands
+
+import sys
+import signal
+import asyncio
+import pymongo
+
+import database
 import secret
 
-client = commands.Bot(command_prefix = '+')
+client = commands.Bot(command_prefix = '=')
 
 @client.event
 async def on_ready():
