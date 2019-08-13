@@ -28,29 +28,39 @@ class Currency(commands.Cog):
                         `+buy companionName` for Coin Companions, `+set companionName` for Helped Companions."""
         embed.add_field(name='Store Help', value=storeHelp, inline=False)
 
-        helpedCompanions = """1 Helped : \tMouse
-                                10 Helped : \tCat
-                                10 Helped : \tGoat
-                                20 Helped : \tParakeet
-                                20 Helped : \tSnake
-                                40 Helped : \tMiniature Donkey
-                                40 Helped : \tWallaby
-                                70 Helped : \tFox
-                                70 Helped : \tHedgehog
-                                100 Helped : \tBean the Corgi
+        helpedCompanions = """`1 Helped` \tMouse
+                                `10 Helped` \tCat
+                                `10 Helped` \tGoat
+                                `10 Helped` \tRock
+                                `20 Helped` \tParakeet
+                                `20 Helped` \tSnake
+                                `20 Helped` \tWallaby
+                                `40 Helped` \tDonkey
+                                `40 Helped` \tPig
+                                `40 Helped` \tPuffin
+                                `70 Helped` \tFox
+                                `70 Helped` \tHedgehog
+                                `70 Helped` \tOtter
+                                `100 Helped` \tCorgi
                             """
-        embed.add_field(name='Helped Companions', value=helpedCompanions)
+        embed.add_field(name='Helped Companions', value=helpedCompanions, inline=True)
 
-        coinCompanions = """100 coins : \tBaymax
-                            100 coins : \tPet Rock
-                            100 coins : \tPig
-                            300 coins : \tNiffler
-                            300 coins : \tHusky Puppy
-                            300 coins : \tPuffin
-                            500 coins : \tToothless
-                            500 coins : \tShiba Inu
+        coinCompanions = """`50 coins` \tBulbasaur
+                            `50 coins` \tCharmander
+                            `50 coins` \tSquirtle
+                            `100 coins` \tBaymax
+                            `100 coins` \tPig
+                            `100 coins` \tOshawott
+                            `100 coins` \tPsyduck
+                            `300 coins` \tNiffler
+                            `300 coins` \tHusky
+                            `500 coins` \tToothless
+                            `500 coins` \tPikachu
+                            `700 coins` \tShiba Inu
+                            `700 coins` \tMudkip
+                            `700 coins` \tYamper
                             """
-        embed.add_field(name='Coin Companions', value=coinCompanions)
+        embed.add_field(name='Coin Companions', value=coinCompanions, inline=True)
 
         embed.set_footer(text = """You can only have one companion, and will have to rebuy any Coin Companions you change from.""")
         await ctx.send(embed = embed)
@@ -62,14 +72,20 @@ class Currency(commands.Cog):
         user = self.dbConnection.findProfile({"id": id})
         coins = user['coins']
         switcher = {
+            'Bulbasaur':50,
+            'Charmander':50,
+            'Squirtle':50,
             'Baymax':100,
-            'Pet Rock':100,
             'Pig':100,
+            'Oshawott':100,
+            'Psyduck':100,
             'Niffler':300,
-            'Husky Puppy':300,
-            'Puffin':300,
+            'Husky':300,
             'Toothless':500,
-            'Shiba Inu':500,
+            'Pikachu':500,
+            'Shiba Inu':700,
+            'Mudkip':700,
+            'Yamper':700
         }
 
         cost = switcher.get(companion, 'none')
@@ -118,12 +134,16 @@ class Currency(commands.Cog):
             'Mouse': 1,
             'Cat': 10,
             'Goat': 10,
+            'Rock': 10,
             'Parakeet': 20,
             'Snake': 20,
-            'Miniature Donkey': 40,
-            'Wallaby':40,
+            'Wallaby':20,
+            'Donkey': 40,
+            'Pig': 40,
+            'Puffin': 40,
             'Hedgehog': 70,
             'Fox':70,
+            'Otter':70,
             'Bean the Corgi':100
         }
 
