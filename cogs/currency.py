@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 from database import Database
 from .meta import Meta
+import random
 
 class Currency(commands.Cog):
 
@@ -38,37 +39,38 @@ class Currency(commands.Cog):
         embed.add_field(name='Store Help', value=storeHelp, inline=False)
 
         helpedCompanions = """`1 Helped` \tMouse
-                                `10 Helped` \tCat
-                                `10 Helped` \tGoat
-                                `10 Helped` \tRock
-                                `20 Helped` \tParakeet
-                                `20 Helped` \tSnake
-                                `20 Helped` \tWallaby
-                                `40 Helped` \tDonkey
-                                `40 Helped` \tPig
-                                `40 Helped` \tPuffin
-                                `70 Helped` \tFox
-                                `70 Helped` \tHedgehog
-                                `70 Helped` \tOtter
-                                `100 Helped` \tCorgi
-                            """
+        `5 Helped` \tRock
+        `5 Helped` \tCat
+        `10 Helped` \tGoat
+        `10 Helped` \tParakeet
+        `20 Helped` \tSnake
+        `20 Helped` \tWallaby
+        `30 Helped` \tDonkey
+        `30 Helped` \tPig
+        `30 Helped` \tPuffin
+        `40 Helped` \tFox
+        `40 Helped` \tHedgehog
+        `40 Helped` \tOtter
+        `50 Helped` \tShiba Inu
+        `50 Helped` \tCorgi
+        """
         embed.add_field(name='Helped Companions', value=helpedCompanions, inline=True)
 
         coinCompanions = """`50 coins` \tBulbasaur
-                            `50 coins` \tCharmander
-                            `50 coins` \tSquirtle
-                            `100 coins` \tBaymax
-                            `100 coins` \tPig
-                            `100 coins` \tOshawott
-                            `100 coins` \tPsyduck
-                            `300 coins` \tNiffler
-                            `300 coins` \tHusky
-                            `500 coins` \tToothless
-                            `500 coins` \tPikachu
-                            `700 coins` \tShiba Inu
-                            `700 coins` \tMudkip
-                            `700 coins` \tYamper
-                            """
+        `50 coins` \tCharmander
+        `50 coins` \tSquirtle
+        `100 coins` \tBaymax
+        `100 coins` \tOshawott
+        `100 coins` \tPsyduck
+        `300 coins` \tNiffler
+        `300 coins` \tHusky
+        `300 coins` \tShaymin
+        `500 coins` \tToothless
+        `500 coins` \tPikachu
+        `500 coins` \tMudkip
+        `700 coins` \tYamper
+        `700 coins` \tEevee
+        """
         embed.add_field(name='Coin Companions', value=coinCompanions, inline=True)
 
         embed.set_footer(text = """You can only have one companion, and will have to rebuy any Coin Companions you change from.""")
@@ -94,16 +96,16 @@ class Currency(commands.Cog):
             'Charmander':50,
             'Squirtle':50,
             'Baymax':100,
-            'Pig':100,
             'Oshawott':100,
             'Psyduck':100,
             'Niffler':300,
             'Husky':300,
+            'Shaymin':300,
             'Toothless':500,
             'Pikachu':500,
-            'Shiba Inu':700,
-            'Mudkip':700,
-            'Yamper':700
+            'Mudkip':500,
+            'Yamper':700,
+            'Eevee':700
         }
 
         cost = switcher.get(companion, 'none')
@@ -130,6 +132,47 @@ class Currency(commands.Cog):
             )
             await ctx.send(embed = embed)
             return
+
+    @commands.command(aliases=['evolveCompanion'])
+    async def evolve(self, ctx):
+        id = ctx.author.id
+        user = self.dbConnection.findProfile({"id": id})
+
+        if user is None:
+            embed = discord.Embed(
+                title = 'Sorry, you don\'t have a profile yet! You can make one by using +profile.',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
+
+        if user['companion'] != 'Eevee':
+            print('Companion: ' + user['companion'])
+            embed = discord.Embed(
+                title = 'You need an Eevee to evolve!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
+        else:
+            choices = ['Flareon',
+                'Jolteon',
+                'Glaceon',
+                'Umbreon',
+                'Leafeon',
+                'Espeon',
+                'Vaporeon',
+                'Sylveon']
+
+            result = random.choice(choices)
+
+            self.dbConnection.updateProfile({"id": id}, {"$set": {"companion": result}})
+
+            embed = discord.Embed(
+                title = 'Consider it done! ✅\nYour companion is now a ' + result + '!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
 
     @commands.command(aliases=['removeCompanion', 'release'])
     async def resetCompanion(self, ctx):
@@ -168,19 +211,20 @@ class Currency(commands.Cog):
 
         switcher = {
             'Mouse': 1,
-            'Cat': 10,
+            'Cat': 5,
+            'Rock': 5,
             'Goat': 10,
-            'Rock': 10,
-            'Parakeet': 20,
+            'Parakeet': 10,
             'Snake': 20,
             'Wallaby':20,
-            'Donkey': 40,
-            'Pig': 40,
-            'Puffin': 40,
-            'Hedgehog': 70,
-            'Fox':70,
-            'Otter':70,
-            'Bean the Corgi':100
+            'Donkey': 30,
+            'Pig': 30,
+            'Puffin': 30,
+            'Hedgehog': 40,
+            'Fox':40,
+            'Otter':40,
+            'Shiba Inu':50,
+            'Corgi':50
         }
 
         cost = switcher.get(companion, 'none')
