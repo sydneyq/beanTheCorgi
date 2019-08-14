@@ -282,7 +282,7 @@ class Support(commands.Cog):
                         break
 
                 newChannel = channel
-                await channel.edit(name = ('s-' + self.client.get_user(userID).name + '-' + 'nsfw' + '-' + str(userID)))
+                #await channel.edit(name = ('s-' + self.client.get_user(userID).name + '-' + 'nsfw' + '-' + str(userID)))
 
                 await newChannel.edit(nsfw = True)
                 role = guild.get_role(257751892241809408)

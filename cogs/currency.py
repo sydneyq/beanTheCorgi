@@ -11,7 +11,7 @@ class Currency(commands.Cog):
         self.dbConnection = database
         self.meta = meta
 
-    @commands.command(aliases=['shop', 'companions', 'pets'])
+    @commands.command(aliases=['shop', 'companions', 'pets', '$'])
     async def store(self, ctx):
         id = ctx.author.id
         user = self.dbConnection.findProfile({"id": id})

@@ -103,9 +103,9 @@ class Profile(commands.Cog):
         elif teaHelped < coffeeHelped:
             coffeeName = coffeeName + '🙌🏻'
         if teaHelped > coffeeHelped:
-            teaName = teaName + '🏅'
+            teaName = teaName + '🏆'
         elif teaHelped < coffeeHelped:
-            coffeeName = coffeeName + '🏅'
+            coffeeName = coffeeName + '🏆'
 
 
         embed.add_field(name=teaName,value=teaStr)
