@@ -39,10 +39,11 @@ class Currency(commands.Cog):
         embed.add_field(name='Store Help', value=storeHelp, inline=False)
 
         helpedCompanions = """`1 Helped` \tMouse
-        `5 Helped` \tRock
+        `1 Helped` \tRock
         `5 Helped` \tCat
         `10 Helped` \tGoat
         `10 Helped` \tParakeet
+        `10 Helped` \tRaccoon
         `20 Helped` \tSnake
         `20 Helped` \tWallaby
         `30 Helped` \tDonkey
@@ -212,9 +213,10 @@ class Currency(commands.Cog):
         switcher = {
             'Mouse': 1,
             'Cat': 5,
-            'Rock': 5,
+            'Rock': 1,
             'Goat': 10,
             'Parakeet': 10,
+            'Raccoon': 10,
             'Snake': 20,
             'Wallaby':20,
             'Donkey': 30,

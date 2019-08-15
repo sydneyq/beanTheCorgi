@@ -100,8 +100,9 @@ class Profile(commands.Cog):
 
         if teaMembers > coffeeMembers:
             teaName = teaName + '🙌🏻'
-        elif teaHelped < coffeeHelped:
+        elif teaMembers < coffeeMembers:
             coffeeName = coffeeName + '🙌🏻'
+
         if teaHelped > coffeeHelped:
             teaName = teaName + '🏆'
         elif teaHelped < coffeeHelped:
@@ -115,10 +116,10 @@ class Profile(commands.Cog):
         return
 
     @commands.command()
-    async def squad(self, ctx, *, squad):
-        if squad is None:
+    async def squad(self, ctx, *, squad = None):
+        if squad is None or (squad.lower() != 'coffee' and squad.lower() != 'tea'):
             embed = discord.Embed(
-                description = 'Correct Usage: `+squad coffee/tea`',
+                description = 'Correct Usage: `+squad coffee` or `+squad tea`.',
                 color = discord.Color.teal()
             )
             await ctx.send(embed = embed)
@@ -249,6 +250,7 @@ class Profile(commands.Cog):
                 'Otter' : 'https://i.redd.it/iu459icfvv401.jpg',
                 'Pig':'https://i.pinimg.com/originals/ee/2b/61/ee2b616224bfb8266217644f9ade0f22.jpg',
                 'Shiba Inu':'https://66.media.tumblr.com/6075188a7f8b0fae3a9a137cd3cba5c3/tumblr_oispg8pBM31u0xpoxo1_1280.jpg',
+                'Raccoon':'https://images2.minutemediacdn.com/image/upload/c_crop,h_2367,w_4209,x_0,y_0/f_auto,q_auto,w_1100/v1554989622/shape/mentalfloss/527175-istock-514622028.jpg',
                 #coin
                 'Baymax':'https://media0.giphy.com/media/Ak7083xqUqvXa/giphy.gif',
                 'Niffler':'https://media.tenor.com/images/59452b5c5368f87cf36316403ad191b6/tenor.gif',
