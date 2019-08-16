@@ -3,6 +3,8 @@ from discord.ext import commands
 from database import Database
 from .meta import Meta
 import random
+import json
+import os
 
 class Currency(commands.Cog):
 
@@ -11,8 +13,14 @@ class Currency(commands.Cog):
         self.dbConnection = database
         self.meta = meta
 
-    @commands.command(aliases=['shop', 'companions', 'pets', '$'])
-    async def store(self, ctx):
+        dirname = os.path.dirname(__file__)
+        filename = os.path.join(dirname, 'docs/store.json')
+
+        with open(filename) as json_file:
+            self.store = json.load(json_file)
+
+    @commands.command(aliases=['shop', 'companions', 'pets', '$', 'sh', 'st'])
+    async def store(self, ctx, type: str = None):
         id = ctx.author.id
         user = self.dbConnection.findProfile({"id": id})
 
@@ -33,11 +41,98 @@ class Currency(commands.Cog):
             color = discord.Color.teal()
         )
 
+        #default store
+        if type is None:
+            storeHelp = """Welcome to the Store! This is where you can reap the rewards of your hard work."""
+            embed.add_field(name='Store Help', value=storeHelp, inline=False)
+
+            storeDesc = """`+store c` - Coin Companion Store
+            `+store h` - Helped Companion Store
+            `+store i` - Item Store"""
+            embed.add_field(name='Coin Companions', value=storeDesc, inline=False)
+
+            embed.set_thumbnail(url = 'https://cdn.discordapp.com/emojis/602910572153143337.png?v=1')
+            embed.set_footer(text = 'Need help with profiles or currency? Check #about-profiles!')
+            await ctx.send(embed = embed)
+            return
+        #coin
+        elif type.lower() == 'coin' or type.lower() == 'c' or type.lower() == 'coins':
+            storeHelp = """You can buy these Companions with Coins. They're gifs! You do not keep a Coin Companion if you set or buy a different Companion."""
+            embed.add_field(name='Store Help', value=storeHelp, inline=False)
+            storeDesc = ''
+            prevCost = 0
+
+            for item in self.store['Coin Companions']:
+                #same price, add to same line
+                if item['price'] == prevCost:
+                    storeDesc += ', ' + item['name']
+                #different price, new line, update prevCost
+                else:
+                    storeDesc += '\n`' + str(item['price']) + ' coins:` ' + item['name']
+                    prevCost = item['price']
+
+            embed.add_field(name='Coin Companions', value=storeDesc, inline=False)
+            embed.set_thumbnail(url = 'https://www.mariowiki.com/images/thumb/1/17/CoinMK8.png/1200px-CoinMK8.png')
+            embed.set_footer(text = 'Earn coins by participating in server events! Read #about-profiles for more information. Access this store using "+store c."')
+            await ctx.send(embed = embed)
+            return
+        #helped
+        elif type.lower() == 'helped' or type.lower() == 'h':
+            storeHelp = """You can unlock these Companions with Help Points. After reaching the minimum amount Helped, you're able to keep these Companions!."""
+            embed.add_field(name='Store Help', value=storeHelp, inline=False)
+            storeDesc = ''
+            prevCost = 0
+
+            for item in self.store['Helped Companions']:
+                #same price, add to same line
+                if item['price'] == prevCost:
+                    storeDesc += ', ' + item['name']
+                #different price, new line, update prevCost
+                else:
+                    storeDesc += '\n`' + str(item['price']) + ' helped:` ' + item['name']
+                    prevCost = item['price']
+
+            embed.add_field(name='Helped Companions', value=storeDesc, inline=False)
+            embed.set_thumbnail(url = 'https://img.pngio.com/mario-bros-star-png-png-image-mario-bros-star-png-240_215.png')
+            embed.set_footer(text = 'Earn Help Points by supporting others! Read #about-profiles for more information. Access this store using "+store h."')
+            await ctx.send(embed = embed)
+            return
+        #item
+        elif type.lower() == 'item' or type.lower() == 'i' or type.lower() == 'items':
+            storeHelp = """You can buy these items with Coins. Items will immediately be used upon purchase."""
+            embed.add_field(name='Store Help', value=storeHelp, inline=False)
+            storeDesc = ''
+            prevCost = 0
+
+            for item in self.store['Items']:
+                #same price, add to same line
+                if item['price'] == prevCost:
+                    storeDesc += ', ' + item['name']
+                #different price, new line, update prevCost
+                else:
+                    storeDesc += '\n`' + str(item['price']) + ' coins:` ' + item['name']
+                    prevCost = item['price']
+
+            embed.add_field(name='Items', value=storeDesc, inline=False)
+            embed.set_thumbnail(url = 'https://vignette.wikia.nocookie.net/mariokart/images/a/aa/Golden_Mushroom_-_Mario_Kart_Wii.png/revision/latest?cb=20180115185605')
+            embed.set_footer(text = 'Earn coins by participating in server events! Read #about-profiles for more information. Access this store using "+store i."')
+            await ctx.send(embed = embed)
+            return
+        #unknown type
+        else:
+            embed2 = discord.Embed(
+                description = 'Correct Usage: \n`+store` \n`store [coin/helped/item]`',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed2)
+            return
+
         storeHelp = """Helped Companions are companions you unlock with your Helped People count.
                         Coin Companions are companions you can buy through coins. They're gifs!
                         `+buy companionName` for Coin Companions, `+set companionName` for Helped Companions."""
         embed.add_field(name='Store Help', value=storeHelp, inline=False)
 
+        '''
         helpedCompanions = """`1 Helped` \tMouse
         `1 Helped` \tRock
         `5 Helped` \tCat
@@ -55,6 +150,9 @@ class Currency(commands.Cog):
         `50 Helped` \tShiba Inu
         `50 Helped` \tCorgi
         """
+        '''
+
+
         embed.add_field(name='Helped Companions', value=helpedCompanions, inline=True)
 
         coinCompanions = """`50 coins` \tBulbasaur
@@ -282,6 +380,22 @@ class Currency(commands.Cog):
             msg += '\n```' + reason + '```'
 
         await log.send(msg)
+
+    @commands.command(aliases=['givesquad'])
+    async def giveSquad(self, ctx, squad, amt: int):
+        if not self.meta.isAdmin(ctx.author):
+            return
+
+        squadDocs = self.dbConnection.findProfiles({'squad' : squad})
+
+        for doc in squadDocs:
+            self.dbConnection.updateProfile({'id': doc['id']}, {"$set": {"coins": (doc['coins']+amt)}})
+
+        embed = discord.Embed(
+            title = 'Consider it done! ✅',
+            color = discord.Color.teal()
+        )
+        await ctx.send(embed = embed)
 
     @commands.command()
     async def take(self, ctx, member: discord.Member, amt, *, reason = ''):

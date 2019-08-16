@@ -9,6 +9,9 @@ class MsgPersist(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        if not isinstance(message.channel, discord.TextChannel):
+            return
+
         if ('karaoke' in message.channel.name):
             id = message.author.id
             if ('add me' in message.content.lower()):

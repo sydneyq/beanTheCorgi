@@ -26,22 +26,6 @@ class Profile(commands.Cog):
         return profile
     '''
 
-    @commands.command(aliases=[])
-    async def giveSquad(self, ctx, squad, amt):
-        if not self.meta.isAdmin(member):
-            return
-
-        squadDocs = self.dbConnection.findProfiles({'squad' : squad})
-
-        for doc in squadDocs:
-            self.dbConnection.updateProfile({'id': doc['id']}, {"$set": {"coins": (doc['coins']+amt)}})
-
-        embed = discord.Embed(
-            title = 'Consider it done! ✅',
-            color = discord.Color.teal()
-        )
-        await ctx.send(embed = embed)
-
     @commands.command(aliases=['squads', 'squadcount', 's', 'sq', 'leaderboard'])
     async def squadCount(self, ctx):
         embed = discord.Embed(

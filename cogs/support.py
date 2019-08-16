@@ -391,7 +391,7 @@ class Support(commands.Cog):
     #support-ticket create channel
     @commands.command()
     async def support(self, ctx, *, topic = ''):
-        if (594008586779361311 in [role.id for role in ctx.message.author.roles]):
+        if ('blindfolded' in [role.name.lower() for role in ctx.message.author.roles]):
             embed = discord.Embed(
                 title = 'Sorry, those with the Blindfolded role are not able to create support channels.',
                 color = discord.Color.teal()
@@ -399,7 +399,7 @@ class Support(commands.Cog):
             await ctx.send(embed = embed)
             return
 
-        if (ctx.message.channel.name == 'support'):
+        if ('support' in ctx.message.channel.name):
             channel = ctx.message.channel
             guild = self.client.get_guild(257751892241809408) #Mind Café
             category = 0
@@ -469,9 +469,10 @@ class Support(commands.Cog):
             if (topic != ''):
                 await newChannel.send("Topic: " + topic)
 
+'''
     @commands.Cog.listener()
     async def on_message(self, message):
-        if (message.channel.name == 'support' and (message.content.lower() == 'ow' or ' oww' in message.content.lower())):
+        if (message.channel.name == 'focused-support' and (message.content.lower() == 'ow' or ' oww' in message.content.lower())):
 
             if (594008586779361311 in [role.id for role in message.author.roles]):
                 embed = discord.Embed(
@@ -565,6 +566,7 @@ class Support(commands.Cog):
                     color = discord.Color.teal()
                 )
                 await ctx.send(embed = embed)
+'''
 
 def setup(client):
     client.add_cog(Support(client))
