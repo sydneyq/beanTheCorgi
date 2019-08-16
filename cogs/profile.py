@@ -4,6 +4,8 @@ from database import Database
 from .meta import Meta
 import json
 import os
+import asyncio
+import random
 
 class Profile(commands.Cog):
 
@@ -194,18 +196,25 @@ class Profile(commands.Cog):
         #Basics
         if (user['squad'] == "Tea"):
             embed = discord.Embed(color=0xa72461)
-            embed.add_field(name="Squad", value=user['squad'], inline=False)
+            embed.add_field(name="Squad", value=user['squad'], inline=True)
             embed.set_author(name = name, icon_url = 'https://cdn2.stylecraze.com/wp-content/uploads/2015/04/2072_11-Surprising-Benefits-And-Uses-Of-Marijuana-Tea_shutterstock_231770824.jpg')
         elif (user['squad'] == "Coffee"):
             embed = discord.Embed(color=0x9cf196)
-            embed.add_field(name="Squad", value=user['squad'], inline=False)
+            embed.add_field(name="Squad", value=user['squad'], inline=True)
             embed.set_author(name = name, icon_url = 'https://www.caffesociety.co.uk/assets/recipe-images/latte-small.jpg')
         else:
             embed = discord.Embed(color = discord.Color.teal())
-            embed.add_field(name="Squad", value='No Squad yet. Use `+squad tea/coffee` to join one!', inline=False)
+            embed.add_field(name="Squad", value='No Squad yet. Use `+squad tea/coffee` to join one!', inline=True)
             embed.set_author(name = name)
 
         embed.set_footer(text = 'Mind Café', icon_url = 'https://media.discordapp.net/attachments/591611902459641856/593267453363224588/Bean_Icon.png')
+
+        #Marriage
+        if user['spouse'] == 0:
+            spouse = 'N/A'
+        else:
+            spouse = '<@' + str(user['spouse']) + '>'
+        embed.add_field(name="Spouse", value=spouse, inline=True)
 
         #Achievements
         #   helped
@@ -237,7 +246,6 @@ class Profile(commands.Cog):
                         embed.set_image(url = c['src'])
                         break
 
-
         #Acknowledgements
         ack = ''
         if self.meta.isAdmin(member):
@@ -261,6 +269,142 @@ class Profile(commands.Cog):
 
         embed.set_thumbnail(url = pic)
         await ctx.send(embed=embed)
+
+    @commands.command(alias=['propose'])
+    async def marry(self, ctx, member: discord.Member = None):
+        if member is None:
+            embed = discord.Embed(
+                description = 'Correct Usage: `+marry @user`.',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
+
+        memberProfile = self.dbConnection.findProfile({"id": member.id})
+        if memberProfile is None:
+            embed = discord.Embed(
+                title = 'Sorry, they don\'t have a profile yet! They can make one by using +profile.',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
+
+        embed = discord.Embed(
+            title = ctx.author.name + ' proposed to ' + member.name + '!',
+            description = 'React to this message with a ❤ for yes, 💔 for no.\nYou have 60 seconds to decide!',
+            color = discord.Color.teal()
+        )
+        await ctx.send(embed = embed)
+
+        msgs = []
+        async for msg in ctx.channel.history(limit=1):
+            if (msg.author.id == 592436047175221259 or msg.author.id == 432038389663924225):
+                msgs.append(msg)
+                break
+
+        msg = msgs[0]
+        await msg.add_reaction('❤')
+        await msg.add_reaction('💔')
+
+        emoji = ''
+
+        def check(reaction, user):
+            nonlocal emoji
+            emoji = str(reaction.emoji)
+            return user == member and (str(reaction.emoji) == '❤' or str(reaction.emoji) == '💔')
+
+        try:
+            reaction, user = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
+        except asyncio.TimeoutError:
+            await channel.send('Timed out.')
+        else:
+            if emoji == '💔':
+                embed = discord.Embed(
+                    title = 'Yikes',
+                    description = '<@' + str(member.id) + '> said no!',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+                return
+
+            self.dbConnection.updateProfile({"id": ctx.author.id}, {"$set": {"spouse": member.id}})
+            self.dbConnection.updateProfile({"id": member.id}, {"$set": {"spouse": ctx.author.id}})
+
+            choices = ['https://i.gifer.com/S3lf.gif',
+                'https://66.media.tumblr.com/ed485a688fc03e4e8f5cdb3f4d01678b/tumblr_oyfmbl9N5W1rl58vno1_500.gif',
+                'https://data.whicdn.com/images/330205015/original.gif',
+                'https://66.media.tumblr.com/b46302ea92abcc8b1af97dd51f9cc434/tumblr_otrlkinIp61rdvr0eo1_500.gif',
+                'https://media1.giphy.com/media/rnJuusfoWyu0U/giphy.gif',
+                'https://www.alamedageek.com.br/wp-content/uploads/2017/01/upaltasaventuras.gif']
+
+            embed = discord.Embed(
+                title = 'Congratulations to the Newlyweds',
+                description = ctx.author.name + ' and ' + member.name + ' are now married!',
+                color = discord.Color.teal()
+            )
+            embed.set_image(url = random.choice(choices))
+            await ctx.send(embed = embed)
+
+    @commands.command()
+    async def divorce(self, ctx):
+        id = ctx.message.author.id
+        user = self.dbConnection.findProfile({"id": id})
+        spouse = user['spouse']
+
+        if spouse == 0:
+            embed = discord.Embed(
+                title = 'You don\'t have a spouse to divorce.',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
+
+        embed = discord.Embed(
+            title = 'Divorce ' + self.client.get_user(spouse).name + '?',
+            description = 'React to this message with a ✅ for yes, ⛔ for no.\nYou have 60 seconds to decide!',
+            color = discord.Color.teal()
+        )
+        await ctx.send(embed = embed)
+
+        msgs = []
+        async for msg in ctx.channel.history(limit=1):
+            if (msg.author.id == 592436047175221259 or msg.author.id == 432038389663924225):
+                msgs.append(msg)
+                break
+
+        msg = msgs[0]
+        await msg.add_reaction('✅')
+        await msg.add_reaction('⛔')
+
+        emoji = ''
+
+        def check(reaction, user):
+            nonlocal emoji
+            emoji = str(reaction.emoji)
+            return user == ctx.author and (str(reaction.emoji) == '✅' or str(reaction.emoji) == '⛔')
+
+        try:
+            reaction, user = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
+        except asyncio.TimeoutError:
+            await channel.send('Timed out.')
+        else:
+            if emoji == '⛔':
+                embed = discord.Embed(
+                    title = 'Divorce canceled.',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+                return
+
+            self.dbConnection.updateProfile({"id": ctx.author.id}, {"$set": {"spouse": 0}})
+            self.dbConnection.updateProfile({"id": spouse}, {"$set": {"spouse": 0}})
+
+            embed = discord.Embed(
+                title = 'Divorced ' + self.client.get_user(spouse).name + '.',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):

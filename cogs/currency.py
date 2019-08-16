@@ -5,6 +5,7 @@ from .meta import Meta
 import random
 import json
 import os
+import asyncio
 
 class Currency(commands.Cog):
 
@@ -73,7 +74,7 @@ class Currency(commands.Cog):
 
             embed.add_field(name='Coin Companions', value=storeDesc, inline=False)
             embed.set_thumbnail(url = 'https://www.mariowiki.com/images/thumb/1/17/CoinMK8.png/1200px-CoinMK8.png')
-            embed.set_footer(text = 'Earn coins by participating in server events! Read #about-profiles for more information. Access this store using "+store c."')
+            embed.set_footer(text = 'Earn coins by participating in server events! Read #about-profiles for more information. Access this store using "+store c".')
             await ctx.send(embed = embed)
             return
         #helped
@@ -94,7 +95,7 @@ class Currency(commands.Cog):
 
             embed.add_field(name='Helped Companions', value=storeDesc, inline=False)
             embed.set_thumbnail(url = 'https://img.pngio.com/mario-bros-star-png-png-image-mario-bros-star-png-240_215.png')
-            embed.set_footer(text = 'Earn Help Points by supporting others! Read #about-profiles for more information. Access this store using "+store h."')
+            embed.set_footer(text = 'Earn Help Points by supporting others! Read #about-profiles for more information. Access this store using "+store h".')
             await ctx.send(embed = embed)
             return
         #item
@@ -115,7 +116,7 @@ class Currency(commands.Cog):
 
             embed.add_field(name='Items', value=storeDesc, inline=False)
             embed.set_thumbnail(url = 'https://vignette.wikia.nocookie.net/mariokart/images/a/aa/Golden_Mushroom_-_Mario_Kart_Wii.png/revision/latest?cb=20180115185605')
-            embed.set_footer(text = 'Earn coins by participating in server events! Read #about-profiles for more information. Access this store using "+store i."')
+            embed.set_footer(text = 'Earn coins by participating in server events! Read #about-profiles for more information. Access this store using "+store i".')
             await ctx.send(embed = embed)
             return
         #unknown type
@@ -265,12 +266,53 @@ class Currency(commands.Cog):
             await ctx.send(embed = embed)
             return
 
-        self.dbConnection.updateProfile({"id": id}, {"$set": {"companion": ''}})
         embed = discord.Embed(
-            title = 'You released your companion!',
+            title = 'Release your Companion?',
+            description = 'React to this message with a ✅ for yes, ⛔ for no.\nYou have 60 seconds to decide!',
             color = discord.Color.teal()
         )
         await ctx.send(embed = embed)
+
+        msgs = []
+        async for msg in ctx.channel.history(limit=1):
+            if (msg.author.id == 592436047175221259 or msg.author.id == 432038389663924225):
+                msgs.append(msg)
+                break
+
+        msg = msgs[0]
+        await msg.add_reaction('✅')
+        await msg.add_reaction('⛔')
+
+        emoji = ''
+
+        def check(reaction, user):
+            #print('str: ' + str(reaction.emoji))
+            nonlocal emoji
+            emoji = str(reaction.emoji)
+            return user == ctx.author and (str(reaction.emoji) == '✅' or str(reaction.emoji) == '⛔')
+
+        try:
+            reaction, user = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
+        except asyncio.TimeoutError:
+            await channel.send('Timed out.')
+        else:
+            if emoji == '⛔':
+                embed = discord.Embed(
+                    title = 'Release canceled.',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+                return
+            print('emoji: ' + emoji)
+
+            self.dbConnection.updateProfile({"id": id}, {"$set": {"companion": ''}})
+
+            embed = discord.Embed(
+                title = 'You released your companion!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
 
     @commands.command()
     async def give(self, ctx, member: discord.Member, amt, *, reason = ''):
