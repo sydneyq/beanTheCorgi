@@ -2,7 +2,8 @@ import discord
 from discord.ext import commands
 from database import Database
 from .meta import Meta
-#import meta
+import json
+import os
 
 class Profile(commands.Cog):
 
@@ -11,6 +12,11 @@ class Profile(commands.Cog):
         self.dbConnection = database
         self.meta = meta
 
+        dirname = os.path.dirname(__file__)
+        filename = os.path.join(dirname, 'docs/store.json')
+
+        with open(filename) as json_file:
+            self.store = json.load(json_file)
     '''
     async def get_profile(member: discord.Member = None):
         if member is None:
@@ -218,49 +224,19 @@ class Profile(commands.Cog):
         embed.add_field(name="Companion", value=msg, inline=True)
 
         if companion is not '':
-            switcher = {
-                #helped
-                'Mouse':'https://www.wallpaperup.com/uploads/wallpapers/2013/10/20/163356/f2ee734991560fc269819a78f891e146-700.jpg',
-                'Cat':'https://www.catster.com/wp-content/uploads/2018/03/Calico-cat-curled-up-asleep.jpg',
-                'Goat':'https://www.smallholderfeed.co.uk/wp-content/uploads/2017/09/Goat-Feeding-Guide.jpg',
-                'Parakeet':'https://i.ytimg.com/vi/yoYnevMnFlA/maxresdefault.jpg',
-                'Snake':'https://resize.hswstatic.com/w_907/gif/coral-snake.jpg',
-                'Hedgehog':'https://images2.minutemediacdn.com/image/upload/c_crop,h_2014,w_3584,x_0,y_187/f_auto,q_auto,w_1100/v1554918066/shape/mentalfloss/56004-istock-496545234.jpg',
-                'Donkey':'https://images.fineartamerica.com/images/artworkimages/mediumlarge/1/12-miniature-donkey-foal-jean-louis-klein--marie-luce-hubert.jpg',
-                'Wallaby':'https://www.australiangeographic.com.au/wp-content/uploads/2018/12/2T8A2202.jpg',
-                'Fox':'https://i.redd.it/9vy19m3z2g421.png',
-                'Corgi':'https://i.etsystatic.com/9905287/r/il/030f27/1483225420/il_794xN.1483225420_kjim.jpg',
-                'Rock':'https://vignette.wikia.nocookie.net/spongebob/images/4/45/Pete_the_rock.png/revision/latest?cb=20141115223905',
-                'Otter' : 'https://i.redd.it/iu459icfvv401.jpg',
-                'Pig':'https://i.pinimg.com/originals/ee/2b/61/ee2b616224bfb8266217644f9ade0f22.jpg',
-                'Shiba Inu':'https://66.media.tumblr.com/6075188a7f8b0fae3a9a137cd3cba5c3/tumblr_oispg8pBM31u0xpoxo1_1280.jpg',
-                'Raccoon':'https://images2.minutemediacdn.com/image/upload/c_crop,h_2367,w_4209,x_0,y_0/f_auto,q_auto,w_1100/v1554989622/shape/mentalfloss/527175-istock-514622028.jpg',
-                #coin
-                'Baymax':'https://media0.giphy.com/media/Ak7083xqUqvXa/giphy.gif',
-                'Niffler':'https://media.tenor.com/images/59452b5c5368f87cf36316403ad191b6/tenor.gif',
-                'Husky':'https://i.chzbgr.com/original/8414926080/h5051269A/',
-                'Toothless':'https://media1.giphy.com/media/1pA8TwX8atOCnAtTbV/giphy.gif',
-                'Yamper' : 'https://thumbs.gfycat.com/SecondhandLawfulGalapagoshawk-size_restricted.gif',
-                'Puffin':'https://www.audubon.org/sites/default/files/styles/hero_cover_bird_page/public/web_h_a1_5428_5_atlantic-puffin_lorraine_minns-breeding-adult.jpg?itok=XYcRrHhm',
-                'Charmander':'https://media.giphy.com/media/erHPszvivFn44/giphy.gif',
-                'Bulbasaur':'https://media0.giphy.com/media/MMK9pcpsSa9gI/giphy.gif',
-                'Squirtle':'https://media.giphy.com/media/8gPs3nAIqtzvW/giphy.gif',
-                'Oshawott':'https://media2.giphy.com/media/rk391iLXWhQIg/source.gif',
-                'Mudkip':'https://thumbs.gfycat.com/FrigidShyJaguar-size_restricted.gif',
-                'Psyduck':'http://31.media.tumblr.com/tumblr_m1igknqbmB1qc2jhfo6_250.gif',
-                'Pikachu':'http://49.media.tumblr.com/540ad0eb71628f0768adce2876962e50/tumblr_o2tesgL5vt1sr6y44o2_500.gif',
-                'Shaymin':'http://45.media.tumblr.com/c3c6b13035a5392183a6676673ecab0c/tumblr_np1gr1IlFv1tdtetdo1_500.gif',
-                'Eevee':'https://media1.tenor.com/images/1df3441f8f9639e4661475009177b42f/tenor.gif?itemid=12016437',
-                'Vaporeon':'https://media1.giphy.com/media/sJ29qAcpPO9uo/source.gif',
-                'Jolteon':'https://media3.giphy.com/media/et6sLQpNiedB6/giphy.gif',
-                'Espeon':'https://data.whicdn.com/images/254804480/original.gif',
-                'Flareon':'https://data.whicdn.com/images/85904853/original.gif',
-                'Umbreon':'https://66.media.tumblr.com/65feeda7b4cd6111353e493fc11303bb/tumblr_inline_p7obtc4AoJ1sbpdql_500.gif',
-                'Leafeon':'https://data.whicdn.com/images/332118464/original.gif',
-                'Sylveon':'https://steamuserimages-a.akamaihd.net/ugc/964220763826312953/E630A4546A45E8E6B04642B91D5E7FEAED7D3318/',
-                'Glaceon':'https://em.wattpad.com/c95e8e70e6b4ed82ba13e4ee344056c276dc4cae/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f776174747061642d6d656469612d736572766963652f53746f7279496d6167652f4148704e334264336d324d314b673d3d2d3434363639323536342e313464353763613531373630653532313836323836313638333637372e676966?s=fit&w=720&h=720',
-            }
-            embed.set_image(url = switcher.get(companion, "none"))
+            isCoin = False
+            for c in self.store['Coin Companions']:
+                if c['name'].lower() == companion.lower():
+                    embed.set_image(url = c['src'])
+                    isCoin = True
+                    break
+
+            if not isCoin:
+                for c in self.store['Helped Companions']:
+                    if c['name'].lower() == companion.lower():
+                        embed.set_image(url = c['src'])
+                        break
+
 
         #Acknowledgements
         ack = ''
