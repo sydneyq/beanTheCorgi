@@ -289,7 +289,7 @@ class Profile(commands.Cog):
             )
             await ctx.send(embed = embed)
             return
-        member = self.dbConnection.findProfile({"id": member.id})
+        memberProfile = self.dbConnection.findProfile({"id": member.id})
         if memberProfile is None:
             embed = discord.Embed(
                 title = 'Sorry, they don\'t have a profile yet! They can make one by using +profile.',
@@ -298,7 +298,7 @@ class Profile(commands.Cog):
             await ctx.send(embed = embed)
             return
 
-        if user['spouse'] != 0 or member['spouse'] != 0:
+        if user['spouse'] != 0 or memberProfile['spouse'] != 0:
             embed = discord.Embed(
                 description = 'One of you is already married!',
                 color = discord.Color.teal()
@@ -363,7 +363,7 @@ class Profile(commands.Cog):
                 'https://www.alamedageek.com.br/wp-content/uploads/2017/01/upaltasaventuras.gif']
 
             embed = discord.Embed(
-                title = 'Congratulations to the Newlyweds',
+                title = 'Congratulations to the Newlyweds!',
                 description = ctx.author.name + ' and ' + member.name + ' are now married!',
                 color = discord.Color.teal()
             )
@@ -374,6 +374,15 @@ class Profile(commands.Cog):
     async def divorce(self, ctx):
         id = ctx.message.author.id
         user = self.dbConnection.findProfile({"id": id})
+
+        if user is None:
+            embed = discord.Embed(
+                title = 'Sorry, you don\'t have a profile yet! You can make one by using +profile.',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
+
         spouse = user['spouse']
 
         if spouse == 0:
