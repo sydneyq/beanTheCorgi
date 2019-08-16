@@ -280,10 +280,35 @@ class Profile(commands.Cog):
             await ctx.send(embed = embed)
             return
 
-        memberProfile = self.dbConnection.findProfile({"id": member.id})
+        id = ctx.author.id
+        user = self.dbConnection.findProfile({"id": id})
+        if user is None:
+            embed = discord.Embed(
+                title = 'Sorry, you don\'t have a profile yet! You can make one by using +profile.',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
+        member = self.dbConnection.findProfile({"id": member.id})
         if memberProfile is None:
             embed = discord.Embed(
                 title = 'Sorry, they don\'t have a profile yet! They can make one by using +profile.',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
+
+        if user['spouse'] != 0 or member['spouse'] != 0:
+            embed = discord.Embed(
+                description = 'One of you is already married!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
+
+        if member == ctx.author:
+            embed = discord.Embed(
+                description = 'Marry someone who\'s not yourself!',
                 color = discord.Color.teal()
             )
             await ctx.send(embed = embed)
