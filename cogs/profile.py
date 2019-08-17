@@ -248,7 +248,7 @@ class Profile(commands.Cog):
                         break
 
             if not isFound:
-                for c in self.store['Special Companions']
+                for c in self.store['Special Companions']:
                     if c['name'].lower() == companion.lower():
                         embed.set_image(url = c['src'])
                         isFound = True
@@ -308,7 +308,7 @@ class Profile(commands.Cog):
 
         if user['spouse'] != 0 or memberProfile['spouse'] != 0:
             embed = discord.Embed(
-                description = 'One of you is already married!',
+                title = 'One of you is already married!',
                 color = discord.Color.teal()
             )
             await ctx.send(embed = embed)

@@ -324,6 +324,23 @@ class Currency(commands.Cog):
         coins = user['coins']
         coins = coins + int(amt)
         self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins}})
+
+        userDiscord = discord.utils.get(self.client.get_all_members(), id=id)
+
+        embed = discord.Embed(
+            title = 'You\'ve been given `' + str(amt) + '` coins!',
+            description = 'Your total: `' + str(coins) + '` coins',
+            color = discord.Color.teal()
+        )
+        if reason != '':
+            embed.add_field(name='Reason: ', value=reason)
+        embed.set_thumbnail(url = 'https://www.mariowiki.com/images/thumb/1/17/CoinMK8.png/1200px-CoinMK8.png')
+
+        try:
+            await userDiscord.send(embed = embed)
+        except:
+            print('Could not send private message.')
+
         embed = discord.Embed(
             title = 'Gave ' + member.name + ' ' + str(amt) + ' coins!',
             description = member.name + '\'s coin count: ' + str(coins),
@@ -338,7 +355,7 @@ class Currency(commands.Cog):
                 log = guild.get_channel(ch.id)
                 break
 
-        msg = '**<@' + str(member.id) + '>** was given ' + str(amt) + ' coins by <@' + str(ctx.author.id) + '>.'
+        msg = '**<@' + str(member.id) + '>** was given ' + str(amt) + ' coins by **' + ctx.author.name + '**.'
         if (reason != ''):
             msg += '\n```' + reason + '```'
 

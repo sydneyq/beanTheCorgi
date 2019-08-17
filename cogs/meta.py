@@ -49,7 +49,8 @@ class Global(commands.Cog):
 
     @commands.command()
     async def ping(self, ctx):
-        await ctx.send(f'Pong! `{round(self.client.latency * 1000)}ms`')
+        if (self.meta.isAdmin(ctx.message.author)):
+            await ctx.send(f'Pong! `{round(self.client.latency * 1000)}ms`')
 
     #clear archive
     @commands.command(aliases=['clearA', 'cleararchive'])
