@@ -8,6 +8,38 @@ class Actions(commands.Cog):
         self.client = client
 
     @commands.command(pass_context=True)
+    async def boop(self, ctx, user: discord.Member = None, *, msg = ''):
+        responses = ['https://media1.tenor.com/images/083ccb85ea107a76b5030cbcb43cbf36/tenor.gif?itemid=7296714',
+        'https://media.tenor.com/images/f6f87118730878c578e0f188da5270fc/tenor.gif',
+        'https://media2.giphy.com/media/12BGUcW8xxpPRS/giphy.gif',
+        'https://i.pinimg.com/originals/ee/85/19/ee851944b03a008493b05b17c1591eac.gif',
+        'https://media0.giphy.com/media/FQiJeR3HBLZT2/giphy.gif',
+        'http://forgifs.com/gallery/d/245318-2/Sneaky-cat-nose-boop.gif',
+        'https://i.imgur.com/5xTll0w.gif',
+        'https://i.imgur.com/dkLJLrt.gif?noredirect',
+        'https://media1.tenor.com/images/5bd848735bbb12a2b7fa0561de918a0c/tenor.gif?itemid=5375919']
+
+        actionName = 'booped'
+
+        if (user != None):
+            embed = discord.Embed(
+                color = discord.Color.teal(),
+                title = '**' + user.name + '**, you\'ve just been ' + actionName + '!'
+            )
+            embed.set_image(url = random.choice(responses))
+
+            await ctx.send(embed = embed)
+
+        else:
+            embed = discord.Embed(
+                color = discord.Color.teal(),
+                title = 'boop'
+            )
+            embed.set_image(url = random.choice(responses))
+
+            await ctx.send(embed = embed)
+
+    @commands.command(pass_context=True)
     async def pat(self, ctx, user: discord.Member = None, *, msg = ''):
         responses = ['https://cdn.discordapp.com/attachments/257751892241809408/597979644725166097/unknown.gif',
         'https://i.gifer.com/7A80.gif',
@@ -53,7 +85,8 @@ class Actions(commands.Cog):
         'http://cdn.funnyisms.com/24ce5866-24d1-4fc7-8ac4-92111f4e5d95.gif',
         'http://the.earth.li/~jon/junk/blep.gif',
         'https://s.mltshp.com/r/1F8ND',
-        'https://media.giphy.com/media/Y9MJ0otgR03yE/giphy.gif']
+        'https://media.giphy.com/media/Y9MJ0otgR03yE/giphy.gif',
+        'https://media.tenor.com/images/1ee46c26979bc89baceb2b3cc52c32a2/tenor.gif']
         embed = discord.Embed(
             title = 'mlem',
             color = discord.Color.teal()

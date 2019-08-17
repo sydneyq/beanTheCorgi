@@ -233,17 +233,25 @@ class Profile(commands.Cog):
         embed.add_field(name="Companion", value=msg, inline=True)
 
         if companion is not '':
-            isCoin = False
+            isFound = False
             for c in self.store['Coin Companions']:
                 if c['name'].lower() == companion.lower():
                     embed.set_image(url = c['src'])
-                    isCoin = True
+                    isFound = True
                     break
 
-            if not isCoin:
+            if not isFound:
                 for c in self.store['Helped Companions']:
                     if c['name'].lower() == companion.lower():
                         embed.set_image(url = c['src'])
+                        isFound = True
+                        break
+
+            if not isFound:
+                for c in self.store['Special Companions']
+                    if c['name'].lower() == companion.lower():
+                        embed.set_image(url = c['src'])
+                        isFound = True
                         break
 
         #Acknowledgements
@@ -308,7 +316,7 @@ class Profile(commands.Cog):
 
         if member == ctx.author:
             embed = discord.Embed(
-                description = 'Marry someone who\'s not yourself!',
+                title = 'You can\'t marry yourself!',
                 color = discord.Color.teal()
             )
             await ctx.send(embed = embed)
