@@ -450,6 +450,7 @@ class Profile(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_remove(self, member):
+        id = member.id
         self.dbConnection.removeProfile({"id": id})
 
 def setup(client):

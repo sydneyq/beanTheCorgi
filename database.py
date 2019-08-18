@@ -28,9 +28,23 @@ class Database:
         self.db.profile.update(updateCritera, change)
 
     def removeProfile(self, toRemove):
-        profile = self.findProfile({"id": id})
-        if profile is not None:
-            self.db.profile.remove(toRemove)
+        self.db.profile.remove(toRemove)
 
-    def count(self, findCriteria):
+    def countProfiles(self, findCriteria):
         return self.db.profile.count(findCriteria)
+
+    #quote
+    def insertQuote(self, toInsert):
+        self.db.quote.insert(toInsert)
+
+    def findQuotes(self, findCriteria):
+        return self.db.quote.find(findCriteria)
+
+    def findQuote(self, findCriteria):
+        return self.db.quote.find_one(findCriteria)
+
+    def removeQuote(self, toRemove):
+        self.db.quote.remove(toRemove)
+
+    def countQuotes(self, findCriteria):
+        return self.db.quote.count(findCriteria)

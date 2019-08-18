@@ -10,7 +10,7 @@ import pymongo
 import database
 import secret
 
-client = commands.Bot(command_prefix = '+')
+client = commands.Bot(commands.when_mentioned_or('+'))
 
 @client.event
 async def on_ready():
