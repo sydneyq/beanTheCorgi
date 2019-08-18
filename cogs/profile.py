@@ -144,7 +144,6 @@ class Profile(commands.Cog):
             await ctx.send(embed = embed)
             return
         else:
-            print('No squad found. Assigning...')
             if 'tea' in squad:
                 self.dbConnection.updateProfile({"id": id}, {"$set": {"squad": "Tea"}})
                 embed = discord.Embed(
@@ -152,6 +151,8 @@ class Profile(commands.Cog):
                     color = discord.Color.teal()
                 )
                 await ctx.send(embed = embed)
+                role = ctx.guild.get_role(612788003542401035)
+                await ctx.author.add_roles(role)
                 return
             elif 'coffee' in squad:
                 self.dbConnection.updateProfile({"id": id}, {"$set": {"squad": "Coffee"}})
@@ -160,6 +161,8 @@ class Profile(commands.Cog):
                     color = discord.Color.teal()
                 )
                 await ctx.send(embed = embed)
+                role = ctx.guild.get_role(612788004926521365)
+                await ctx.author.add_roles(role)
                 return
             else:
                 embed = discord.Embed(
@@ -168,6 +171,43 @@ class Profile(commands.Cog):
                 )
                 await ctx.send(embed = embed)
                 return
+
+    @commands.command()
+    async def getSquadRole(self, ctx):
+        id = ctx.author.id
+        user = self.dbConnection.findProfile({"id": id})
+
+        if user is None:
+            embed = discord.Embed(
+                title = 'Sorry, you don\'t have a profile yet! You can make one by using +profile.',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
+
+        if user['squad'] == 'Coffee':
+            role = ctx.guild.get_role(612788004926521365)
+            await ctx.author.add_roles(role)
+            embed = discord.Embed(
+                title = 'Consider it done! ✅',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+        elif user['squad'] == 'Tea':
+            role = ctx.guild.get_role(612788003542401035)
+            await ctx.author.add_roles(role)
+            embed = discord.Embed(
+                title = 'Consider it done! ✅',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+        else:
+            embed = discord.Embed(
+                title = 'Couldn\'t find your Squad.',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
 
     #   Goes through certain elements of a users data in the database
     #   and puts them into an embed to send to the user through the bot

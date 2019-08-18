@@ -188,8 +188,12 @@ class Currency(commands.Cog):
                     if i['name'].lower() == 'squad swap':
                         if user['squad'] == 'Coffee':
                             self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "squad": 'Tea'}})
+                            role = ctx.guild.get_role(612788003542401035)
+                            await ctx.author.add_roles(role)
                         else:
                             self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "squad": 'Coffee'}})
+                            role = ctx.guild.get_role(612788004926521365)
+                            await ctx.author.add_roles(role)
 
                     embed = discord.Embed(
                         title = 'Consider it done! ✅',
