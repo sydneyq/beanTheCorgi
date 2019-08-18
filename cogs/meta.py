@@ -33,6 +33,11 @@ class Meta:
             return True
         return False
 
+    def isVerified(self, member: discord.Member):
+        if 'spirits' in [role.name.lower() for role in member.roles]:
+            return True
+        return False
+
     #not allowed embed
     def noAccessEmbed(self):
         embed = discord.Embed(
@@ -85,7 +90,7 @@ class Global(commands.Cog):
 
     @commands.command()
     async def bean(self, ctx, channel: discord.TextChannel, *, message):
-        if ctx.message.author.id == secret.BOT_OWNER_ID: 
+        if ctx.message.author.id == secret.BOT_OWNER_ID:
 
             embed = discord.Embed(
                 description = message,
