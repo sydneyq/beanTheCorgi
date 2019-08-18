@@ -12,7 +12,7 @@ class Event(commands.Cog):
         self.client = client
         self.dbConnection = database
         self.meta = meta
-
+        
     @commands.command(aliases=['snames'])
     async def squadnames(self, ctx):
         guild = ctx.guild
@@ -32,17 +32,17 @@ class Event(commands.Cog):
             if not self.meta.isVerified(member):
                 continue
             if member.nick is not None:
-                if 'tea' in member.nick.lower().split():
+                if self.meta.hasWord(member.nick, 'tea'):
                     tea += 1
                     teaMembers += '<@' + str(member.id) + '>\n'
-                if 'coffee' in member.nick.lower().split():
+                if self.meta.hasWord(member.nick, 'coffee'):
                     coffee += 1
                     coffeeMembers += '<@' + str(member.id) + '>\n'
             else:
-                if 'tea' in member.name.lower().split():
+                if self.meta.hasWord(member.name, 'tea'):
                     tea += 1
                     teaMembers += '<@' + str(member.id) + '>\n'
-                if 'coffee' in member.name.lower().split():
+                if self.meta.hasWord(member.name, 'coffee'):
                     coffee += 1
                     coffeeMembers += '<@' + str(member.id) + '>\n'
 

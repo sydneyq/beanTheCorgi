@@ -46,6 +46,32 @@ class Meta:
         )
         return embed
 
+    def hasWord(self, string, word):
+        #case-insensitive, ignores punctuation: 32-96, 123-126 (not 97 - 122)
+        string = string.lower()
+        word = word.lower()
+        filtered = ''
+        #print('string: ' + filtered)
+        #print('word: ' + filtered)
+
+        if word not in string:
+            return False
+
+        for portion in string.split():
+            filtered = ''
+            #print('portion: ' + filtered)
+            if word in portion:
+                for c in portion:
+                    ascii = ord(c)
+                    if ascii >= 97 and ascii <= 122:
+                        filtered += c
+                #print('filtered: ' + filtered)
+
+                if filtered == word:
+                    return True
+
+        return False
+
 class Global(commands.Cog):
 
     def __init__(self, client, meta):
