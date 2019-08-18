@@ -102,7 +102,6 @@ class Actions(commands.Cog):
         'https://media.giphy.com/media/17Q92poP1qJwI/giphy.gif',
         'https://gifrific.com/wp-content/uploads/2015/05/Sloth-Hugs-Toy-Animal-and-Falls-Over.gif',
         'https://media.giphy.com/media/6dsQ68HCZZ1xm/giphy.gif',
-        'https://66.media.tumblr.com/487912f009d7545d1cee698d68d12e5d/tumblr_pdx639rmL51rhmoixo1_400.gif',
         'https://media2.giphy.com/media/ZaBHSbiLQTmFi/source.gif',
         'https://media3.giphy.com/media/hdOrhnBB6Enuw/source.gif',
         'https://i.pinimg.com/originals/f3/48/a9/f348a9ffee1943fbe248fa2dc7eb3f19.gif',

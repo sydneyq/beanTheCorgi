@@ -362,7 +362,7 @@ class Currency(commands.Cog):
         await log.send(msg)
 
 
-    @commands.command(aliases=['givesquad'])
+    @commands.command()
     async def giveSquad(self, ctx, squad, amt: int):
         if not self.meta.isAdmin(ctx.author):
             return
@@ -408,7 +408,7 @@ class Currency(commands.Cog):
 
         await log.send(msg)
 
-    @commands.command(aliases=['rep', 'helpedby', 'thanks'])
+    @commands.command(aliases=['rep', 'thanks'])
     async def helpedBy(self, ctx, member: discord.Member = None):
         if member is None:
             embed = discord.Embed(

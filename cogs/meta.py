@@ -52,8 +52,56 @@ class Global(commands.Cog):
         if (self.meta.isAdmin(ctx.message.author)):
             await ctx.send(f'Pong! `{round(self.client.latency * 1000)}ms`')
 
+    @commands.command()
+    async def status(self, ctx, *, msg):
+        if (self.meta.isAdmin(ctx.message.author)):
+            await self.client.change_presence(status=discord.Status.online, activity=discord.Game(msg))
+        else:
+            embed = discord.Embed(
+                title = 'Sorry, you don\'t have permission to do that!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+
+    @commands.command()
+    async def echo(self, ctx, channel: discord.TextChannel, *, message):
+        if (self.meta.isAdmin(ctx.message.author)):
+
+            embed = discord.Embed(
+                title = 'A Mind Café Staff Member Says:',
+                description = message,
+                color = discord.Color.teal()
+            )
+
+            #await channel.send("**Staff Member:** " + message)
+            #self.client.send_message(channel, embed=embed)
+            await channel.send(embed = embed)
+        else:
+            embed = discord.Embed(
+                title = 'Sorry, you don\'t have permission to do that!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+
+    @commands.command()
+    async def bean(self, ctx, channel: discord.TextChannel, *, message):
+        if ctx.message.author.id == secret.BOT_OWNER_ID: 
+
+            embed = discord.Embed(
+                description = message,
+                color = discord.Color.teal()
+            )
+
+            await channel.send(embed = embed)
+        else:
+            embed = discord.Embed(
+                title = 'Sorry, you don\'t have permission to do that!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+
     #clear archive
-    @commands.command(aliases=['clearA', 'cleararchive'])
+    @commands.command(aliases=['clearA'])
     async def clearArchive(self, ctx):
         guild = self.client.get_guild(257751892241809408)
         author = ctx.message.author

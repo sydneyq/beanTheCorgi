@@ -34,7 +34,7 @@ class Profile(commands.Cog):
         return profile
     '''
 
-    @commands.command(aliases=['squads', 'squadcount', 's', 'sq', 'leaderboard'])
+    @commands.command(aliases=['squads', 's', 'sq', 'leaderboard'])
     async def squadCount(self, ctx):
         embed = discord.Embed(
             title = 'Squad Count',

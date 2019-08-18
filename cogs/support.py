@@ -8,7 +8,7 @@ class Support(commands.Cog):
         self.client = client
 
     #support-ticket reset
-    @commands.command(aliases=['Reset', 'resetST'])
+    @commands.command(aliases=['resetST'])
     async def reset(self, ctx):
         channel = ctx.message.channel
         guild = self.client.get_guild(257751892241809408)
@@ -50,7 +50,7 @@ class Support(commands.Cog):
             await ctx.send(embed = embed)
 
     #support-ticket certified only
-    @commands.command(aliases=['Remove', 'deny', 'Deny'])
+    @commands.command(aliases=['deny'])
     async def remove(self, ctx, member: discord.Member = None):
         channel = ctx.message.channel
         guild = self.client.get_guild(257751892241809408)
@@ -101,7 +101,7 @@ class Support(commands.Cog):
             await ctx.send(embed = embed)
 
     #support-ticket certified only
-    @commands.command(aliases=['Add', 'invite', 'Invite'])
+    @commands.command(aliases=['invite'])
     async def add(self, ctx, member: discord.Member = None):
         channel = ctx.message.channel
         guild = self.client.get_guild(257751892241809408)
@@ -152,7 +152,7 @@ class Support(commands.Cog):
             await ctx.send(embed = embed)
 
     #support-ticket lockdown
-    @commands.command(aliases=['Lock', 'lockdown', 'Lockdown', 'lockST', 'lockdownST'])
+    @commands.command(aliases=['lockdown', 'lockST', 'lockdownST'])
     async def lock(self, ctx):
         channel = ctx.message.channel
         guild = self.client.get_guild(257751892241809408)
@@ -206,7 +206,7 @@ class Support(commands.Cog):
             await ctx.send(embed = embed)
 
     #support-ticket certified only
-    @commands.command(aliases=['Certified', 'certifiedST'])
+    @commands.command(aliases=['certifiedST'])
     async def certified(self, ctx):
         channel = ctx.message.channel
         guild = self.client.get_guild(257751892241809408)
@@ -260,7 +260,7 @@ class Support(commands.Cog):
             await ctx.send(embed = embed)
 
     #support-ticket switch channel
-    @commands.command(aliases=['swapST', 'swap', 'swapst', 'SwapST', 'switch', 'switchst'])
+    @commands.command(aliases=['swapST', 'swap', 'switch'])
     async def switchST(self, ctx):
         channel = ctx.message.channel
         guild = self.client.get_guild(257751892241809408)
@@ -314,7 +314,7 @@ class Support(commands.Cog):
             await ctx.send(embed = embed)
 
     #support-ticket archive channel
-    @commands.command(aliases=['archiveSupport', 'archiveS', 'archivest', 'archive'])
+    @commands.command(aliases=['archiveSupport', 'archive'])
     async def archiveST(self, ctx):
         channel = ctx.message.channel
         guild = self.client.get_guild(257751892241809408)
@@ -367,7 +367,7 @@ class Support(commands.Cog):
             await ctx.send(embed = embed)
 
     #support-ticket close channel
-    @commands.command(aliases=['closeSupport', 'closeS', 'close', 'closest'])
+    @commands.command(aliases=['closeSupport', 'close'])
     async def closeST(self, ctx):
         if 'Halo' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
             channel = ctx.message.channel

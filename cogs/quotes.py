@@ -13,7 +13,7 @@ class Profile(commands.Cog):
         self.dbConnection = database
         self.meta = meta
 
-    @commands.command(aliases=['specificq', 'specificquote', 'squote', 'sQuote', 'spq'])
+    @commands.command(aliases=['specificq', 'squote', 'spq'])
     async def specificQuote(self, ctx, quoteID: objectid.ObjectId = None):
         if quoteID is None:
             embed = discord.Embed(
@@ -25,7 +25,7 @@ class Profile(commands.Cog):
 
         quote = self.dbConnection.findQuote({'_id' : quoteID})
 
-        await ctx.send('**Quote ' + str(quote['_id']) + '** by <@' + str(quote['author']) + '>:\n' + quote['quote'])
+        await ctx.send('**Quote ' + str(quote['_id']) + '** by ' + self.client.get_user(quote['author']).name + '>:\n' + quote['quote'])
 
     @commands.command(aliases=['q'])
     async def quote(self, ctx, member: discord.Member = None):
@@ -35,21 +35,22 @@ class Profile(commands.Cog):
             quote = quotes[random.randrange(count)]
         else:
             quotes = self.dbConnection.findQuotes({'author' : member.id})
+
+            if quotes.count() == 0:
+                embed = discord.Embed(
+                    title = member.name + ' has no quotes.',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+                return
+
             count = quotes.count()
             quote = quotes[random.randrange(count)]
-
-        if quote is None:
-            embed = discord.Embed(
-                title = member.name + ' has no quotes.',
-                color = discord.Color.teal()
-            )
-            await ctx.send(embed = embed)
-            return
 
         if member is None:
             member = self.client.get_user(quote['author'])
 
-        await ctx.send('Quote **' + str(quote['_id']) + '** by <@' + str(member.id) + '>:\n' + quote['quote'])
+        await ctx.send('Quote **' + str(quote['_id']) + '** by ' + member.name + ':\n' + quote['quote'])
 
     @commands.command(aliases=['listquotes', 'allquotes', 'qs'])
     async def quotes(self, ctx, member: discord.Member = None):
@@ -78,7 +79,7 @@ class Profile(commands.Cog):
 
     #   Goes through certain elements of a users data in the database
     #   and puts them into an embed to send to the user through the bot
-    @commands.command(aliases=['addquote', 'addq'])
+    @commands.command(aliases=['addq'])
     async def addQuote(self, ctx, member: discord.Member, *, quote = None):
         if not self.meta.isStaff(ctx.author):
             embed = discord.Embed(
@@ -112,7 +113,7 @@ class Profile(commands.Cog):
         )
         await ctx.send(embed = embed)
 
-    @commands.command(aliases=['rquote', 'rQuote', 'removeq', 'removequote', 'removeQ', 'deletequote', 'dquote'])
+    @commands.command(aliases=['rquote', 'removeq', 'deletequote', 'dquote'])
     async def removeQuote(self, ctx, quoteID: objectid.ObjectId = None):
         if not self.meta.isStaff(ctx.author):
             embed = discord.Embed(
