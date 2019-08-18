@@ -363,10 +363,12 @@ class Currency(commands.Cog):
 
 
     @commands.command()
-    async def giveSquad(self, ctx, squad, amt: int):
+    async def giveSquad(self, ctx, squad, amt: int, reason = ''):
         if not self.meta.isAdmin(ctx.author):
             return
 
+        squad = squad.lower()
+        squad = squad.capitalize()
         squadDocs = self.dbConnection.findProfiles({'squad' : squad})
 
         for doc in squadDocs:
@@ -377,6 +379,19 @@ class Currency(commands.Cog):
             color = discord.Color.teal()
         )
         await ctx.send(embed = embed)
+
+        #finding log channel
+        guild = ctx.guild
+        for ch in guild.text_channels:
+            if ch.name.lower() == 'log':
+                log = guild.get_channel(ch.id)
+                break
+
+        msg = 'The **' + squad + ' Squad** was given ' + str(amt) + ' coins by **' + ctx.author.name + '**.'
+        if (reason != ''):
+            msg += '\n```' + reason + '```'
+
+        await log.send(msg)
 
     @commands.command()
     async def take(self, ctx, member: discord.Member, amt, *, reason = ''):
@@ -402,7 +417,7 @@ class Currency(commands.Cog):
                 log = guild.get_channel(ch.id)
                 break
 
-        msg = '**<@' + str(member.id) + '>** lost ' + str(amt) + ' coins by <@' + str(ctx.author.id) + '>.'
+        msg = '**<@' + str(member.id) + '>** lost ' + str(amt) + ' coins by **' + ctx.author.name + '**.'
         if (reason != ''):
             msg += '\n```' + reason + '```'
 
