@@ -186,14 +186,16 @@ class Currency(commands.Cog):
                     coins -= i['price']
 
                     if i['name'].lower() == 'squad swap':
+                        teaRole = ctx.guild.get_role(612788003542401035)
+                        coffeeRole = role = ctx.guild.get_role(612788004926521365)
                         if user['squad'] == 'Coffee':
                             self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "squad": 'Tea'}})
-                            role = ctx.guild.get_role(612788003542401035)
-                            await ctx.author.add_roles(role)
+                            await ctx.author.add_roles(teaRole)
+                            await ctx.author.remove_roles(coffeeRole)
                         else:
                             self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "squad": 'Coffee'}})
-                            role = ctx.guild.get_role(612788004926521365)
-                            await ctx.author.add_roles(role)
+                            await ctx.author.add_roles(coffeeRole)
+                            await ctx.author.remove_roles(teaRole)
 
                     embed = discord.Embed(
                         title = 'Consider it done! ✅',
@@ -427,8 +429,9 @@ class Currency(commands.Cog):
 
         await log.send(msg)
 
-    @commands.command(aliases=['rep', 'thanks'])
-    async def helpedBy(self, ctx, member: discord.Member = None):
+    '''
+    @commands.command(aliases=['helpedby', 'thanks'])
+    async def rep(self, ctx, member: discord.Member = None):
         if member is None:
             embed = discord.Embed(
                 title = 'Please tag a person you\'d like to rep!',
@@ -475,52 +478,100 @@ class Currency(commands.Cog):
         msg = '**<@' + str(member.id) + '>** was repped by <@' + str(ctx.author.id) + '>.'
 
         await log.send(msg)
+    '''
 
+    @commands.command(aliases=['helpedby', 'thanks'])
+    async def rep(self, ctx):
+        members = ctx.message.mentions
 
-    @commands.command(aliases=['derep'])
-    async def removeHelped(self, ctx, member: discord.Member = None):
-        if not self.meta.isAdmin(ctx.author):
-            return
-
-        if member is None:
-            embed = discord.Embed(
-                title = 'Please tag a person you\'d like to derep!',
-                color = discord.Color.teal()
-            )
-            await ctx.send(embed = embed)
-            return
-        else:
-            id = member.id
-            user = self.dbConnection.findProfile({"id": id})
-
-            if user is None:
+        for member in members:
+            if ctx.author.id == member.id:
                 embed = discord.Embed(
-                    title = 'Sorry, they don\'t have a profile yet! They can make one by using +profile.',
+                    title = 'You can\'t rep yourself!',
                     color = discord.Color.teal()
                 )
                 await ctx.send(embed = embed)
                 return
+            else:
+                id = member.id
+                user = self.dbConnection.findProfile({"id": id})
 
-            helped = user['helped']
-            helped = helped - 1
-            self.dbConnection.updateProfile({"id": id}, {"$set": {"helped": helped}})
-            embed = discord.Embed(
-                title = 'Derepped ' + member.name + '!',
-                description = member.name + '\'s rep count: ' + str(helped),
-                color = discord.Color.teal()
-            )
-            await ctx.send(embed = embed)
+                if user is None:
+                    embed = discord.Embed(
+                        title = 'Sorry, ' + member.name + ' doesn\'t have a profile yet! They can make one by using +profile.',
+                        color = discord.Color.teal()
+                    )
+                    await ctx.send(embed = embed)
+                    return
 
-        #finding log channel
-        guild = ctx.guild
-        for ch in guild.text_channels:
-            if ch.name.lower() == 'log':
-                log = guild.get_channel(ch.id)
-                break
+                helped = user['helped']
+                helped = helped + 1
+                self.dbConnection.updateProfile({"id": id}, {"$set": {"helped": helped}})
+                embed = discord.Embed(
+                    title = 'Repped ' + member.name + '!',
+                    description = member.name + '\'s rep count: ' + str(helped),
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
 
-        msg = '**<@' + str(member.id) + '>** was derepped by <@' + str(ctx.author.id) + '>.'
+            #finding log channel
+            guild = ctx.guild
+            for ch in guild.text_channels:
+                if ch.name.lower() == 'log':
+                    log = guild.get_channel(ch.id)
+                    break
 
-        await log.send(msg)
+            msg = '**<@' + str(member.id) + '>** was repped by <@' + str(ctx.author.id) + '>.'
+
+            await log.send(msg)
+
+    @commands.command(aliases=['removehelped'])
+    async def derep(self, ctx):
+        if not self.meta.isAdmin(ctx.author):
+            return
+
+        members = ctx.message.mentions
+
+        for member in members:
+            if ctx.author.id == member.id:
+                embed = discord.Embed(
+                    title = 'You can\'t rep yourself!',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+                return
+            else:
+                id = member.id
+                user = self.dbConnection.findProfile({"id": id})
+
+                if user is None:
+                    embed = discord.Embed(
+                        title = 'Sorry, ' + member.name + ' doesn\'t have a profile yet! They can make one by using +profile.',
+                        color = discord.Color.teal()
+                    )
+                    await ctx.send(embed = embed)
+                    return
+
+                helped = user['helped']
+                helped = helped - 1
+                self.dbConnection.updateProfile({"id": id}, {"$set": {"helped": helped}})
+                embed = discord.Embed(
+                    title = 'Derepped ' + member.name + '!',
+                    description = member.name + '\'s rep count: ' + str(helped),
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+
+            #finding log channel
+            guild = ctx.guild
+            for ch in guild.text_channels:
+                if ch.name.lower() == 'log':
+                    log = guild.get_channel(ch.id)
+                    break
+
+            msg = '**<@' + str(member.id) + '>** was derepped by <@' + str(ctx.author.id) + '>.'
+
+            await log.send(msg)
 
 def setup(client):
     database_connection = Database()

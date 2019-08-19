@@ -34,7 +34,7 @@ class Meta:
         return False
 
     def isVerified(self, member: discord.Member):
-        if 'spirits' in [role.name.lower() for role in member.roles]:
+        if secret.VERIFIED_ID in [role.id for role in member.roles]:
             return True
         return False
 
@@ -113,6 +113,33 @@ class Global(commands.Cog):
                 color = discord.Color.teal()
             )
             await ctx.send(embed = embed)
+
+    @commands.command()
+    async def verify(self, ctx):
+        member = ctx.author
+        if not self.meta.isVerified(member):
+            guild = ctx.guild
+            #spirits
+            verified_role = guild.get_role(secret.VERIFIED_ID)
+            await member.add_roles(verified_role)
+            #basicroles
+            basicroles = guild.get_role(593065193966403587)
+            await member.add_roles(basicroles)
+            #helpingothers
+            helpingothers = guild.get_role(593064902038650880)
+            await member.add_roles(helpingothers)
+            #exclusive
+            exclusive = guild.get_role(593064760648663041)
+            await member.add_roles(exclusive)
+            #welcome
+            casual = guild.get_channel(secret.WORKSHOP_CHANNEL)
+            #casual = guild.get_channel(secret.GENERAL_CHANNEL)
+            msg = '**__🎉 Let\'s all welcome <@' + str(member.id) + '> to Mind Cafe! 🎉__**'
+            msg += '\n> **Need Support?** Take a look at <#601444570600964097> and get started in <#597026335835291659>.'
+            msg += '\n> **Want to join a Squad?** Go to <#431191485933813765> and say `+profile` to get started.'
+            await casual.send(msg)
+            #delete command
+            await ctx.message.delete()
 
     @commands.command()
     async def bean(self, ctx, channel: discord.TextChannel, *, message):
