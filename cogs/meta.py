@@ -132,8 +132,7 @@ class Global(commands.Cog):
             exclusive = guild.get_role(593064760648663041)
             await member.add_roles(exclusive)
             #welcome
-            casual = guild.get_channel(secret.WORKSHOP_CHANNEL)
-            #casual = guild.get_channel(secret.GENERAL_CHANNEL)
+            casual = guild.get_channel(secret.GENERAL_CHANNEL)
             msg = '**__🎉 Let\'s all welcome <@' + str(member.id) + '> to Mind Cafe! 🎉__**'
             msg += '\n> **Need Support?** Take a look at <#601444570600964097> and get started in <#597026335835291659>.'
             msg += '\n> **Want to join a Squad?** Go to <#431191485933813765> and say `+profile` to get started.'

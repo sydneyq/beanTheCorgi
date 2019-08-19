@@ -1,14 +1,16 @@
 import discord
 from discord.ext import commands
+from .meta import Meta
 
 class Announce(commands.Cog):
 
-    def __init__(self, client):
+    def __init__(self, client, meta):
         self.client = client
+        self.meta = meta
 
     @commands.command()
     async def mcRolesHelp(self, ctx):
-        if 'mechanic' in [role.name for role in ctx.message.author.roles]:
+        if self.meta.isAdmin(ctx.author):
             embed = discord.Embed(
                 color = discord.Color.teal(),
                 description = 'React with the corresponding emoji to obtain/remove a role.'
@@ -27,7 +29,7 @@ class Announce(commands.Cog):
 
     @commands.command()
     async def mcRolesAccess(self, ctx):
-        if 'mechanic' in [role.name for role in ctx.message.author.roles]:
+        if self.meta.isAdmin(ctx.author):
             embed = discord.Embed(
                 color = discord.Color.teal(),
                 description = 'React with the corresponding emoji to obtain/remove a role.'
@@ -46,7 +48,7 @@ class Announce(commands.Cog):
 
     @commands.command()
     async def mcRolesIdentity(self, ctx):
-        if 'mechanic' in [role.name for role in ctx.message.author.roles]:
+        if self.meta.isAdmin(ctx.author):
             embed = discord.Embed(
                 color = discord.Color.teal(),
                 description = 'React with the corresponding emoji to obtain/remove a role.'
@@ -65,15 +67,13 @@ class Announce(commands.Cog):
 
     @commands.command()
     async def mcRolesPing(self, ctx):
-        if 'mechanic' in [role.name for role in ctx.message.author.roles]:
+        if self.meta.isAdmin(ctx.author):
             embed = discord.Embed(
                 color = discord.Color.teal(),
                 description = 'React with the corresponding emoji to obtain/remove a role.'
             )
 
-            embed.add_field(name = 'Ping Roles',
-            value = '👑 - <@&596053595548549150>\nFor our real up-to-date enthusiasts! Get pinged about every little announcement, partnership, or public change.\n\n🎉 - <@&595088852323139604>\nGet notified for any online events hosted for the community!\n\n📣 - <@&596053605065162948>\nGet notified for everything important happening in Mind Café!')
-
+            embed.add_field(name = 'Ping Roles', value = '👑 - <@&596053595548549150>\nFor our real up-to-date enthusiasts! Get pinged about every little announcement, partnership, or public change.\n\n🎉 - <@&595088852323139604>\nGet notified for any online events hosted for the community!\n\n📣 - <@&596053605065162948>\nGet notified for everything important happening in Mind Café!')
             await ctx.send(embed = embed)
         else:
             embed = discord.Embed(
@@ -84,7 +84,7 @@ class Announce(commands.Cog):
 
     @commands.command()
     async def mcRolesTop(self, ctx):
-        if 'mechanic' in [role.name for role in ctx.message.author.roles]:
+        if self.meta.isAdmin(ctx.author):
             embed = discord.Embed(
                 color = discord.Color.teal(),
                 title = '**Welcome to the Roles Channel!**',
@@ -93,11 +93,9 @@ class Announce(commands.Cog):
 
             embed.set_thumbnail(url = 'https://cdn.discordapp.com/emojis/594982856162541573.png')
 
-            embed.add_field(name = '**Staff Roles**',
-            value = '<@&594652646611222538> - Administrative staff\n<@&592070664169455616> - Moderation staff\n<@&594642605862682672> - Event hosting and coordination staff\n<@&594642783160107186> - Partnership and marketing staff\n<@&591398563578380289> - Staff in-trial\n<@&257755582662967305> - All staff\n<@&445391150828748801> - Bots\n[Want to apply to join the staff team?](https://forms.gle/bm9WS95hdWLr3TEG9)')
+            embed.add_field(name = '**Staff Roles**',value = '<@&594652646611222538> - Administrative staff\n<@&592070664169455616> - Moderation staff\n<@&594642605862682672> - Event hosting and coordination staff\n<@&594642783160107186> - Partnership and marketing staff\n<@&591398563578380289> - Staff in-trial\n<@&257755582662967305> - All staff\n<@&445391150828748801> - Bots\n[Want to apply to join the staff team?](https://forms.gle/bm9WS95hdWLr3TEG9)')
 
-            embed.add_field(name = '**Exclusive Roles**',
-            value = '<@&591479293801136149> - 1 invites\n<@&591479443281674251> - 5 invites\n<@&591480362891345937> - 10 invites\n<@&588686697227616257> - Server nitro boosters\nCheck how many invites you have by using `%invites` in <#431191485933813765>.')
+            embed.add_field(name = '**Exclusive Roles**',value = '<@&591479293801136149> - 1 invites\n<@&591479443281674251> - 5 invites\n<@&591480362891345937> - 10 invites\n<@&588686697227616257> - Server nitro boosters\nCheck how many invites you have by using `%invites` in <#431191485933813765>.')
 
             await ctx.send(embed = embed)
         else:
@@ -110,7 +108,7 @@ class Announce(commands.Cog):
 
     @commands.command()
     async def mcVerify(self, ctx):
-        if 'mechanic' in [role.name for role in ctx.message.author.roles]:
+        if self.meta.isAdmin(ctx.author):
             embed = discord.Embed(
                 color = discord.Color.teal(),
                 title = '**Welcome to Mind Café!**',
@@ -121,7 +119,7 @@ class Announce(commands.Cog):
             embed.set_thumbnail(url = 'https://cdn.discordapp.com/emojis/593214693573787654.png')
 
             embed.add_field(name = '**You are currently unverified.**',
-            value = 'Please take a second to verify yourself by saying: `?verify`\n\nAsk a Mod if you need assistance!')
+            value = 'Please take a second to verify yourself by saying: `+verify`\n\nAsk a Mod if you need assistance!')
 
             await ctx.send(embed = embed)
         else:
@@ -133,7 +131,7 @@ class Announce(commands.Cog):
 
     @commands.command()
     async def mcAbout(self, ctx):
-        if 'mechanic' in [role.name for role in ctx.message.author.roles]:
+        if self.meta.isAdmin(ctx.author):
             embed = discord.Embed(
                 color = discord.Color.teal(),
                 title = '**Welcome to Mind Café!**',
@@ -161,7 +159,7 @@ class Announce(commands.Cog):
 
     @commands.command()
     async def mcRules(self, ctx):
-        if 'mechanic' in [role.name for role in ctx.message.author.roles]:
+        if self.meta.isAdmin(ctx.author):
             embed = discord.Embed(
                 color = discord.Color.teal(),
                 title = '**Mind Café Server Rules!**',
@@ -218,4 +216,5 @@ class Announce(commands.Cog):
             await ctx.send(embed = embed)
 
 def setup(client):
-    client.add_cog(Announce(client))
+    meta_class = Meta()
+    client.add_cog(Announce(client, meta_class))

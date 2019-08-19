@@ -369,13 +369,7 @@ class Profile(commands.Cog):
         )
         await ctx.send(embed = embed)
 
-        msgs = []
-        async for msg in ctx.channel.history(limit=1):
-            if (msg.author.id == 592436047175221259 or msg.author.id == 432038389663924225):
-                msgs.append(msg)
-                break
-
-        msg = msgs[0]
+        msg = ctx.channel.last_message
         await msg.add_reaction('❤')
         await msg.add_reaction('💔')
 
@@ -448,13 +442,7 @@ class Profile(commands.Cog):
         )
         await ctx.send(embed = embed)
 
-        msgs = []
-        async for msg in ctx.channel.history(limit=1):
-            if (msg.author.id == 592436047175221259 or msg.author.id == 432038389663924225):
-                msgs.append(msg)
-                break
-
-        msg = msgs[0]
+        msg = ctx.channel.last_message
         await msg.add_reaction('✅')
         await msg.add_reaction('⛔')
 
