@@ -5,6 +5,8 @@ from .meta import Meta
 import json
 import os
 import asyncio
+import secret
+import random
 
 class Event(commands.Cog):
 
@@ -12,7 +14,71 @@ class Event(commands.Cog):
         self.client = client
         self.dbConnection = database
         self.meta = meta
+        self.queue = list()
+        self.tea_score = 0
+        self.coffee_score = 0
 
+    #karaoke event
+    '''
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if not isinstance(message.channel, discord.TextChannel):
+            return
+
+        if ('karaoke' in message.channel.name):
+            id = message.author.id
+            if ('add me' in message.content.lower()):
+                if id not in self.queue:
+                    self.queue.append(id)
+                    embed = discord.Embed(
+                        title = 'Added you to the queue!',
+                        color = discord.Color.teal()
+                    )
+                    await message.channel.send(embed = embed)
+                else:
+                    embed = discord.Embed(
+                        title = 'You\'re already in the queue!',
+                        color = discord.Color.teal()
+                    )
+                    await message.channel.send(embed = embed)
+            elif ('remove me' in message.content.lower()):
+                if id in self.queue:
+                    embed = discord.Embed(
+                        title = 'I\'ve removed you from the queue.',
+                        color = discord.Color.teal()
+                    )
+                    await message.channel.send(embed = embed)
+
+                    self.queue.remove(id)
+                else:
+                    embed = discord.Embed(
+                        title = 'You\'re not in the queue!',
+                        color = discord.Color.teal()
+                    )
+                    await message.channel.send(embed = embed)
+            elif ('queue' in message.content.lower()):
+                say = ''
+
+                for id in self.queue:
+                    say += self.client.get_user(id).name + '\n'
+                embed = discord.Embed(
+                    title = 'Current Queue',
+                    color = discord.Color.teal(),
+                    description = say
+                )
+                await message.channel.send(embed = embed)
+            elif 'skip' == message.content.lower() and ('angels' in [role.name for role in message.author.roles] or 'mechanic' in [role.name for role in message.author.roles]):
+                self.queue.pop()
+                embed = discord.Embed(
+                    title = 'I\'ve skipped to the next person.',
+                    color = discord.Color.teal()
+                )
+                await message.channel.send(embed = embed)
+                self.queue.remove(id)
+    '''
+
+    #team names in names event
+    '''
     @commands.command(aliases=['snames'])
     async def squadnames(self, ctx):
         guild = ctx.guild
@@ -51,28 +117,113 @@ class Event(commands.Cog):
 
         await ctx.send(embed = embed)
         return
+    '''
 
-    @commands.command()
-    async def test(self, ctx):
-        channel = ctx.guild.get_channel(612449175686086667)
-        msg = channel.last_message
+    @commands.command(aliases=['pts'])
+    async def points(self, ctx):
+        embed2 = discord.Embed(
+            title = 'Squad Points',
+            description = '**Tea Squad:** `' + str(self.tea_score) + '`\n**Coffee Squad:** `' + str(self.coffee_score) + '`',
+            color = discord.Color.teal()
+        )
 
-        if msg.author != self.client.user:
+        await ctx.send(embed = embed2)
+
+    #@commands.cooldown(1, 60*60*24, commands.BucketType.user)
+    #@commands.Cog.listener()
+    #@commands.cooldown(1, 180, commands.BucketType.guild)
+    #async def on_message(self, message):
+    @commands.command(aliases=['typerace'])
+    async def typeracer(self, ctx, rounds: int = 1, channel: discord.TextChannel = None):
+        message = ctx.message
+        if not self.meta.isAdmin(message.author):
+            return
+
+        '''
+        if message.author.bot:
+            return
+        '''
+
+        if channel is None:
+            channel = message.channel
+
+        #corresponding arrays
+        strings = ['the quick brown fox jumps over the lazy dog', #1
+        'bean the corgi is the goodest boy', #2
+        'tea and coffee make the world go round', #3
+        'with great power comes great responsibility', #4
+        'elementary my dear watson', #5
+        'the snack that smiles back', #6
+        'take a deep breath', #7
+        'sorry earth is closed today', #8
+        'i am right where i am supposed to be'] #9
+
+        for round in range(0, rounds):
+            string = random.choice(strings)
+            altered = ''
+
+            punctuation = ['!', '@', '&', '.']
+            for ch in string:
+                altered += ch + random.choice(punctuation)
+
+            altered = altered[:-1]
+
             embed = discord.Embed(
-                title = 'edit me',
+                #title = 'Game On: Win ' + str(amt) + ' Coins!',
+                title = 'Game On: Squad Racers!',
                 color = discord.Color.teal()
             )
 
+            embed.add_field(name='Be the first to type the sentence without any punctuation or symbols!',
+            value='`' + altered + '`')
+            embed.set_footer(text = 'This expires in 3 minutes.')
             await channel.send(embed = embed)
-        else:
-            embeds = msg.embeds
-            embed = embeds[0]
+
+            def check(m):
+                return m.content.lower() == string and m.channel == channel
+
+            msg = await self.client.wait_for('message', check=check)
+
+            user = self.dbConnection.findProfile({'id' : msg.author.id})
+            if user is None:
+                embed = discord.Embed(
+                    title = 'Sorry, you don\'t have a profile yet! You can make one by using +profile.',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+                return
+            elif user['squad'] == '':
+                embed = discord.Embed(
+                    title = 'Sorry, you\'re not in a Squad yet! Join one by using `+squad tea/coffee`.',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+                return
+
+            squad = user['squad']
+            if user['squad'] == 'Tea':
+                self.tea_score += 1
+            else:
+                self.coffee_score += 1
+
+            #coins = user['coins'] + amt
+            #self.dbConnection.updateProfile({"id": msg.author.id}, {"$set": {"coins": coins}})
+
+            #embed2 = discord.Embed(
+            #    title = msg.author.name + ', you\'ve just earned ' + str(amt) + ' coins!',
+            #    description = 'Your total: `' + str(coins) + '` coins',
+            #    color = discord.Color.teal()
+            #)
+
             embed2 = discord.Embed(
-                title = 'edited wow',
-                color = discord.Color.gold()
+                title = msg.author.name + ' just earned `1` point for **' + squad + '**!',
+                description = '**Tea Squad:** `' + str(self.tea_score) + '`\n**Coffee Squad:** `' + str(self.coffee_score) + '`',
+                color = discord.Color.teal()
             )
 
-            await msg.edit(embed = embed2)
+            await ctx.send(embed = embed2)
+
+        return
 
     #event idea:
         #random prompt sent according to message activity in casual

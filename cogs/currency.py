@@ -6,6 +6,8 @@ import random
 import json
 import os
 import asyncio
+from numpy.random import choice
+import secret
 
 class Currency(commands.Cog):
 
@@ -19,6 +21,86 @@ class Currency(commands.Cog):
 
         with open(filename) as json_file:
             self.store = json.load(json_file)
+
+
+    @commands.cooldown(1, 60*60*24, commands.BucketType.user)
+    @commands.command(aliases=['treasurehunt', 'treasure', 'test'])
+    async def daily(self, ctx):
+        id = ctx.message.author.id
+
+        #temp
+        if id != secret.BOT_OWNER_ID:
+            print('Not Bot Owner')
+            return
+
+        user = self.dbConnection.findProfile({"id": id})
+
+        if user is None:
+            embed = discord.Embed(
+                title = 'Sorry, you don\'t have a profile yet! You can make one by using +profile.',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
+
+        companion = user['companion']
+        if companion == '':
+            embed = discord.Embed(
+                title = 'Sorry, you need a companion for that!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
+
+        special = False
+        elements = [5, 10, 25, 50]
+        weights = [0.2, 0.5, 0.2, 0.1]
+
+        if companion in [item['name'] for item in self.store['Special Companions']]:
+            special = True
+            weights = [0.1, 0.4, 0.3, 0.2]
+
+        amt = choice(elements, p=weights)
+
+        coins = user['coins']
+        coins = coins + int(amt)
+        self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins}})
+
+        print('making embed')
+        embed = discord.Embed(
+            title = ctx.author.name + ', your ' + companion + ' found `' + str(amt) + '` coins!',
+            description = '<@' + str(id) + '> coin count: `' + str(coins) + '`',
+            color = discord.Color.teal()
+        )
+
+        print('checking url')
+        if companion != '':
+            isFound = False
+            for c in self.store['Coin Companions']:
+                if c['name'].lower() == companion.lower():
+                    embed.set_image(url = c['src'])
+                    isFound = True
+                    break
+
+            if not isFound:
+                for c in self.store['Helped Companions']:
+                    if c['name'].lower() == companion.lower():
+                        embed.set_image(url = c['src'])
+                        isFound = True
+                        break
+
+            if not isFound:
+                for c in self.store['Special Companions']:
+                    if c['name'].lower() == companion.lower():
+                        embed.set_image(url = c['src'])
+                        isFound = True
+                        break
+
+        print('is special')
+        if special:
+            embed.set_footer(text = 'Special Companion detected! You have a higher chance of getting more coins.')
+        print('sending embed')
+        await ctx.channel.send(embed = embed)
 
     @commands.command(aliases=['shop', 'companions', 'pets', '$', 'sh', 'st'])
     async def store(self, ctx, type: str = None):
@@ -122,7 +204,7 @@ class Currency(commands.Cog):
         #unknown type
         else:
             embed2 = discord.Embed(
-                description = 'Correct Usage: \n`+store` \n`store [coin/helped/item]`',
+                description = 'Correct Usage: `+store [coin/helped/item]`',
                 color = discord.Color.teal()
             )
             await ctx.send(embed = embed2)
@@ -327,6 +409,15 @@ class Currency(commands.Cog):
 
         id = member.id
         user = self.dbConnection.findProfile({"id": id})
+
+        if user is None:
+            embed = discord.Embed(
+                title = 'Sorry, ' + member.name + ' doesn\'t have a profile yet! They can make one by using +profile.',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
+
         coins = user['coins']
         coins = coins + int(amt)
         self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins}})
@@ -369,7 +460,7 @@ class Currency(commands.Cog):
 
 
     @commands.command()
-    async def giveSquad(self, ctx, squad, amt: int, reason = ''):
+    async def giveSquad(self, ctx, squad, amt: int, *, reason = ''):
         if not self.meta.isAdmin(ctx.author):
             return
 
@@ -428,57 +519,6 @@ class Currency(commands.Cog):
             msg += '\n```' + reason + '```'
 
         await log.send(msg)
-
-    '''
-    @commands.command(aliases=['helpedby', 'thanks'])
-    async def rep(self, ctx, member: discord.Member = None):
-        if member is None:
-            embed = discord.Embed(
-                title = 'Please tag a person you\'d like to rep!',
-                color = discord.Color.teal()
-            )
-            await ctx.send(embed = embed)
-            return
-        elif ctx.author.id == member.id:
-            embed = discord.Embed(
-                title = 'You can\'t rep yourself!',
-                color = discord.Color.teal()
-            )
-            await ctx.send(embed = embed)
-            return
-        else:
-            id = member.id
-            user = self.dbConnection.findProfile({"id": id})
-
-            if user is None:
-                embed = discord.Embed(
-                    title = 'Sorry, they don\'t have a profile yet! They can make one by using +profile.',
-                    color = discord.Color.teal()
-                )
-                await ctx.send(embed = embed)
-                return
-
-            helped = user['helped']
-            helped = helped + 1
-            self.dbConnection.updateProfile({"id": id}, {"$set": {"helped": helped}})
-            embed = discord.Embed(
-                title = 'Repped ' + member.name + '!',
-                description = member.name + '\'s rep count: ' + str(helped),
-                color = discord.Color.teal()
-            )
-            await ctx.send(embed = embed)
-
-        #finding log channel
-        guild = ctx.guild
-        for ch in guild.text_channels:
-            if ch.name.lower() == 'log':
-                log = guild.get_channel(ch.id)
-                break
-
-        msg = '**<@' + str(member.id) + '>** was repped by <@' + str(ctx.author.id) + '>.'
-
-        await log.send(msg)
-    '''
 
     @commands.command(aliases=['helpedby', 'thanks'])
     async def rep(self, ctx):

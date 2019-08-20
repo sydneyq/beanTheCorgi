@@ -6,16 +6,26 @@ import sys
 import signal
 import asyncio
 import pymongo
+import math
 
 import database
 import secret
 
-client = commands.Bot(commands.when_mentioned_or('+'), case_insensitive=True)
+client = commands.Bot(commands.when_mentioned_or('='), case_insensitive=True)
 
 @client.event
 async def on_ready():
     print('Bean is online!')
     await client.change_presence(status=discord.Status.online, activity=discord.Game('DM me for help/feedback!'))
+
+@client.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.CommandOnCooldown):
+        embed = discord.Embed(
+            title = "Cooldown: please retry in `{}s`.".format(math.ceil(error.retry_after)),
+            color = discord.Color.teal()
+        )
+        await ctx.send(embed = embed, delete_after=10)
 
 @client.command()
 async def reload(ctx, extension):

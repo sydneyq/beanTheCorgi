@@ -259,7 +259,7 @@ class Profile(commands.Cog):
         #Achievements
         #   helped
         helped = user['helped']
-        embed.add_field(name="People Helped", value=helped, inline=True)
+        embed.add_field(name="Help Points", value=helped, inline=True)
 
         #   coins
         coins = user['coins']

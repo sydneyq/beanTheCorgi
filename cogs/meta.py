@@ -182,6 +182,31 @@ class Global(commands.Cog):
         )
         await ctx.send(embed = embed)
 
+    '''
+    #edit msg example
+    @commands.command()
+    async def test(self, ctx):
+        channel = ctx.guild.get_channel(612449175686086667)
+        msg = channel.last_message
+
+        if msg.author != self.client.user:
+            embed = discord.Embed(
+                title = 'edit me',
+                color = discord.Color.teal()
+            )
+
+            await channel.send(embed = embed)
+        else:
+            embeds = msg.embeds
+            embed = embeds[0]
+            embed2 = discord.Embed(
+                title = 'edited wow',
+                color = discord.Color.gold()
+            )
+
+            await msg.edit(embed = embed2)
+    '''
+
 def setup(client):
     meta_class = Meta()
     client.add_cog(Global(client, meta_class))
