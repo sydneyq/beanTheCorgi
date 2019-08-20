@@ -1,13 +1,15 @@
 import discord
 from discord.ext import commands
 from discord.utils import get
-#import bot
 import secret
+from database import Database
 
 class Meta:
 
-    def __init__(self):
-        self.OWNER = secret.BOT_OWNER_ID
+    def isBotOwner(self, member: discord.Member):
+        if member.id == secret.BOT_OWNER_ID:
+            return True
+        return False
 
     #isAdmin
     def isAdmin(self, member: discord.Member):
@@ -46,6 +48,21 @@ class Meta:
         )
         return embed
 
+    '''
+    def getProfile(self, member: discord.Member = None):
+        if member is None:
+            return
+
+        id = member.id
+
+        profile = self.dbConnection.findProfile({"id": id})
+        if profile is None:
+            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'spouse': 0})
+            profile = self.dbConnection.findProfile({"id": id})
+
+        return profile
+    '''
+
     def hasWord(self, string, word):
         #case-insensitive, ignores punctuation: 32-96, 123-126 (not 97 - 122)
         string = string.lower()
@@ -74,9 +91,23 @@ class Meta:
 
 class Global(commands.Cog):
 
-    def __init__(self, client, meta):
+    def __init__(self, client, database, meta):
         self.client = client
         self.meta = meta
+        self.dbConnection = database
+
+    def getProfile(self, member: discord.Member = None):
+        if member is None:
+            return
+
+        id = member.id
+
+        profile = self.dbConnection.findProfile({"id": id})
+        if profile is None:
+            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'spouse': 0})
+            profile = self.dbConnection.findProfile({"id": id})
+
+        return profile
 
     @commands.command()
     async def ping(self, ctx):
@@ -115,7 +146,7 @@ class Global(commands.Cog):
             await ctx.send(embed = embed)
 
     @commands.command()
-    async def verify(self, ctx):
+    async def verify(self, ctx, squad = None):
         member = ctx.author
         if not self.meta.isVerified(member):
             guild = ctx.guild
@@ -132,7 +163,8 @@ class Global(commands.Cog):
             exclusive = guild.get_role(593064760648663041)
             await member.add_roles(exclusive)
             #welcome
-            casual = guild.get_channel(secret.GENERAL_CHANNEL)
+            casual = guild.get_channel(secret.WORKSHOP_CHANNEL)
+            #casual = guild.get_channel(secret.GENERAL_CHANNEL)
             msg = '**__🎉 Let\'s all welcome <@' + str(member.id) + '> to Mind Cafe! 🎉__**'
             msg += '\n> **Need Support?** Take a look at <#601444570600964097> and get started in <#597026335835291659>.'
             msg += '\n> **Want to join a Squad?** Go to <#431191485933813765> and say `+profile` to get started.'
@@ -140,9 +172,29 @@ class Global(commands.Cog):
             #delete command
             await ctx.message.delete()
 
+            if squad != None:
+                id = member.id
+                user = self.getProfile(member)
+
+                if 'tea' in squad:
+                    self.dbConnection.updateProfile({"id": id}, {"$set": {"squad": "Tea"}})
+                    role = ctx.guild.get_role(612788003542401035)
+                    await ctx.author.add_roles(role)
+                elif 'coffee' in squad:
+                    self.dbConnection.updateProfile({"id": id}, {"$set": {"squad": "Coffee"}})
+                    role = ctx.guild.get_role(612788004926521365)
+                    await ctx.author.add_roles(role)
+                else:
+                    embed = discord.Embed(
+                        title = 'That Squad doesn\'t exist. Please choose either Coffee or Tea.',
+                        color = discord.Color.teal()
+                    )
+                    await ctx.send(embed = embed, delete_after=10)
+                    return
+
     @commands.command()
     async def bean(self, ctx, channel: discord.TextChannel, *, message):
-        if ctx.message.author.id == secret.BOT_OWNER_ID:
+        if self.meta.isBotOwner(ctx.author):
 
             embed = discord.Embed(
                 description = message,
@@ -209,4 +261,5 @@ class Global(commands.Cog):
 
 def setup(client):
     meta_class = Meta()
-    client.add_cog(Global(client, meta_class))
+    database_connection = Database()
+    client.add_cog(Global(client, database_connection, meta_class))

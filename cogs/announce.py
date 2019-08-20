@@ -112,14 +112,14 @@ class Announce(commands.Cog):
             embed = discord.Embed(
                 color = discord.Color.teal(),
                 title = '**Welcome to Mind Café!**',
-                description = 'Be sure to read `#rules` for our server rules.'
+                description = 'Be sure to read `#rules` for our server rules.\nYou are currently unverified.'
             )
 
             embed.set_footer(text = 'Thanks for joining our family!')
             embed.set_thumbnail(url = 'https://cdn.discordapp.com/emojis/593214693573787654.png')
 
-            embed.add_field(name = '**You are currently unverified.**',
-            value = 'Please take a second to verify yourself by saying: `+verify`\n\nAsk a Mod if you need assistance!')
+            embed.add_field(name = '**Verify Yourself**',
+            value = '`+verify tea` - Verify and join the Tea Squad\n`+verify coffee` - Verify and join the Coffee Squad\n`+verify` - Verify without joining a Squad\n\nAsk a Mod if you need assistance!')
 
             await ctx.send(embed = embed)
         else:

@@ -19,20 +19,6 @@ class Profile(commands.Cog):
 
         with open(filename) as json_file:
             self.store = json.load(json_file)
-    '''
-    async def get_profile(member: discord.Member = None):
-        if member is None:
-            return
-
-        id = member.id
-
-        profile = self.dbConnection.findProfile({"id": id})
-        if profile is None:
-            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'spouse': 0})
-            profile = self.dbConnection.findProfile({"id": id})
-
-        return profile
-    '''
 
     @commands.command(aliases=['squads', 's', 'sq', 'leaderboard'])
     async def squadCount(self, ctx):
