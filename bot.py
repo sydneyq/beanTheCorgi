@@ -11,7 +11,7 @@ import math
 import database
 import secret
 
-client = commands.Bot(commands.when_mentioned_or('='), case_insensitive=True)
+client = commands.Bot(commands.when_mentioned_or('+'), case_insensitive=True)
 
 @client.event
 async def on_ready():
