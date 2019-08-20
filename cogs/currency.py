@@ -24,14 +24,9 @@ class Currency(commands.Cog):
 
 
     @commands.cooldown(1, 60*60*24, commands.BucketType.user)
-    @commands.command(aliases=['treasurehunt', 'treasure', 'test'])
+    @commands.command(aliases=['treasurehunt', 'treasure'])
     async def daily(self, ctx):
         id = ctx.message.author.id
-
-        #temp
-        if id != secret.BOT_OWNER_ID:
-            print('Not Bot Owner')
-            return
 
         user = self.dbConnection.findProfile({"id": id})
 
@@ -140,7 +135,7 @@ class Currency(commands.Cog):
             return
         #coin
         elif type.lower() == 'coin' or type.lower() == 'c' or type.lower() == 'coins':
-            storeHelp = """You can buy these Companions with Coins. They're gifs! You do not keep a Coin Companion if you set or buy a different Companion."""
+            storeHelp = """You can buy these Companions with Coins. They're gifs! You do not keep a Coin Companion if you set or buy a different Companion. Special Companions are evolvable."""
             embed.add_field(name='Store Help', value=storeHelp, inline=False)
             storeDesc = ''
             prevCost = 0
@@ -155,7 +150,19 @@ class Currency(commands.Cog):
                     prevCost = item['price']
 
             embed.add_field(name='Coin Companions', value=storeDesc, inline=False)
-            embed.set_thumbnail(url = 'https://www.mariowiki.com/images/thumb/1/17/CoinMK8.png/1200px-CoinMK8.png')
+
+            storeDesc_special = ''
+            for item in self.store['Special Companions']:
+                #same price, add to same line
+                if item['price'] == prevCost:
+                    storeDesc_special += ', ' + item['name']
+                #different price, new line, update prevCost
+                else:
+                    storeDesc_special += '\n`' + str(item['price']) + ' coins:` ' + item['name']
+                    prevCost = item['price']
+
+            embed.add_field(name='Special Companions', value=storeDesc_special, inline=False)
+
             embed.set_footer(text = 'Earn coins by participating in server events! Read #about-profiles for more information. Access this store using "+store c".')
             await ctx.send(embed = embed)
             return
@@ -231,9 +238,25 @@ class Currency(commands.Cog):
             if c['name'].lower() == input.lower():
                 if coins >= c['price']:
                     coins -= c['price']
-                    self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "companion": c['name']}})
+
                     embed = discord.Embed(
-                        title = 'Consider it done! ✅',
+                        color = discord.Color.teal()
+                    )
+
+                    #ditto event
+                    dittos = ['Squirtle', 'Charmander', 'Bulbasaur']
+                    companion_name = c['name']
+                    title = 'Consider it done! ✅'
+                    value = ''
+
+                    if companion_name in dittos:
+                        if random.random() < .1:
+                            companion_name = 'Ditto'
+                            title = 'Consider it — Oh? **Ditto** was caught! 🌟'
+
+                    self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "companion": companion_name}})
+                    embed = discord.Embed(
+                        title = title,
                         color = discord.Color.teal()
                     )
                     await ctx.send(embed = embed)
@@ -249,6 +272,24 @@ class Currency(commands.Cog):
             if c['name'].lower() == input.lower():
                 if helped >= c['price']:
                     self.dbConnection.updateProfile({"id": id}, {"$set": {"companion": c['name']}})
+                    embed = discord.Embed(
+                        title = 'Consider it done! ✅',
+                        color = discord.Color.teal()
+                    )
+                    await ctx.send(embed = embed)
+                else:
+                    embed = discord.Embed(
+                        title = 'You can\'t seem to afford that companion.',
+                        color = discord.Color.teal()
+                    )
+                    await ctx.send(embed = embed)
+                return
+
+        for c in self.store['Special Companions']:
+            if c['name'].lower() == input.lower():
+                if coins >= c['price']:
+                    coins -= c['price']
+                    self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "companion": c['name']}})
                     embed = discord.Embed(
                         title = 'Consider it done! ✅',
                         color = discord.Color.teal()
@@ -292,13 +333,25 @@ class Currency(commands.Cog):
                     await ctx.send(embed = embed)
                 return
 
-
         embed = discord.Embed(
             title = 'I couldn\'t seem to find companion or item.',
             color = discord.Color.teal()
         )
         await ctx.send(embed = embed)
         return
+
+    @commands.command()
+    async def setCompanion(self, ctx, *, companion):
+        if ctx.author.id != secret.BOT_OWNER_ID:
+            return
+        else:
+            id = ctx.author.id
+            self.dbConnection.updateProfile({"id": id}, {"$set": {"companion": companion}})
+            embed = discord.Embed(
+                title = 'Consider it done! ✅',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
 
     @commands.command(aliases=['evolveCompanion'])
     async def evolve(self, ctx):
@@ -313,23 +366,30 @@ class Currency(commands.Cog):
             await ctx.send(embed = embed)
             return
 
-        if user['companion'] != 'Eevee':
-            print('Companion: ' + user['companion'])
+        companion = user['companion']
+        if companion not in [c["name"] for c in self.store['Special Companions']]:
+            print('Companion: ' + companion)
             embed = discord.Embed(
-                title = 'You need an Eevee to evolve!',
+                title = 'You need an evolvable Special Companion to evolve!',
                 color = discord.Color.teal()
             )
             await ctx.send(embed = embed)
             return
         else:
-            choices = ['Flareon',
-                'Jolteon',
-                'Glaceon',
-                'Umbreon',
-                'Leafeon',
-                'Espeon',
-                'Vaporeon',
-                'Sylveon']
+            if companion == 'Eevee':
+                choices = ['Flareon',
+                    'Jolteon',
+                    'Glaceon',
+                    'Umbreon',
+                    'Leafeon',
+                    'Espeon',
+                    'Vaporeon',
+                    'Sylveon']
+            elif companion == 'Cosmog':
+                choices = ['Solgaleo',
+                    'Lunala']
+            elif companion == 'Yamper':
+                choices = ['Dancing Yamper']
 
             result = random.choice(choices)
 

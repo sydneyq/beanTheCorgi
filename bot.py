@@ -17,7 +17,7 @@ client = commands.Bot(commands.when_mentioned_or('='), case_insensitive=True)
 async def on_ready():
     print('Bean is online!')
     await client.change_presence(status=discord.Status.online, activity=discord.Game('DM me for help/feedback!'))
-
+'''
 @client.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.CommandOnCooldown):
@@ -26,7 +26,7 @@ async def on_command_error(ctx, error):
             color = discord.Color.teal()
         )
         await ctx.send(embed = embed, delete_after=10)
-
+'''
 @client.command()
 async def reload(ctx, extension):
     if ctx.message.author.id == secret.BOT_OWNER_ID:

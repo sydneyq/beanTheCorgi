@@ -41,6 +41,11 @@
             "src":"https://www.australiangeographic.com.au/wp-content/uploads/2018/12/2T8A2202.jpg"
         },
         {
+            "name":"Husky",
+            "price":20,
+            "src":"https://i.chzbgr.com/original/8414926080/h5051269A/"
+        },
+        {
             "name":"Donkey",
             "price":30,
             "src":"https://images.fineartamerica.com/images/artworkimages/mediumlarge/1/12-miniature-donkey-foal-jean-louis-klein--marie-luce-hubert.jpg"
@@ -115,13 +120,13 @@
         },
         {
             "name":"Niffler",
-            "price":300,
+            "price":200,
             "src":"https://media.tenor.com/images/59452b5c5368f87cf36316403ad191b6/tenor.gif"
         },
         {
-            "name":"Husky",
-            "price":300,
-            "src":"https://i.chzbgr.com/original/8414926080/h5051269A/"
+            "name":"Greninja",
+            "price":200,
+            "src":"https://projectpokemon.org/home/uploads/monthly_2018_05/large.5aeb1c9c5b87b_greninjawatershurikenmoveGif.gif.cf9b20fded49483b3f154b0ad9277403.gif"
         },
         {
             "name":"Shaymin",
@@ -130,8 +135,13 @@
         },
         {
             "name":"Toothless",
+            "price":300,
+            "src":"https://media2.giphy.com/media/V6td6y7YiVGEg/source.gif"
+        },
+        {
+            "name":"Alolan Vulpix",
             "price":500,
-            "src":"'Toothless':'https://media1.giphy.com/media/1pA8TwX8atOCnAtTbV/giphy.gif"
+            "src":"https://i.pinimg.com/originals/ba/16/cb/ba16cb34f3e58f486f2657b6ec6beace.gif"
         },
         {
             "name":"Pikachu",
@@ -142,7 +152,10 @@
             "name":"Mudkip",
             "price":500,
             "src":"https://thumbs.gfycat.com/FrigidShyJaguar-size_restricted.gif"
-        },
+        }
+    ],
+
+    "Special Companions" : [
         {
             "name":"Yamper",
             "price":700,
@@ -152,10 +165,19 @@
             "name":"Eevee",
             "price":700,
             "src":"https://media1.tenor.com/images/1df3441f8f9639e4661475009177b42f/tenor.gif?itemid=12016437"
+        },
+        {
+            "name":"Cosmog",
+            "price":700,
+            "src":"https://i.kym-cdn.com/photos/images/original/001/306/029/2aa.gif"
         }
     ],
 
-    "Special Companions" : [
+    "Evolved Companions" : [
+        {
+            "name":"Ditto",
+            "src":"https://media1.giphy.com/media/uQZTgSuGZMTHG/giphy.gif"
+        },
         {
             "name":"Vaporeon",
             "src":"https://media1.giphy.com/media/sJ29qAcpPO9uo/source.gif"
@@ -187,6 +209,18 @@
         {
             "name":"Glaceon",
             "src":"https://em.wattpad.com/c95e8e70e6b4ed82ba13e4ee344056c276dc4cae/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f776174747061642d6d656469612d736572766963652f53746f7279496d6167652f4148704e334264336d324d314b673d3d2d3434363639323536342e313464353763613531373630653532313836323836313638333637372e676966?s=fit&w=720&h=720"
+        },
+        {
+            "name":"Solgaleo",
+            "src":"https://i.imgur.com/bVItqNZ.gif"
+        },
+        {
+            "name":"Lunala",
+            "src":"https://data.whicdn.com/images/259554863/original.gif"
+        },
+        {
+            "name":"Dancing Yamper",
+            "src":"https://thumbs.gfycat.com/UnderstatedEmptyEeve-size_restricted.gif"
         }
     ],
 

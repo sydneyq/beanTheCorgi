@@ -254,7 +254,7 @@ class Profile(commands.Cog):
             spouse = 'N/A'
         else:
             spouse = '<@' + str(user['spouse']) + '>'
-        embed.add_field(name="Spouse", value=spouse, inline=True)
+        embed.add_field(name="Spouse", value=spouse, inline=False)
 
         #Achievements
         #   helped
@@ -265,14 +265,12 @@ class Profile(commands.Cog):
         coins = user['coins']
         embed.add_field(name="Coins", value=coins, inline=True)
 
-        #   companion
+        #Companion
         companion = user['companion']
-        msg = companion
-        if msg == '':
-            msg = 'No companion yet. Get one at `+store`!'
-        embed.add_field(name="Companion", value=msg, inline=True)
+        msg = ''
 
         if companion is not '':
+            isSpecial = False
             isFound = False
             for c in self.store['Coin Companions']:
                 if c['name'].lower() == companion.lower():
@@ -292,7 +290,24 @@ class Profile(commands.Cog):
                     if c['name'].lower() == companion.lower():
                         embed.set_image(url = c['src'])
                         isFound = True
+                        isSpecial = True
                         break
+
+            if not isFound:
+                for c in self.store['Evolved Companions']:
+                    if c['name'].lower() == companion.lower():
+                        embed.set_image(url = c['src'])
+                        isFound = True
+                        isSpecial = True
+                        break
+
+            msg = companion
+            if isSpecial:
+                msg = "[🌟] " + companion
+        else:
+            msg = 'No companion yet. Get one at `+store`!'
+
+        embed.add_field(name="Companion", value=msg, inline=False)
 
         #Acknowledgements
         ack = ''
