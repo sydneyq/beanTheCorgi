@@ -48,12 +48,12 @@ class Currency(commands.Cog):
             return
 
         special = False
-        elements = [5, 10, 25, 50]
-        weights = [0.2, 0.5, 0.2, 0.1]
+        elements = [10, 25, 50]
+        weights = [0.6, 0.3, 0.1]
 
         if companion in [item['name'] for item in self.store['Special Companions']]:
             special = True
-            weights = [0.1, 0.4, 0.3, 0.2]
+            weights = [0.4, 0.35, 0.25]
 
         amt = choice(elements, p=weights)
 
@@ -135,7 +135,7 @@ class Currency(commands.Cog):
             return
         #coin
         elif type.lower() == 'coin' or type.lower() == 'c' or type.lower() == 'coins':
-            storeHelp = """You can buy these Companions with Coins. They're gifs! You do not keep a Coin Companion if you set or buy a different Companion. Special Companions are evolvable."""
+            storeHelp = """You can buy these Companions with Coins and using `+buy companionName`. You do not keep a Coin Companion if you set or buy a different Companion. Special Companions are evolvable and have a higher chance for more daily coins."""
             embed.add_field(name='Store Help', value=storeHelp, inline=False)
             storeDesc = ''
             prevCost = 0
@@ -168,7 +168,7 @@ class Currency(commands.Cog):
             return
         #helped
         elif type.lower() == 'helped' or type.lower() == 'h':
-            storeHelp = """You can unlock these Companions with Help Points. After reaching the minimum amount Helped, you're able to keep these Companions!"""
+            storeHelp = """You can unlock these Companions with Help Points and using `+set companionName`. After reaching the minimum amount Helped, you're able to keep these Companions!"""
             embed.add_field(name='Store Help', value=storeHelp, inline=False)
             storeDesc = ''
             prevCost = 0

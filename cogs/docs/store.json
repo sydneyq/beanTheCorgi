@@ -3,7 +3,7 @@
         {
             "name":"Mouse",
             "price":1,
-            "src":"https://www.wallpaperup.com/uploads/wallpapers/2013/10/20/163356/f2ee734991560fc269819a78f891e146-700.jpg"
+            "src":"https://media0.giphy.com/media/1rPpzEMv4t52OeC60R/giphy.gif"
         },
         {
             "name":"Rock",
@@ -11,79 +11,89 @@
             "src":"https://vignette.wikia.nocookie.net/spongebob/images/4/45/Pete_the_rock.png/revision/latest?cb=20141115223905"
         },
         {
+            "name":"Turtle",
+            "price":5,
+            "src":"https://i.imgur.com/bQZrpV2.gif"
+        },
+        {
+            "name":"Lynx",
+            "price":5,
+            "src":"https://media3.giphy.com/media/8cEr5Auy0RAni3Mmov/giphy.gif"
+        },
+        {
             "name":"Cat",
             "price":5,
-            "src":"https://www.catster.com/wp-content/uploads/2018/03/Calico-cat-curled-up-asleep.jpg"
+            "src":"https://i.pinimg.com/originals/1b/57/1a/1b571a9aeabafa99e3ea89fc0476d55d.gif"
         },
         {
             "name":"Goat",
             "price":10,
-            "src":"https://www.smallholderfeed.co.uk/wp-content/uploads/2017/09/Goat-Feeding-Guide.jpg"
+            "src":"https://i.gifer.com/embedded/download/cXL.gif"
         },
         {
             "name":"Parakeet",
             "price":10,
-            "src":"https://i.ytimg.com/vi/yoYnevMnFlA/maxresdefault.jpg"
+            "src":"https://66.media.tumblr.com/4ff874638d5f6412c0342108e1128226/tumblr_omzf8e42qC1uu91fqo1_400.gif"
         },
         {
             "name":"Raccoon",
             "price":10,
-            "src":"https://images2.minutemediacdn.com/image/upload/c_crop,h_2367,w_4209,x_0,y_0/f_auto,q_auto,w_1100/v1554989622/shape/mentalfloss/527175-istock-514622028.jpg"
+            "src":"https://i.gifer.com/embedded/download/AQ8c.gif"
         },
         {
             "name":"Snake",
-            "price":20,
-            "src":"https://resize.hswstatic.com/w_907/gif/coral-snake.jpg"
+            "price":15,
+            "src":"https://media2.giphy.com/media/LcoK2zRKbQlUc/giphy.gif"
         },
         {
             "name":"Wallaby",
-            "price":20,
-            "src":"https://www.australiangeographic.com.au/wp-content/uploads/2018/12/2T8A2202.jpg"
+            "price":15,
+            "src":"https://media1.giphy.com/media/bTAhXtRFCnUkvRS5fB/giphy.gif"
         },
         {
             "name":"Husky",
-            "price":20,
-            "src":"https://i.chzbgr.com/original/8414926080/h5051269A/"
+            "price":15,
+            "src":"https://i.gifer.com/7JvD.gif"
         },
         {
-            "name":"Donkey",
-            "price":30,
-            "src":"https://images.fineartamerica.com/images/artworkimages/mediumlarge/1/12-miniature-donkey-foal-jean-louis-klein--marie-luce-hubert.jpg"
+            "name":"Ferret",
+            "price":20,
+            "src":"https://78.media.tumblr.com/31a964dbd56215845b9ff80a076982ce/tumblr_owz8tstNxu1toamj8o4_400.gif"
         },
         {
             "name":"Pig",
-            "price":30,
-            "src":"https://i.pinimg.com/originals/ee/2b/61/ee2b616224bfb8266217644f9ade0f22.jpg"
+            "price":20,
+            "src":"https://thumbs.gfycat.com/VioletSlowDalmatian-size_restricted.gif"
         },
         {
             "name":"Puffin",
-            "price":30,
-            "src":"https://www.audubon.org/sites/default/files/styles/hero_cover_bird_page/public/web_h_a1_5428_5_atlantic-puffin_lorraine_minns-breeding-adult.jpg?itok=XYcRrHhm"
+            "price":20,
+            "src":"http://vagabondbaker.com/wp-content/uploads/2015/06/Puffins-Hermaness.gif"
         },
         {
             "name":"Hedgehog",
-            "price":40,
-            "src":"https://images2.minutemediacdn.com/image/upload/c_crop,h_2014,w_3584,x_0,y_187/f_auto,q_auto,w_1100/v1554918066/shape/mentalfloss/56004-istock-496545234.jpg"
+            "price":25,
+            "src":"https://media2.giphy.com/media/3o6EhMw6ajWA4SJ9Ti/source.gif"
         },
         {
             "name":"Fox",
-            "price":40,
-            "src":"https://i.redd.it/9vy19m3z2g421.png"
+            "price":25,
+            "src":"https://i.redd.it/pbfimjntu2w21.gif"
         },
         {
             "name":"Otter",
-            "price":40,
-            "src":"https://i.redd.it/iu459icfvv401.jpg"
+            "price":25,
+            "src":"https://media2.giphy.com/media/26gssIytJvy1b1THO/giphy.gif"
         },
         {
             "name":"Shiba Inu",
-            "price":50,
-            "src":"https://66.media.tumblr.com/6075188a7f8b0fae3a9a137cd3cba5c3/tumblr_oispg8pBM31u0xpoxo1_1280.jpg"
+            "price":30,
+            "src":"https://thumbs.gfycat.com/FlamboyantRecentAnkole-size_restricted.gif"
         },
         {
             "name":"Corgi",
-            "price":50,
-            "src":"https://i.etsystatic.com/9905287/r/il/030f27/1483225420/il_794xN.1483225420_kjim.jpg"
+            "price":30,
+            "src":"https://66.media.tumblr.com/7cef19a112b64b30d57bf3610c23f0b3/tumblr_pr9qbvdyPj1qisc9uo2_r1_500.gif"
         }
     ],
 
@@ -136,7 +146,7 @@
         {
             "name":"Toothless",
             "price":300,
-            "src":"https://media2.giphy.com/media/V6td6y7YiVGEg/source.gif"
+            "src":"https://media2.giphy.com/media/C7D9NXWU8NebC/giphy.gif"
         },
         {
             "name":"Alolan Vulpix",

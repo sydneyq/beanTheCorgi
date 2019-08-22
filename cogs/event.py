@@ -133,19 +133,16 @@ class Event(commands.Cog):
     #@commands.Cog.listener()
     #@commands.cooldown(1, 180, commands.BucketType.guild)
     #async def on_message(self, message):
-    @commands.command(aliases=['typerace'])
-    async def typeracer(self, ctx, rounds: int = 1, channel: discord.TextChannel = None):
+    @commands.command(aliases=['typerace', 'squadrace', 'squadracer', 'race'])
+    async def typeracer(self, ctx, channel: discord.TextChannel = None):#rounds: int = 1, channel: discord.TextChannel = None):
         message = ctx.message
         if not self.meta.isAdmin(message.author):
             return
 
-        '''
-        if message.author.bot:
-            return
-        '''
-
         if channel is None:
-            channel = message.channel
+            channel = ctx.channel
+
+        await ctx.message.delete()
 
         #corresponding arrays
         strings = ['the quick brown fox jumps over the lazy dog', #1
@@ -156,72 +153,96 @@ class Event(commands.Cog):
         'the snack that smiles back', #6
         'take a deep breath', #7
         'sorry earth is closed today', #8
-        'i am right where i am supposed to be'] #9
+        'i am right where i am supposed to be', #9
+        'houston we have a problem', #10
+        'you had me at hello world', #11
+        'keep your friends close and your enemies closer', #12
+        'today is going to be a good day', #13
+        'adventure is out there', #14
+        'there is no one i would rather be than me', #15
+        'hakuna matata what a wonderful phrase', #16
+        'no one deserves to be forgotten', #17
+        'i could do this all day', #18
+        'i have been falling for twenty minutes', #19
+        'come with me where dreams are born and time is never planned', #20
+        'i wanna be the very best that no one ever was', #21
+        'we are a product of the stories we tell ourselves', #22
+        'let us learn to show our friendship for a man when he is alive and not after he is dead', #23
+        'a man can learn more from defeat than success or victory', #24
+        'when there are clouds in the sky you will get by', #25
+        'if you do not like where you are move you are not a tree', #26
+        'i think you are confused for it is you who will taste defeat', #27
+        'we used google cloud platform to predict how clouds will behave', #28
+        'it is bed o clock you best be sleeping', #29
+        'when you cannot sleep at night it is because you are awake', #30
+        'does the sun shine for man to tell it where to cast its rays']
 
-        for round in range(0, rounds):
-            string = random.choice(strings)
-            altered = ''
+        #for round in range(0, rounds):
+        string = random.choice(strings)
+        amt = 25
+        altered = ''
 
-            punctuation = ['!', '@', '&', '.']
-            for ch in string:
-                altered += ch + random.choice(punctuation)
+        punctuation = ['!', '@', '&', '.']
+        for ch in string:
+            altered += ch + random.choice(punctuation)
 
-            altered = altered[:-1]
+        altered = altered[:-1]
 
+        embed = discord.Embed(
+            title = 'Game On: Win ' + str(amt) + ' Coins!',
+            #title = 'Game On: Squad Racers!',
+            color = discord.Color.teal()
+        )
+
+        embed.add_field(name='Be the first to type the sentence without any punctuation or symbols!',
+        value='`' + altered + '`')
+        embed.set_footer(text = 'This expires in 3 minutes.')
+        await channel.send(embed = embed)
+
+        def check(m):
+            return m.content.lower() == string and m.channel == channel
+
+        msg = await self.client.wait_for('message', check=check)
+
+        user = self.dbConnection.findProfile({'id' : msg.author.id})
+        if user is None:
             embed = discord.Embed(
-                #title = 'Game On: Win ' + str(amt) + ' Coins!',
-                title = 'Game On: Squad Racers!',
+                title = 'Sorry, you don\'t have a profile yet! You can make one by using +profile.',
                 color = discord.Color.teal()
             )
-
-            embed.add_field(name='Be the first to type the sentence without any punctuation or symbols!',
-            value='`' + altered + '`')
-            embed.set_footer(text = 'This expires in 3 minutes.')
             await channel.send(embed = embed)
-
-            def check(m):
-                return m.content.lower() == string and m.channel == channel
-
-            msg = await self.client.wait_for('message', check=check)
-
-            user = self.dbConnection.findProfile({'id' : msg.author.id})
-            if user is None:
-                embed = discord.Embed(
-                    title = 'Sorry, you don\'t have a profile yet! You can make one by using +profile.',
-                    color = discord.Color.teal()
-                )
-                await ctx.send(embed = embed)
-                return
-            elif user['squad'] == '':
-                embed = discord.Embed(
-                    title = 'Sorry, you\'re not in a Squad yet! Join one by using `+squad tea/coffee`.',
-                    color = discord.Color.teal()
-                )
-                await ctx.send(embed = embed)
-                return
-
-            squad = user['squad']
-            if user['squad'] == 'Tea':
-                self.tea_score += 1
-            else:
-                self.coffee_score += 1
-
-            #coins = user['coins'] + amt
-            #self.dbConnection.updateProfile({"id": msg.author.id}, {"$set": {"coins": coins}})
-
-            #embed2 = discord.Embed(
-            #    title = msg.author.name + ', you\'ve just earned ' + str(amt) + ' coins!',
-            #    description = 'Your total: `' + str(coins) + '` coins',
-            #    color = discord.Color.teal()
-            #)
-
-            embed2 = discord.Embed(
-                title = msg.author.name + ' just earned `1` point for **' + squad + '**!',
-                description = '**Tea Squad:** `' + str(self.tea_score) + '`\n**Coffee Squad:** `' + str(self.coffee_score) + '`',
+            return
+        '''
+        elif user['squad'] == '':
+            embed = discord.Embed(
+                title = 'Sorry, you\'re not in a Squad yet! Join one by using `+squad tea/coffee`.',
                 color = discord.Color.teal()
             )
+            await channel.send(embed = embed)
+            return
 
-            await ctx.send(embed = embed2)
+        squad = user['squad']
+        if user['squad'] == 'Tea':
+            self.tea_score += 1
+        else:
+            self.coffee_score += 1
+        '''
+        coins = user['coins'] + amt
+        self.dbConnection.updateProfile({"id": msg.author.id}, {"$set": {"coins": coins}})
+
+        embed2 = discord.Embed(
+            title = msg.author.name + ', you\'ve just earned ' + str(amt) + ' coins!',
+            description = 'Your total: `' + str(coins) + '` coins',
+            color = discord.Color.teal()
+        )
+        '''
+        embed2 = discord.Embed(
+            title = msg.author.name + ' just earned `1` point for **' + squad + '**!',
+            description = '**Tea Squad:** `' + str(self.tea_score) + '`\n**Coffee Squad:** `' + str(self.coffee_score) + '`',
+            color = discord.Color.teal()
+        )
+        '''
+        await channel.send(embed = embed2)
 
         return
 
