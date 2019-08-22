@@ -54,6 +54,9 @@ class Currency(commands.Cog):
         if companion in [item['name'] for item in self.store['Special Companions']]:
             special = True
             weights = [0.4, 0.35, 0.25]
+        elif companion in [item['name'] for item in self.store['Evolved Companions']]:
+            special = True
+            weights = [0.4, 0.35, 0.25]
 
         amt = choice(elements, p=weights)
 
@@ -86,6 +89,13 @@ class Currency(commands.Cog):
 
             if not isFound:
                 for c in self.store['Special Companions']:
+                    if c['name'].lower() == companion.lower():
+                        embed.set_image(url = c['src'])
+                        isFound = True
+                        break
+
+            if not isFound:
+                for c in self.store['Evolved Companions']:
                     if c['name'].lower() == companion.lower():
                         embed.set_image(url = c['src'])
                         isFound = True
