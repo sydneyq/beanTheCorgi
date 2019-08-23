@@ -118,7 +118,7 @@ class Event(commands.Cog):
         await ctx.send(embed = embed)
         return
     '''
-
+    '''
     @commands.command(aliases=['pts'])
     async def points(self, ctx):
         embed2 = discord.Embed(
@@ -128,7 +128,7 @@ class Event(commands.Cog):
         )
 
         await ctx.send(embed = embed2)
-
+    '''
     #@commands.cooldown(1, 60*60*24, commands.BucketType.user)
     #@commands.Cog.listener()
     #@commands.cooldown(1, 180, commands.BucketType.guild)
@@ -196,7 +196,7 @@ class Event(commands.Cog):
 
         embed.add_field(name='Be the first to type the sentence without any punctuation or symbols!',
         value='`' + altered + '`')
-        embed.set_footer(text = 'This expires in 3 minutes.')
+        #embed.set_footer(text = 'This expires in 3 minutes.')
         await channel.send(embed = embed)
 
         def check(m):

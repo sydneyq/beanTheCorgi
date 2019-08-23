@@ -329,6 +329,14 @@ class Profile(commands.Cog):
             await ctx.send(embed = embed)
             return
 
+        if ctx.author.bot or member.bot:
+            embed = discord.Embed(
+                title = 'You can\'t marry a bot!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
+
         id = ctx.author.id
         user = self.dbConnection.findProfile({"id": id})
         if user is None:
