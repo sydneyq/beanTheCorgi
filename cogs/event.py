@@ -164,7 +164,9 @@ class Event(commands.Cog):
         'we used google cloud platform to predict how clouds will behave', #28
         'it is bed o clock you best be sleeping', #29
         'when you cannot sleep at night it is because you are awake', #30
-        'does the sun shine for man to tell it where to cast its rays']
+        'does the sun shine for man to tell it where to cast its rays',
+        'the wilderness must be explored',
+        'a wilderness explorer is a friend to all be it plants or fish or tiny mole']
 
         #for round in range(0, rounds):
         string = random.choice(strings)
