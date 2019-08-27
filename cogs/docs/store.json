@@ -21,8 +21,13 @@
             "src":"https://media3.giphy.com/media/8cEr5Auy0RAni3Mmov/giphy.gif"
         },
         {
-            "name":"Cat",
+            "name":"Bunny",
             "price":5,
+            "src":"http://78.media.tumblr.com/d590c8bda137f7e5c30217e2c3d7e052/tumblr_p0efpefn571wbxqk4o1_540.gif"
+        },
+        {
+            "name":"Cat",
+            "price":10,
             "src":"https://i.pinimg.com/originals/1b/57/1a/1b571a9aeabafa99e3ea89fc0476d55d.gif"
         },
         {
@@ -137,6 +142,11 @@
             "name":"Greninja",
             "price":200,
             "src":"https://projectpokemon.org/home/uploads/monthly_2018_05/large.5aeb1c9c5b87b_greninjawatershurikenmoveGif.gif.cf9b20fded49483b3f154b0ad9277403.gif"
+        },
+        {
+            "name":"Ice Bear",
+            "price":300,
+            "src":"https://i.kym-cdn.com/photos/images/original/001/001/592/fb8.gif"
         },
         {
             "name":"Shaymin",

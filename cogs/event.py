@@ -118,17 +118,6 @@ class Event(commands.Cog):
         await ctx.send(embed = embed)
         return
     '''
-    '''
-    @commands.command(aliases=['pts'])
-    async def points(self, ctx):
-        embed2 = discord.Embed(
-            title = 'Squad Points',
-            description = '**Tea Squad:** `' + str(self.tea_score) + '`\n**Coffee Squad:** `' + str(self.coffee_score) + '`',
-            color = discord.Color.teal()
-        )
-
-        await ctx.send(embed = embed2)
-    '''
     #@commands.cooldown(1, 60*60*24, commands.BucketType.user)
     #@commands.Cog.listener()
     #@commands.cooldown(1, 180, commands.BucketType.guild)
@@ -246,10 +235,136 @@ class Event(commands.Cog):
 
         return
 
-    #event idea:
-        #random prompt sent according to message activity in casual
-        #the first person to send a special, random word ("biscuit", "treat", etc) gives team point
-    #https://discordpy.readthedocs.io/en/latest/api.html#discord.Client.wait_for
+    @commands.command(aliases=['pewpew', 'pewpewpew', 'teamwork', 'teambattle'])
+    async def pew(self, ctx, channel: discord.TextChannel = None):
+        message = ctx.message
+        if not self.meta.isAdmin(message.author):
+            return
+
+        if channel is None:
+            channel = ctx.channel
+
+        await ctx.message.delete()
+
+        embed = discord.Embed(
+            title = 'Game On: Pewpew!',
+            description = 'Get three people from your Squad to say \"pewpew\" first to gain a point!',
+            color = discord.Color.teal()
+        )
+
+        await channel.send(embed = embed)
+
+        isFull = False
+        local_tea_score = 0
+        local_coffee_score = 0
+
+        tea_shooters = []
+        coffee_shooters = []
+
+        while not isFull:
+            def check(m):
+                return m.content.lower() == 'pew pew' or m.content.lower() == 'pewpew' and m.channel == channel
+
+            msg = await self.client.wait_for('message', check=check)
+
+            user = self.dbConnection.findProfile({'id' : msg.author.id})
+            if user is None:
+                embed = discord.Embed(
+                    title = 'Sorry, you don\'t have a profile yet! You can make one by using +profile.',
+                    color = discord.Color.teal()
+                )
+                await channel.send(embed = embed)
+                continue
+
+            elif user['squad'] == '':
+                embed = discord.Embed(
+                    title = 'Sorry, you\'re not in a Squad yet! Join one by using `+squad tea/coffee`.',
+                    color = discord.Color.teal()
+                )
+                await channel.send(embed = embed)
+                continue
+
+            squad = user['squad']
+
+            if squad == 'Tea':
+                if msg.author.id in tea_shooters:
+                    embed = discord.Embed(
+                        title = 'Sorry, you\'ve already shot in this round!',
+                        color = discord.Color.teal()
+                    )
+                    await channel.send(embed = embed)
+                    continue
+                else:
+                    tea_shooters.append(msg.author.id)
+
+                local_tea_score += 1
+            else:
+                if msg.author.id in coffee_shooters:
+                    embed = discord.Embed(
+                        title = 'Sorry, you\'ve already shot in this round!',
+                        color = discord.Color.teal()
+                    )
+                    await channel.send(embed = embed)
+                    continue
+                else:
+                    coffee_shooters.append(msg.author.id)
+
+                local_coffee_score += 1
+
+            if local_tea_score == 3 or local_coffee_score == 3:
+                isFull = True
+
+            embed3 = discord.Embed(
+                title = 'Current Attacks',
+                color = discord.Color.teal()
+            )
+
+            tea_shooters_str = ''
+            for shooter in tea_shooters:
+                tea_shooters_str += '<@' + str(shooter) + '>\n'
+
+            if tea_shooters_str == '':
+                tea_shooters_str = 'N/A'
+
+            embed3.add_field(name='Tea Shooters (' + str(len(tea_shooters)) + '/3)', value=tea_shooters_str)
+
+            coffee_shooters_str = ''
+            for shooter in coffee_shooters:
+                coffee_shooters_str += '<@' + str(shooter) + '>\n'
+
+            if coffee_shooters_str == '':
+                coffee_shooters_str = 'N/A'
+
+            embed3.add_field(name='Coffee Shooters (' + str(len(coffee_shooters)) + '/3)', value=coffee_shooters_str)
+
+            await channel.send(embed = embed3)
+
+        if local_tea_score == 3:
+            self.tea_score += 1
+        else:
+            self.coffee_score += 1
+
+        embed2 = discord.Embed(
+            title = squad + ' Squad just earned `1` point!',
+            description = '**Tea Squad:** `' + str(self.tea_score) + '`\n**Coffee Squad:** `' + str(self.coffee_score) + '`',
+            color = discord.Color.teal()
+        )
+
+        await channel.send(embed = embed2)
+
+        return
+
+
+    @commands.command(aliases=['pts'])
+    async def points(self, ctx):
+        embed2 = discord.Embed(
+            title = 'Squad Points',
+            description = '**Tea Squad:** `' + str(self.tea_score) + '`\n**Coffee Squad:** `' + str(self.coffee_score) + '`',
+            color = discord.Color.teal()
+        )
+
+        await ctx.send(embed = embed2)
+
 
 def setup(client):
     database_connection = Database()

@@ -22,91 +22,6 @@ class Currency(commands.Cog):
         with open(filename) as json_file:
             self.store = json.load(json_file)
 
-
-    @commands.cooldown(1, 60*60*24, commands.BucketType.user)
-    @commands.command(aliases=['treasurehunt', 'treasure'])
-    async def daily(self, ctx):
-        id = ctx.message.author.id
-
-        user = self.dbConnection.findProfile({"id": id})
-
-        if user is None:
-            embed = discord.Embed(
-                title = 'Sorry, you don\'t have a profile yet! You can make one by using +profile.',
-                color = discord.Color.teal()
-            )
-            await ctx.send(embed = embed)
-            return
-
-        companion = user['companion']
-        if companion == '':
-            embed = discord.Embed(
-                title = 'Sorry, you need a companion for that!',
-                color = discord.Color.teal()
-            )
-            await ctx.send(embed = embed)
-            return
-
-        special = False
-        elements = [10, 25, 50]
-        weights = [0.6, 0.3, 0.1]
-
-        if companion in [item['name'] for item in self.store['Special Companions']]:
-            special = True
-            weights = [0.4, 0.35, 0.25]
-        elif companion in [item['name'] for item in self.store['Evolved Companions']]:
-            special = True
-            weights = [0.4, 0.35, 0.25]
-
-        amt = choice(elements, p=weights)
-
-        coins = user['coins']
-        coins = coins + int(amt)
-        self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins}})
-
-        print('making embed')
-        embed = discord.Embed(
-            title = ctx.author.name + ', your ' + companion + ' found `' + str(amt) + '` coins!',
-            description = '<@' + str(id) + '> coin count: `' + str(coins) + '`',
-            color = discord.Color.teal()
-        )
-
-        print('checking url')
-        if companion != '':
-            isFound = False
-            for c in self.store['Coin Companions']:
-                if c['name'].lower() == companion.lower():
-                    embed.set_image(url = c['src'])
-                    isFound = True
-                    break
-
-            if not isFound:
-                for c in self.store['Helped Companions']:
-                    if c['name'].lower() == companion.lower():
-                        embed.set_image(url = c['src'])
-                        isFound = True
-                        break
-
-            if not isFound:
-                for c in self.store['Special Companions']:
-                    if c['name'].lower() == companion.lower():
-                        embed.set_image(url = c['src'])
-                        isFound = True
-                        break
-
-            if not isFound:
-                for c in self.store['Evolved Companions']:
-                    if c['name'].lower() == companion.lower():
-                        embed.set_image(url = c['src'])
-                        isFound = True
-                        break
-
-        print('is special')
-        if special:
-            embed.set_footer(text = 'Special Companion detected! You have a higher chance of getting more coins.')
-        print('sending embed')
-        await ctx.channel.send(embed = embed)
-
     @commands.command(aliases=['shop', 'companions', 'pets', '$', 'sh', 'st'])
     async def store(self, ctx, type: str = None):
         id = ctx.author.id
@@ -136,7 +51,8 @@ class Currency(commands.Cog):
 
             storeDesc = """`+store c` - Coin Companion Store
             `+store h` - Helped Companion Store
-            `+store i` - Item Store"""
+            `+store i` - Item Store
+            `+store s` - Special Companion List"""
             embed.add_field(name='Store Commands', value=storeDesc, inline=False)
 
             embed.set_thumbnail(url = 'https://cdn.discordapp.com/emojis/602910572153143337.png?v=1')
@@ -216,6 +132,36 @@ class Currency(commands.Cog):
             embed.add_field(name='Items', value=storeDesc, inline=False)
             embed.set_thumbnail(url = 'https://vignette.wikia.nocookie.net/mariokart/images/a/aa/Golden_Mushroom_-_Mario_Kart_Wii.png/revision/latest?cb=20180115185605')
             embed.set_footer(text = 'Earn coins by participating in server events! Read #about-profiles for more information. Access this store using "+store i".')
+            await ctx.send(embed = embed)
+            return
+        #special
+        elif type.lower() == 'special' or type.lower() == 's' or type.lower() == 'special':
+            storeHelp = """Evolved Companions cannot be bought with coins. All Special Companions give a higher chance of more daily Coins."""
+            embed.add_field(name='Store Help', value=storeHelp, inline=False)
+            storeDesc = ''
+            prevCost = 0
+
+            for item in self.store['Special Companions']:
+                #same price, add to same line
+                if item['price'] == prevCost:
+                    storeDesc += ', ' + item['name']
+                #different price, new line, update prevCost
+                else:
+                    storeDesc += '\n`' + str(item['price']) + ' coins:` ' + item['name']
+                    prevCost = item['price']
+
+            embed.add_field(name='Unevolved Special Companions', value=storeDesc, inline=False)
+
+            storeDesc_special = ''
+            for item in self.store['Evolved Companions']:
+                if storeDesc_special == '':
+                    storeDesc_special = item['name']
+                else:
+                    storeDesc_special += ', ' + item['name']
+
+            embed.add_field(name='Evolved Special Companions', value=storeDesc_special, inline=False)
+
+            embed.set_footer(text = 'Earn coins by participating in server events! Read #about-profiles for more information. Access this store using "+store s".')
             await ctx.send(embed = embed)
             return
         #unknown type
