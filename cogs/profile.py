@@ -64,7 +64,7 @@ class Profile(commands.Cog):
 
         tea_affinities = '`' + str(tea_earth) + '` Earth | `' + str(tea_air) + '` Air | `' + str(tea_fire) + '` Fire | `' + str(tea_water) + '` Water'
 
-        teaStr = '`' + str(teaMembers) + '` Members\n`' + str(teaHelped) + '` Helped\n ' + tea_affinities + '\nMost Helpful Member(s):\n' + teaTop
+        teaStr = '`' + str(teaMembers) + '` Members | `' + str(teaHelped) + '` Helped\n ' + tea_affinities + '\nMost Helpful Member(s):\n' + teaTop
 
         #coffee
         #tea
@@ -103,7 +103,7 @@ class Profile(commands.Cog):
 
         coffee_affinities = '`' + str(coffee_earth) + '` Earth | `' + str(coffee_air) + '` Air | `' + str(coffee_fire) + '` Fire | `' + str(coffee_water) + '` Water'
 
-        coffeeStr = '`' + str(coffeeMembers) + '` Members\n`' + str(coffeeHelped) + '` Helped\n' + coffee_affinities + '\nMost Helpful Member(s):\n' + coffeeTop
+        coffeeStr = '`' + str(coffeeMembers) + '` Members | `' + str(coffeeHelped) + '` Helped\n' + coffee_affinities + '\nMost Helpful Member(s):\n' + coffeeTop
 
         #emojis
         teaName = 'Tea Squad '
@@ -168,7 +168,7 @@ class Profile(commands.Cog):
             return
         else:
             embed = discord.Embed(
-                description = 'You already have an affinity!',
+                title = 'You already have an affinity!',
                 color = discord.Color.teal()
             )
             await ctx.send(embed = embed)

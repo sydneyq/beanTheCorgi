@@ -52,7 +52,7 @@ class Store(commands.Cog):
             storeDesc = """`+store c` - Coin Companion Store
             `+store h` - Helped Companion Store
             `+store i` - Item Store
-            `+store s` - Special Companion List"""
+            `+store e` - Evolvable/Evolved Companion List"""
             embed.add_field(name='Store Commands', value=storeDesc, inline=False)
 
             embed.set_thumbnail(url = 'https://cdn.discordapp.com/emojis/602910572153143337.png?v=1')
@@ -135,7 +135,7 @@ class Store(commands.Cog):
             await ctx.send(embed = embed)
             return
         #special
-        elif type.lower() == 'special' or type.lower() == 's' or type.lower() == 'special':
+        elif type.lower() == 'evolvable' or type.lower() == 'e' or type.lower() == 'evolve':
             storeHelp = """Some Evolved Companions cannot be bought with coins. All Evolved Companions give a higher chance of more daily Coins."""
             embed.add_field(name='Store Help', value=storeHelp, inline=False)
             storeDesc = ''
@@ -404,7 +404,7 @@ class Store(commands.Cog):
 
     #members can gift coin companions or lotto tickets
     @commands.command(aliases=['donate'])
-    async def gift(self, ctx, member: discord.Member, *, item):
+    async def gift(self, ctx, member: discord.Member, *, item = 'gift'):
         if ctx.author == member:
             embed = discord.Embed(
                 title = 'You can\'t gift yourself!',
@@ -433,7 +433,7 @@ class Store(commands.Cog):
                 self.dbConnection.updateProfile({"id": id}, {"$set": {"gifts": gifts}})
 
                 elements = [50, 75, 100]
-                weights = [0.3, 0.5, 0.2]
+                weights = [0.25, 0.5, 0.25]
                 amt = choice(elements, p=weights)
 
                 giftee_coins = member['coins'] + int(amt)

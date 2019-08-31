@@ -330,7 +330,7 @@ class Event(commands.Cog):
                     self.coffee_score += 1
 
                 embed2 = discord.Embed(
-                    title = msg.author.name + ' just earned `1` point for ' + squad + ' !',
+                    title = msg.author.name + ' just earned `1` point for ' + squad + '!',
                     description = '**Tea Squad:** `' + str(self.tea_score) + '`\n**Coffee Squad:** `' + str(self.coffee_score) + '`',
                     color = discord.Color.teal()
                 )
