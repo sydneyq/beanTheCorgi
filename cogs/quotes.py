@@ -146,5 +146,5 @@ class Profile(commands.Cog):
 
 def setup(client):
     database_connection = Database()
-    meta_class = Meta()
+    meta_class = Meta(database_connection)
     client.add_cog(Profile(client, database_connection, meta_class))

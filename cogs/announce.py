@@ -1,11 +1,13 @@
 import discord
 from discord.ext import commands
 from .meta import Meta
+from database import Database
 
 class Announce(commands.Cog):
 
-    def __init__(self, client, meta):
+    def __init__(self, client, database, meta):
         self.client = client
+        self.dbConnection = database
         self.meta = meta
 
     @commands.command()
@@ -216,5 +218,6 @@ class Announce(commands.Cog):
             await ctx.send(embed = embed)
 
 def setup(client):
-    meta_class = Meta()
-    client.add_cog(Announce(client, meta_class))
+    database_connection = Database()
+    meta_class = Meta(database_connection)
+    client.add_cog(Announce(client, database_connection, meta_class))

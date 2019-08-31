@@ -46,15 +46,12 @@ class Cooldown(commands.Cog):
             await ctx.send(embed = embed)
             return
 
-        special = False
+        isEvolved = False
         elements = [10, 25, 50, 75]
         weights = [0.3, 0.4, 0.2, 0.1]
 
-        if companion in [item['name'] for item in self.store['Special Companions']]:
-            special = True
-            weights = [0.1, 0.3, 0.4, 0.2]
-        elif companion in [item['name'] for item in self.store['Evolved Companions']]:
-            special = True
+        if companion in [item['name'] for item in self.store['Evolved Companions']]:
+            isEvolved = True
             weights = [0.1, 0.3, 0.4, 0.2]
 
         amt = choice(elements, p=weights)
@@ -87,7 +84,7 @@ class Cooldown(commands.Cog):
                         break
 
             if not isFound:
-                for c in self.store['Special Companions']:
+                for c in self.store['Evolvable Companions']:
                     if c['name'].lower() == companion.lower():
                         embed.set_image(url = c['src'])
                         isFound = True
@@ -100,13 +97,12 @@ class Cooldown(commands.Cog):
                         isFound = True
                         break
 
-        print('is special')
-        if special:
-            embed.set_footer(text = 'Special Companion detected! You have a higher chance of getting more coins.')
+        if isEvolved:
+            embed.set_footer(text = 'Evolved Companion detected! You have a higher chance of getting more coins.')
         print('sending embed')
         await ctx.channel.send(embed = embed)
 
 def setup(client):
     database_connection = Database()
-    meta_class = Meta()
+    meta_class = Meta(database_connection)
     client.add_cog(Cooldown(client, database_connection, meta_class))

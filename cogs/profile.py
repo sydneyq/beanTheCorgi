@@ -38,8 +38,23 @@ class Profile(commands.Cog):
         #top squad member
         teaTop = ''
         teaTopHelped = 0
+        tea_water = 0
+        tea_fire = 0
+        tea_air = 0
+        tea_earth = 0
 
         for doc in tea:
+            #affinities
+            aff = doc['affinity'].lower()
+            if aff == 'water':
+                tea_water += 1
+            elif aff == 'air':
+                tea_air += 1
+            elif aff == 'fire':
+                tea_fire += 1
+            elif aff == 'earth':
+                tea_earth += 1
+            #helped
             teaHelped += doc['helped']
             if doc['helped'] > teaTopHelped:
                 teaTop = '<@' + str(doc['id']) + '> (' + str(doc['helped']) + ')'
@@ -47,7 +62,9 @@ class Profile(commands.Cog):
             elif doc['helped'] == teaTopHelped:
                 teaTop += '\n<@' + str(doc['id']) + '> (' + str(doc['helped']) + ')'
 
-        teaStr = '`' + str(teaMembers) + '` Members\n`' + str(teaHelped) + '` Helped\nMost Helpful Member(s):\n' + teaTop
+        tea_affinities = '`' + str(tea_earth) + '` Earth | `' + str(tea_air) + '` Air | `' + str(tea_fire) + '` Fire | `' + str(tea_water) + '` Water'
+
+        teaStr = '`' + str(teaMembers) + '` Members\n`' + str(teaHelped) + '` Helped\n ' + tea_affinities + '\nMost Helpful Member(s):\n' + teaTop
 
         #coffee
         #tea
@@ -61,8 +78,22 @@ class Profile(commands.Cog):
         #top squad member
         coffeeTop = ''
         coffeeTopHelped = 0
+        coffee_water = 0
+        coffee_fire = 0
+        coffee_air = 0
+        coffee_earth = 0
 
         for doc in coffee:
+            #affinities
+            aff = doc['affinity'].lower()
+            if aff == 'water':
+                coffee_water += 1
+            elif aff == 'air':
+                coffee_air += 1
+            elif aff == 'fire':
+                coffee_fire += 1
+            elif aff == 'earth':
+                coffee_earth += 1
             coffeeHelped += doc['helped']
             if doc['helped'] > coffeeTopHelped:
                 coffeeTop = '<@' + str(doc['id']) + '> (' + str(doc['helped']) + ')'
@@ -70,7 +101,9 @@ class Profile(commands.Cog):
             elif doc['helped'] == coffeeTopHelped:
                 coffeeTop += '\n<@' + str(doc['id']) + '> (' + str(doc['helped']) + ')'
 
-        coffeeStr = '`' + str(coffeeMembers) + '` Members\n`' + str(coffeeHelped) + '` Helped\nMost Helpful Member(s):\n' + coffeeTop
+        coffee_affinities = '`' + str(coffee_earth) + '` Earth | `' + str(coffee_air) + '` Air | `' + str(coffee_fire) + '` Fire | `' + str(coffee_water) + '` Water'
+
+        coffeeStr = '`' + str(coffeeMembers) + '` Members\n`' + str(coffeeHelped) + '` Helped\n' + coffee_affinities + '\nMost Helpful Member(s):\n' + coffeeTop
 
         #emojis
         teaName = 'Tea Squad '
@@ -86,12 +119,60 @@ class Profile(commands.Cog):
         elif teaHelped < coffeeHelped:
             coffeeName = coffeeName + '🏆'
 
+        if tea_earth > coffee_earth:
+            teaName = teaName + '🌱'
+        elif tea_earth < coffee_earth:
+            coffeeName = coffeeName + '🌱'
+
+        if tea_air > coffee_air:
+            teaName = teaName + '🎐'
+        elif tea_air < coffee_air:
+            coffeeName = coffeeName + '🎐'
+
+        if tea_fire > coffee_fire:
+            teaName = teaName + '🔥'
+        elif tea_fire < coffee_fire:
+            coffeeName = coffeeName + '🔥'
+
+        if tea_water > coffee_water:
+            teaName = teaName + '💧'
+        elif tea_water < coffee_water:
+            coffeeName = coffeeName + '💧'
 
         embed.add_field(name=teaName,value=teaStr)
         embed.add_field(name=coffeeName,value=coffeeStr, inline=False)
 
         await ctx.send(embed = embed)
         return
+
+    @commands.command(aliases=['element'])
+    async def affinity(self, ctx, *, affinity = None):
+        affinity = affinity.lower()
+
+        if affinity is None or (affinity != 'water' and affinity != 'fire' and affinity != 'air' and affinity != 'earth'):
+            embed = discord.Embed(
+                title = 'Correct Usage: `+affinity water/air/fire/earth`.',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
+
+        affinity = affinity.capitalize()
+
+        id = ctx.author.id
+        user = self.meta.getProfile(ctx.author)
+
+        if user['affinity'] is None or user['affinity'] == '':
+            self.dbConnection.updateProfile({"id": id}, {"$set": {"affinity": affinity}})
+            await ctx.send(embed = self.meta.embedDone())
+            return
+        else:
+            embed = discord.Embed(
+                description = 'You already have an affinity!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
 
     @commands.command()
     async def squad(self, ctx, *, squad = None):
@@ -103,18 +184,10 @@ class Profile(commands.Cog):
             await ctx.send(embed = embed)
             return
         squad = squad.lower()
-        # see whats in the message -> adjust the specific persons profile based  on it
-        # .update "updates" the profile $ must be used to keep old items
-        id = ctx.author.id
-        #user = self.dbConnection.findProfile({"id": id})
-        user = self.dbConnection.findProfile({"id": id})
-        print('Finding profile...')
-        if user is None:
-            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'spouse': 0})
-            user = self.dbConnection.findProfile({"id": id})
-            print('No profile found. Creating new one...')
 
-        print('Finding squad...')
+        id = ctx.author.id
+        user = self.meta.getProfile(ctx.author)
+
         if user['squad'] == "Tea":
             embed = discord.Embed(
                 title = 'You\'re already part of the Tea Squad!',
@@ -161,15 +234,7 @@ class Profile(commands.Cog):
     @commands.command()
     async def getSquadRole(self, ctx):
         id = ctx.author.id
-        user = self.dbConnection.findProfile({"id": id})
-
-        if user is None:
-            embed = discord.Embed(
-                title = 'Sorry, you don\'t have a profile yet! You can make one by using +profile.',
-                color = discord.Color.teal()
-            )
-            await ctx.send(embed = embed)
-            return
+        user = self.meta.getProfile(ctx.author)
 
         if user['squad'] == 'Coffee':
             role = ctx.guild.get_role(612788004926521365)
@@ -194,6 +259,14 @@ class Profile(commands.Cog):
             )
             await ctx.send(embed = embed)
             return
+    '''
+    @commands.command()
+    async def test(self, ctx):
+        if self.meta.isBotOwner(ctx.author):
+            #self.dbConnection.makeColumn("gifts", 0)
+            self.dbConnection.makeColumn("affinity", "")
+            print("Done!")
+    '''
 
     #   Goes through certain elements of a users data in the database
     #   and puts them into an embed to send to the user through the bot
@@ -201,23 +274,14 @@ class Profile(commands.Cog):
     async def profile(self, ctx, other: discord.Member = None):
         if other == None:
             id = ctx.author.id
+            member = ctx.author
         else:
             id = other.id
-        #user = self.dbConnection.profileFind({"id": id})
-
-        user = self.dbConnection.findProfile({"id": id})
-        name = self.client.get_user(id).name
-
-        if other == None:
-            member = ctx.message.author
-        else:
             member = other
 
-        if user is None:
-            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'spouse': 0})
-            user = self.dbConnection.findProfile({"id": id})
-
+        user = self.meta.getProfile(member)
         pic = member.avatar_url
+        name = member.name
 
         #Basics
         if (user['squad'] == "Tea"):
@@ -233,6 +297,12 @@ class Profile(commands.Cog):
             embed.add_field(name="Squad", value='No Squad yet. Use `+squad tea/coffee` to join one!', inline=True)
             embed.set_author(name = name)
 
+        if user['affinity'] == '':
+            msg2 = 'No affinity yet. Set one with `+affinity`!'
+        else:
+            msg2 = user['affinity']
+        embed.add_field(name='Affinity', value=msg2, inline=True)
+
         embed.set_footer(text = 'Mind Café', icon_url = 'https://media.discordapp.net/attachments/591611902459641856/593267453363224588/Bean_Icon.png')
 
         #Marriage
@@ -240,16 +310,7 @@ class Profile(commands.Cog):
             spouse = 'N/A'
         else:
             spouse = '<@' + str(user['spouse']) + '>'
-        embed.add_field(name="Spouse", value=spouse, inline=False)
-
-        #Achievements
-        #   helped
-        helped = user['helped']
-        embed.add_field(name="Help Points", value=helped, inline=True)
-
-        #   coins
-        coins = user['coins']
-        embed.add_field(name="Coins", value=coins, inline=True)
+        embed.add_field(name="Spouse", value=spouse, inline=True)
 
         #Companion
         companion = user['companion']
@@ -272,11 +333,10 @@ class Profile(commands.Cog):
                         break
 
             if not isFound:
-                for c in self.store['Special Companions']:
+                for c in self.store['Evolvable Companions']:
                     if c['name'].lower() == companion.lower():
                         embed.set_image(url = c['src'])
                         isFound = True
-                        isSpecial = True
                         break
 
             if not isFound:
@@ -293,7 +353,7 @@ class Profile(commands.Cog):
         else:
             msg = 'No companion yet. Get one at `+store`!'
 
-        embed.add_field(name="Companion", value=msg, inline=False)
+        embed.add_field(name="Companion", value=msg, inline=True)
 
         #Acknowledgements
         ack = ''
@@ -338,22 +398,9 @@ class Profile(commands.Cog):
             return
 
         id = ctx.author.id
-        user = self.dbConnection.findProfile({"id": id})
-        if user is None:
-            embed = discord.Embed(
-                title = 'Sorry, you don\'t have a profile yet! You can make one by using +profile.',
-                color = discord.Color.teal()
-            )
-            await ctx.send(embed = embed)
-            return
-        memberProfile = self.dbConnection.findProfile({"id": member.id})
-        if memberProfile is None:
-            embed = discord.Embed(
-                title = 'Sorry, they don\'t have a profile yet! They can make one by using +profile.',
-                color = discord.Color.teal()
-            )
-            await ctx.send(embed = embed)
-            return
+
+        user = self.meta.getProfile(ctx.author)
+        memberProfile = self.meta.getProfile(member)
 
         if user['spouse'] != 0 or memberProfile['spouse'] != 0:
             embed = discord.Embed(
@@ -423,16 +470,8 @@ class Profile(commands.Cog):
 
     @commands.command()
     async def divorce(self, ctx):
-        id = ctx.message.author.id
-        user = self.dbConnection.findProfile({"id": id})
-
-        if user is None:
-            embed = discord.Embed(
-                title = 'Sorry, you don\'t have a profile yet! You can make one by using +profile.',
-                color = discord.Color.teal()
-            )
-            await ctx.send(embed = embed)
-            return
+        id = ctx.author.id
+        user = self.meta.getProfile(ctx.author)
 
         spouse = user['spouse']
 
@@ -492,5 +531,5 @@ class Profile(commands.Cog):
 
 def setup(client):
     database_connection = Database()
-    meta_class = Meta()
+    meta_class = Meta(database_connection)
     client.add_cog(Profile(client, database_connection, meta_class))

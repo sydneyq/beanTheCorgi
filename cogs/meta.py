@@ -6,6 +6,9 @@ from database import Database
 
 class Meta:
 
+    def __init__(self, database):
+        self.dbConnection = database
+
     def isBotOwner(self, member: discord.Member):
         if member.id == secret.BOT_OWNER_ID:
             return True
@@ -41,14 +44,27 @@ class Meta:
         return False
 
     #not allowed embed
-    def noAccessEmbed(self):
+    def embedNoAccess(self):
         embed = discord.Embed(
             title = 'Sorry, you don\'t have permission to do that!',
             color = discord.Color.teal()
         )
         return embed
 
-    '''
+    def embedDone(self):
+        embed = discord.Embed(
+            title = 'Consider it done! ✅',
+            color = discord.Color.teal()
+        )
+        return embed
+
+    def embedOops(self):
+        embed = discord.Embed(
+            title = 'Oops! Something went wrong.',
+            color = discord.Color.teal()
+        )
+        return embed
+
     def getProfile(self, member: discord.Member = None):
         if member is None:
             return
@@ -57,11 +73,34 @@ class Meta:
 
         profile = self.dbConnection.findProfile({"id": id})
         if profile is None:
-            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'spouse': 0})
+            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'spouse': 0, 'gifts': 0, 'affinity':''})
             profile = self.dbConnection.findProfile({"id": id})
 
         return profile
-    '''
+
+    def changeCoins(self, member: discord.Member, val: int):
+        user = self.getProfile(member)
+        coins = user['coins']
+        coins += val
+
+        #cannot afford
+        if coins < 0:
+            return False
+
+        self.dbConnection.updateProfile({"id": user['id']}, {"$set": {"coins": coins}})
+        return True
+
+    def changeHelped(self, member: discord.Member, val: int):
+        user = self.getProfile(member)
+        helped = user['helped']
+        helped += val
+
+        #cannot afford
+        if helped < 0:
+            return False
+
+        self.dbConnection.updateProfile({"id": user['id']}, {"$set": {"helped": helped}})
+        return True
 
     def hasWord(self, string, word):
         #case-insensitive, ignores punctuation: 32-96, 123-126 (not 97 - 122)
@@ -95,19 +134,6 @@ class Global(commands.Cog):
         self.client = client
         self.meta = meta
         self.dbConnection = database
-
-    def getProfile(self, member: discord.Member = None):
-        if member is None:
-            return
-
-        id = member.id
-
-        profile = self.dbConnection.findProfile({"id": id})
-        if profile is None:
-            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'spouse': 0})
-            profile = self.dbConnection.findProfile({"id": id})
-
-        return profile
 
     @commands.command()
     async def ping(self, ctx):
@@ -260,6 +286,6 @@ class Global(commands.Cog):
     '''
 
 def setup(client):
-    meta_class = Meta()
     database_connection = Database()
+    meta_class = Meta(database_connection)
     client.add_cog(Global(client, database_connection, meta_class))

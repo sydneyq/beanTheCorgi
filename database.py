@@ -48,3 +48,7 @@ class Database:
 
     def countQuotes(self, findCriteria):
         return self.db.quote.count(findCriteria)
+
+    #meta
+    def makeColumn(self, title, value):
+        self.db.profile.update({},{"$set": {title: value}},upsert=False,multi=True)
