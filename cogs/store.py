@@ -274,6 +274,67 @@ class Store(commands.Cog):
                         )
                         await ctx.send(embed = embed)
                     #buying an evolution
+                    elif i['name'].lower() == 'affinity swap':
+                        if user['affinity'] == '':
+                            embed_oops = discord.Embed(
+                                title = 'Sorry, you haven\'t set an affinity yet! You can do that by using `+affinity fire/water/air/earth`.',
+                                color = discord.Color.teal()
+                            )
+                            await channel.send(embed = embed_oops)
+                            return
+
+                        embed = discord.Embed(
+                            title = 'Swap to which affinity?',
+                            description = '🌱 - Earth\n🎐 - Air\n🔥 - Fire\n💧 - Water\n⛔ - Cancel',
+                            color = discord.Color.teal()
+                        )
+                        await ctx.send(embed = embed)
+
+                        msg = ctx.channel.last_message
+                        await msg.add_reaction('🌱')
+                        await msg.add_reaction('🎐')
+                        await msg.add_reaction('🔥')
+                        await msg.add_reaction('💧')
+                        await msg.add_reaction('⛔')
+
+                        emoji = ''
+
+                        def check(reaction, user):
+                            nonlocal emoji
+                            emoji = str(reaction.emoji)
+                            return user == ctx.author and (str(reaction.emoji) == '🌱' or str(reaction.emoji) == '🎐' or str(reaction.emoji) == '🔥' or str(reaction.emoji) == '💧' or str(reaction.emoji) == '⛔')
+
+                        try:
+                            reaction, user = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
+                        except asyncio.TimeoutError:
+                            await channel.send('Timed out.')
+                        else:
+                            if emoji == '⛔':
+                                embed = discord.Embed(
+                                    title = 'Swap canceled.',
+                                    color = discord.Color.teal()
+                                )
+                                await ctx.send(embed = embed)
+                                return
+
+                            aff = ''
+                            if emoji == '🌱':
+                                aff = 'Earth'
+                            elif emoji == '🎐':
+                                aff = 'Air'
+                            elif emoji == '🔥':
+                                aff = 'Fire'
+                            elif emoji == '💧':
+                                aff = 'Water'
+
+                            self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "affinity": aff}})
+
+                            embed = discord.Embed(
+                                title = 'Consider it done! ✅\nYour affinity is now `' + aff + '`.',
+                                color = discord.Color.teal()
+                            )
+                            await ctx.send(embed = embed)
+                            return
                     elif i['name'].lower() == 'evolution stone':
                         companion = user['companion']
                         if companion == 'Eevee':
@@ -348,6 +409,11 @@ class Store(commands.Cog):
                             choices = ['Lombre']
                         elif companion == 'Lombre':
                             choices = ['Ludicolo']
+                        #Froakie Line
+                        elif companion == 'Froakie':
+                            choices = ['Frogadier']
+                        elif companion == 'Frogadier':
+                            choices = ['Greninja']
                         else:
                             embed = discord.Embed(
                                 title = 'You need an evolvable Companion to evolve!',

@@ -147,9 +147,7 @@ class Profile(commands.Cog):
 
     @commands.command(aliases=['element'])
     async def affinity(self, ctx, *, affinity = None):
-        affinity = affinity.lower()
-
-        if affinity is None or (affinity != 'water' and affinity != 'fire' and affinity != 'air' and affinity != 'earth'):
+        if affinity is None or (affinity.lower() != 'water' and affinity.lower() != 'fire' and affinity.lower() != 'air' and affinity.lower() != 'earth'):
             embed = discord.Embed(
                 title = 'Correct Usage: `+affinity water/air/fire/earth`.',
                 color = discord.Color.teal()
@@ -157,6 +155,7 @@ class Profile(commands.Cog):
             await ctx.send(embed = embed)
             return
 
+        affinity = affinity.lower()
         affinity = affinity.capitalize()
 
         id = ctx.author.id
@@ -285,11 +284,11 @@ class Profile(commands.Cog):
 
         #Basics
         if (user['squad'] == "Tea"):
-            embed = discord.Embed(color=0xa72461)
+            embed = discord.Embed(color=0xe99c3e)
             embed.add_field(name="Squad", value=user['squad'], inline=True)
             embed.set_author(name = name, icon_url = 'https://cdn2.stylecraze.com/wp-content/uploads/2015/04/2072_11-Surprising-Benefits-And-Uses-Of-Marijuana-Tea_shutterstock_231770824.jpg')
         elif (user['squad'] == "Coffee"):
-            embed = discord.Embed(color=0x9cf196)
+            embed = discord.Embed(color=0xace605)
             embed.add_field(name="Squad", value=user['squad'], inline=True)
             embed.set_author(name = name, icon_url = 'https://www.caffesociety.co.uk/assets/recipe-images/latte-small.jpg')
         else:

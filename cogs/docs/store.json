@@ -119,11 +119,6 @@
             "src":"http://www.thesassologist.com/wp-content/uploads/2018/05/Niffler.gif"
         },
         {
-            "name":"Greninja",
-            "price":200,
-            "src":"https://projectpokemon.org/home/uploads/monthly_2018_05/large.5aeb1c9c5b87b_greninjawatershurikenmoveGif.gif.cf9b20fded49483b3f154b0ad9277403.gif"
-        },
-        {
             "name":"Ice Bear",
             "price":300,
             "src":"https://i.kym-cdn.com/photos/images/original/001/001/592/fb8.gif"
@@ -155,6 +150,11 @@
             "name":"Squirtle",
             "price":50,
             "src":"https://media.giphy.com/media/8gPs3nAIqtzvW/giphy.gif"
+        },
+        {
+            "name":"Froakie",
+            "price":100,
+            "src":"https://66.media.tumblr.com/9911993c643e4d01a895aef2e462c4bc/tumblr_o03ef835Fe1r8sc3ro1_500.gif"
         },
         {
             "name":"Oshawott",
@@ -217,6 +217,10 @@
         {
             "name":"Ditto",
             "src":"https://media1.giphy.com/media/uQZTgSuGZMTHG/giphy.gif"
+        },
+        {
+            "name":"Totodile",
+            "src":"https://media0.giphy.com/media/1Yt1HtikFRn9e/source.gif"
         },
         {
             "name":"Vaporeon",
@@ -345,6 +349,14 @@
         {
             "name":"Mega Lucario",
             "src":"https://media0.giphy.com/media/yzAMX8ug6baOQ/source.gif"
+        },
+        {
+            "name":"Frogadier",
+            "src":"https://media.giphy.com/media/wSO6txA0FVXQQ/giphy.gif"
+        },
+        {
+            "name":"Greninja",
+            "src":"https://projectpokemon.org/home/uploads/monthly_2018_05/large.5aeb1c9c5b87b_greninjawatershurikenmoveGif.gif.cf9b20fded49483b3f154b0ad9277403.gif"
         }
     ],
 
@@ -352,6 +364,10 @@
         {
             "name":"Squad Swap",
             "price":700
+        },
+        {
+            "name":"Affinity Swap",
+            "price":200
         },
         {
             "name":"Evolution Stone",
