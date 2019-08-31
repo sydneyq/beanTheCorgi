@@ -7,6 +7,7 @@ import os
 import asyncio
 import secret
 import random
+from numpy.random import choice
 
 class Event(commands.Cog):
 
@@ -340,6 +341,109 @@ class Event(commands.Cog):
                 elif self.coffee_score > self.tea_score:
                     embed2.set_thumbnail(url = 'https://cdn.discordapp.com/attachments/591611902459641856/613918442034298890/teamcoffeeBean.png')
 
+
+                await channel.send(embed = embed2)
+
+                return
+
+    @commands.command(aliases=['traffic', 'trafficlight', 'rlgl'])
+    async def redlightgreenlight(self, ctx, channel: discord.TextChannel = None):
+        message = ctx.message
+        if not self.meta.isAdmin(message.author):
+            return
+
+        if channel is None:
+            channel = ctx.channel
+
+        await ctx.message.delete()
+
+        embed = discord.Embed(
+            title = 'Game On: Red Light, Green Light!',
+            color = discord.Color.teal()
+        )
+
+        elements = ['Red', 'Green', 'Yellow']
+        weights = [0.20, 0.70, 0.10]
+        result = choice(elements, p=weights)
+
+        embed.add_field(name='Light: ' + result, value='Say `go` if the Light is Green, `stop` if the Light is Red, or `slow` if the Light is Yellow before the other Squad!\nWrong answers deduct points from your Squad. Getting a Yellow Light correct deducts from the other Squad!')
+        embed.set_thumbnail(url = 'https://cdn4.iconfinder.com/data/icons/universal-signs-symbols/128/traffic-light-color-512.png')
+        await channel.send(embed = embed)
+        msg = ''
+
+        def check(m):
+            nonlocal msg = m.content.lower()
+            return (m.content.lower() == 'stop' or m.content.lower() == 'go' or m.content.lower() == 'slow') and m.channel == channel
+
+        cont = True
+
+        while (cont):
+            msg = await self.client.wait_for('message', check=check)
+
+            user = self.meta.getProfile(msg.author)
+
+            if user['squad'] == '':
+                embed = discord.Embed(
+                    title = 'Sorry, you\'re not in a Squad yet! Join one by using `+squad tea/coffee`.',
+                    color = discord.Color.teal()
+                )
+                await channel.send(embed = embed)
+                cont = True
+                continue
+            else:
+                cont = False
+                correct = False
+
+                if result == 'Red':
+                    if msg == 'stop':
+                        correct = True
+                elif result == 'Green':
+                    if msg == 'go':
+                        correct = True
+                elif result == 'Yellow':
+                    if msg == 'slow':
+                        correct = True
+
+                squad = user['squad']
+
+                if correct:
+                    if result == 'Yellow':
+                        opposquad = 'Tea'
+                        if squad == 'Tea':
+                            opposquad = 'Coffee'
+                            self.coffee_score -= 10
+                        else:
+                            self.tea_score -= 10
+                        embed2 = discord.Embed(
+                            title = msg.author.name + ' just deducted `10` points from ' + opposquad + '!',
+                            description = '**Tea Squad:** `' + str(self.tea_score) + '`\n**Coffee Squad:** `' + str(self.coffee_score) + '`',
+                            color = discord.Color.teal()
+                        )
+                    else:
+                        if squad == 'Tea':
+                            self.tea_score += 10
+                        else:
+                            self.coffee_score += 10
+                        embed2 = discord.Embed(
+                            title = msg.author.name + ' just earned `10` points for ' + squad + '!',
+                            description = '**Tea Squad:** `' + str(self.tea_score) + '`\n**Coffee Squad:** `' + str(self.coffee_score) + '`',
+                            color = discord.Color.teal()
+                        )
+                else:
+                    if squad == 'Tea':
+                        self.tea_score -= 10
+                    else:
+                        self.coffee_score -= 10
+                    embed2 = discord.Embed(
+                        title = msg.author.name + ' just dropped ' + squad + '\'s score by `10` points!',
+                        description = '**Tea Squad:** `' + str(self.tea_score) + '`\n**Coffee Squad:** `' + str(self.coffee_score) + '`',
+                        color = discord.Color.teal()
+                    )
+
+                if self.tea_score > self.coffee_score:
+                    embed2.set_thumbnail(url = 'https://cdn.discordapp.com/attachments/591611902459641856/613918428293627914/teamteaBean.png')
+                elif self.coffee_score > self.tea_score:
+                    embed2.set_thumbnail(url = 'https://cdn.discordapp.com/attachments/591611902459641856/613918442034298890/teamcoffeeBean.png')
 
                 await channel.send(embed = embed2)
 
