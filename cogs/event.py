@@ -357,22 +357,43 @@ class Event(commands.Cog):
 
         await ctx.message.delete()
 
+        which = ['pic', 'text']
+        ref = random.choice(which)
+        desc = 'Look at the text, not the picture!'
+
+        if ref == 'pic':
+            desc = 'Look at the picture, not the text!'
+
         embed = discord.Embed(
             title = 'Game On: Red Light, Green Light!',
+            description = desc,
             color = discord.Color.teal()
         )
 
         elements = ['Red', 'Green', 'Yellow']
-        weights = [0.20, 0.70, 0.10]
-        result = choice(elements, p=weights)
+        weights = [0.45, 0.45, 0.10]
+        text = choice(elements, p=weights)
 
-        embed.add_field(name='Light: ' + result, value='Say `go` if the Light is Green, `stop` if the Light is Red, or `slow` if the Light is Yellow before the other Squad!\nWrong answers deduct points from your Squad. Getting a Yellow Light correct deducts from the other Squad!')
-        embed.set_thumbnail(url = 'https://cdn4.iconfinder.com/data/icons/universal-signs-symbols/128/traffic-light-color-512.png')
+        color_pics = ['https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Disc_Plain_red.svg/2000px-Disc_Plain_red.svg.png',
+        'https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Green_icon.svg/1024px-Green_icon.svg.png',
+        'https://upload.wikimedia.org/wikipedia/en/thumb/f/fb/Yellow_icon.svg/1024px-Yellow_icon.svg.png']
+        pic = random.choice(elements)
+
+        embed.add_field(name='Light: ' + text, value='Say `go` if the Light is Green, `stop` if the Light is Red, or `slow` if the Light is Yellow before the other Squad!\nWrong answers deduct points from your Squad. Getting a Yellow Light correct deducts from the other Squad!')
+
+        url = color_pics[0]
+        if pic == 'Green':
+            url = color_pics[1]
+        elif pic == 'Yellow':
+            url = color_pics[2]
+
+        embed.set_thumbnail(url = url)
         await channel.send(embed = embed)
-        msg = ''
+        input = ''
 
         def check(m):
-            nonlocal msg = m.content.lower()
+            nonlocal input
+            input = m.content.lower()
             return (m.content.lower() == 'stop' or m.content.lower() == 'go' or m.content.lower() == 'slow') and m.channel == channel
 
         cont = True
@@ -393,21 +414,25 @@ class Event(commands.Cog):
             else:
                 cont = False
                 correct = False
+                answer = text
 
-                if result == 'Red':
-                    if msg == 'stop':
+                if ref == 'pic':
+                    answer = pic
+
+                if answer == 'Red':
+                    if input == 'stop':
                         correct = True
-                elif result == 'Green':
-                    if msg == 'go':
+                elif answer == 'Green':
+                    if input == 'go':
                         correct = True
-                elif result == 'Yellow':
-                    if msg == 'slow':
+                elif answer == 'Yellow':
+                    if input == 'slow':
                         correct = True
 
                 squad = user['squad']
 
                 if correct:
-                    if result == 'Yellow':
+                    if answer == 'Yellow':
                         opposquad = 'Tea'
                         if squad == 'Tea':
                             opposquad = 'Coffee'
@@ -421,11 +446,11 @@ class Event(commands.Cog):
                         )
                     else:
                         if squad == 'Tea':
-                            self.tea_score += 10
+                            self.tea_score += 5
                         else:
-                            self.coffee_score += 10
+                            self.coffee_score += 5
                         embed2 = discord.Embed(
-                            title = msg.author.name + ' just earned `10` points for ' + squad + '!',
+                            title = msg.author.name + ' just earned `5` points for ' + squad + '!',
                             description = '**Tea Squad:** `' + str(self.tea_score) + '`\n**Coffee Squad:** `' + str(self.coffee_score) + '`',
                             color = discord.Color.teal()
                         )
