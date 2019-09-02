@@ -25,15 +25,7 @@ class Store(commands.Cog):
     @commands.command(aliases=['shop', 'companions', 'pets', '$', 'sh', 'st'])
     async def store(self, ctx, type: str = None):
         id = ctx.author.id
-        user = self.dbConnection.findProfile({"id": id})
-
-        if user is None:
-            embed = discord.Embed(
-                title = 'Sorry, you don\'t have a profile yet! You can make one by using +profile.',
-                color = discord.Color.teal()
-            )
-            await ctx.send(embed = embed)
-            return
+        user = self.meta.getProfile(ctx.author)
 
         helped = user['helped']
         coins = user['coins']

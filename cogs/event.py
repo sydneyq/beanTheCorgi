@@ -148,8 +148,7 @@ class Event(commands.Cog):
             channel = ctx.channel
 
         await ctx.message.delete()
-
-        #corresponding arrays
+        
         strings = ['the quick brown fox jumps over the lazy dog', #1
         'bean the corgi is the goodest boy', #2
         'tea and coffee make the world go round', #3
@@ -168,7 +167,7 @@ class Event(commands.Cog):
         'hakuna matata what a wonderful phrase', #16
         'no one deserves to be forgotten', #17
         'i could do this all day', #18
-        'i have been falling for twenty minutes', #19
+        'i have been falling for thirty minutes', #19
         'come with me where dreams are born and time is never planned', #20
         'i wanna be the very best like no one ever was', #21
         'we are a product of the stories we tell ourselves', #22
@@ -211,14 +210,7 @@ class Event(commands.Cog):
 
         msg = await self.client.wait_for('message', check=check)
 
-        user = self.dbConnection.findProfile({'id' : msg.author.id})
-        if user is None:
-            embed = discord.Embed(
-                title = 'Sorry, you don\'t have a profile yet! You can make one by using +profile.',
-                color = discord.Color.teal()
-            )
-            await channel.send(embed = embed)
-            return
+        user = self.meta.getProfile(msg.author)
         '''
         elif user['squad'] == '':
             embed = discord.Embed(
@@ -250,9 +242,9 @@ class Event(commands.Cog):
         )
         '''
         await channel.send(embed = embed2)
-
         return
 
+    '''
     @commands.command()
     async def avatar(self, ctx, channel: discord.TextChannel = None):
         message = ctx.message
@@ -345,6 +337,7 @@ class Event(commands.Cog):
                 await channel.send(embed = embed2)
 
                 return
+    '''
 
     @commands.command(aliases=['traffic', 'trafficlight', 'rlgl'])
     async def redlightgreenlight(self, ctx, channel: discord.TextChannel = None):
@@ -377,7 +370,7 @@ class Event(commands.Cog):
         color_pics = ['https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Disc_Plain_red.svg/2000px-Disc_Plain_red.svg.png',
         'https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Green_icon.svg/1024px-Green_icon.svg.png',
         'https://upload.wikimedia.org/wikipedia/en/thumb/f/fb/Yellow_icon.svg/1024px-Yellow_icon.svg.png']
-        pic = random.choice(elements)
+        pic = choice(elements, p=weights)
 
         embed.add_field(name='Light: ' + text, value='Say `go` if the Light is Green, `stop` if the Light is Red, or `slow` if the Light is Yellow before the other Squad!\nWrong answers deduct points from your Squad. Getting a Yellow Light correct deducts from the other Squad!')
 

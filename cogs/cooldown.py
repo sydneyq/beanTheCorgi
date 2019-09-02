@@ -27,15 +27,7 @@ class Cooldown(commands.Cog):
     async def daily(self, ctx):
         id = ctx.message.author.id
 
-        user = self.dbConnection.findProfile({"id": id})
-
-        if user is None:
-            embed = discord.Embed(
-                title = 'Sorry, you don\'t have a profile yet! You can make one by using +profile.',
-                color = discord.Color.teal()
-            )
-            await ctx.send(embed = embed)
-            return
+        user = self.meta.getProfile(ctx.author)
 
         companion = user['companion']
         if companion == '':
@@ -46,28 +38,41 @@ class Cooldown(commands.Cog):
             await ctx.send(embed = embed)
             return
 
-        isEvolved = False
-        elements = [10, 25, 50, 75]
-        weights = [0.3, 0.4, 0.2, 0.1]
+        elem = ['gift', 'coins']
+        wei = [.1, .9]
+        ref = choice(elements, p=weights)
 
-        if companion in [item['name'] for item in self.store['Evolved Companions']]:
-            isEvolved = True
-            weights = [0.1, 0.3, 0.4, 0.2]
+        if (ref == 'coins'):
+            isEvolved = False
+            elements = [25, 50, 75]
+            weights = [0.6, 0.3, 0.1]
 
-        amt = choice(elements, p=weights)
+            if companion in [item['name'] for item in self.store['Evolved Companions']]:
+                isEvolved = True
+                weights = [0.3, 0.5, 0.2]
 
-        coins = user['coins']
-        coins = coins + int(amt)
-        self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins}})
+            amt = choice(elements, p=weights)
 
-        print('making embed')
-        embed = discord.Embed(
-            title = ctx.author.name + ', your ' + companion + ' found `' + str(amt) + '` coins!',
-            description = '<@' + str(id) + '> coin count: `' + str(coins) + '`',
-            color = discord.Color.teal()
-        )
+            coins = user['coins']
+            coins = coins + int(amt)
+            self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins}})
 
-        print('checking url')
+            embed = discord.Embed(
+                title = ctx.author.name + ', your ' + companion + ' found `' + str(amt) + '` coins!',
+                description = '<@' + str(id) + '>\'s coin count: `' + str(coins) + '`',
+                color = discord.Color.teal()
+            )
+        elif (ref == 'gift'):
+            gifts = user['gifts']
+            gifts += 1
+            self.dbConnection.updateProfile({"id": id}, {"$set": {"gifts": gifts}})
+
+            embed = discord.Embed(
+                title = ctx.author.name + ', your ' + companion + ' found a Coin Gift',
+                description = '<@' + str(id) + '>\'s gifts: `' + str(gifts) + '`',
+                color = discord.Color.teal()
+            )
+
         if companion != '':
             isFound = False
             for c in self.store['Coin Companions']:
@@ -99,7 +104,6 @@ class Cooldown(commands.Cog):
 
         if isEvolved:
             embed.set_footer(text = 'Evolved Companion detected! You have a higher chance of getting more coins.')
-        print('sending embed')
         await ctx.channel.send(embed = embed)
 
 def setup(client):
