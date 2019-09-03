@@ -250,21 +250,25 @@ class Store(commands.Cog):
 
                     #buying a squad swap
                     if i['name'].lower() == 'squad swap':
+                        guild = ctx.guild
                         teaRole = ctx.guild.get_role(612788003542401035)
                         coffeeRole = role = ctx.guild.get_role(612788004926521365)
                         if user['squad'] == 'Coffee':
                             self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "squad": 'Tea'}})
                             await ctx.author.add_roles(teaRole)
                             await ctx.author.remove_roles(coffeeRole)
+                            await guild.get_channel(secret.SQUAD2_CHANNEL).send(self.meta.msgWelcomeSquad(ctx.author))
                         else:
                             self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "squad": 'Coffee'}})
                             await ctx.author.add_roles(coffeeRole)
                             await ctx.author.remove_roles(teaRole)
+                            await guild.get_channel(secret.SQUAD1_CHANNEL).send(self.meta.msgWelcomeSquad(ctx.author))
                         embed = discord.Embed(
                             title = 'Consider it done! ✅',
                             color = discord.Color.teal()
                         )
                         await ctx.send(embed = embed)
+                        return
                     #buying an evolution
                     elif i['name'].lower() == 'affinity swap':
                         if user['affinity'] == '':
@@ -484,7 +488,7 @@ class Store(commands.Cog):
         item = item.lower()
         coins = user['coins']
 
-        if item == 'gift' or item == 'coin gift' or item == 'coins':
+        if item == 'gift' or item == 'coin gift' or item == 'coins' or item == 'coingift':
             if user['gifts'] > 0:
                 gifts = user['gifts'] - 1
                 id = ctx.author.id

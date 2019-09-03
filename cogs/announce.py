@@ -165,7 +165,7 @@ class Announce(commands.Cog):
             embed = discord.Embed(
                 color = discord.Color.teal(),
                 title = '**Mind Café Server Rules!**',
-                description = 'Need help? Message a moderator (<@&592070664169455616>) or Bean for ModMail!'
+                description = 'Need help? Message a moderator (<@&592070664169455616>) or Bean for ModMail! We operate on a point-based offense system. [Click here to see the spreadsheet for points and sanctions.](https://docs.google.com/spreadsheets/d/1t3ppHecBITclZdoQ7t-VQMdBHsQ_-5tepOvdw3qLQlU/edit#gid=0)'
             )
 
             embed.set_footer(text = 'By joining and participating in our server you agree to abide by our server rules and respect our staff decisions.')
@@ -208,6 +208,9 @@ class Announce(commands.Cog):
 
             embed.add_field(name = '13) Discord Above All, Hail Discord',
             value = 'In addition to the rules above, we enforce [Discord\'s ToS](https://discordapp.com/terms) and [Guidelines](https://discordapp.com/guidelines).')
+
+            embed.add_field(name = '14) No begging',
+            value = 'Badgering people for roles, positions, currency, etc. is not enjoyable! Earn your stats, earn your privileges.')
 
             await ctx.send(embed = embed)
         else:

@@ -40,10 +40,11 @@ class Cooldown(commands.Cog):
 
         elem = ['gift', 'coins']
         wei = [.1, .9]
-        ref = choice(elements, p=weights)
+        ref = choice(elem, p=wei)
+
+        isEvolved = False
 
         if (ref == 'coins'):
-            isEvolved = False
             elements = [25, 50, 75]
             weights = [0.6, 0.3, 0.1]
 
@@ -68,7 +69,7 @@ class Cooldown(commands.Cog):
             self.dbConnection.updateProfile({"id": id}, {"$set": {"gifts": gifts}})
 
             embed = discord.Embed(
-                title = ctx.author.name + ', your ' + companion + ' found a Coin Gift',
+                title = ctx.author.name + ', your ' + companion + ' found a Coin Gift!',
                 description = '<@' + str(id) + '>\'s gifts: `' + str(gifts) + '`',
                 color = discord.Color.teal()
             )

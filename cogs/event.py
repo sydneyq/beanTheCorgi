@@ -148,7 +148,7 @@ class Event(commands.Cog):
             channel = ctx.channel
 
         await ctx.message.delete()
-        
+
         strings = ['the quick brown fox jumps over the lazy dog', #1
         'bean the corgi is the goodest boy', #2
         'tea and coffee make the world go round', #3
@@ -338,7 +338,7 @@ class Event(commands.Cog):
 
                 return
     '''
-
+    '''
     @commands.command(aliases=['traffic', 'trafficlight', 'rlgl'])
     async def redlightgreenlight(self, ctx, channel: discord.TextChannel = None):
         message = ctx.message
@@ -466,7 +466,7 @@ class Event(commands.Cog):
                 await channel.send(embed = embed2)
 
                 return
-
+    '''
     '''
     @commands.command(aliases=['pewpew', 'pewpewpew', 'teamwork', 'teambattle'])
     async def pew(self, ctx, channel: discord.TextChannel = None):

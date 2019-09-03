@@ -186,6 +186,7 @@ class Profile(commands.Cog):
 
         id = ctx.author.id
         user = self.meta.getProfile(ctx.author)
+        guild = ctx.guild
 
         if user['squad'] == "Tea":
             embed = discord.Embed(
@@ -211,6 +212,7 @@ class Profile(commands.Cog):
                 await ctx.send(embed = embed)
                 role = ctx.guild.get_role(612788003542401035)
                 await ctx.author.add_roles(role)
+                await guild.get_channel(secret.SQUAD2_CHANNEL).send(self.meta.msgWelcomeSquad(ctx.author))
                 return
             elif 'coffee' in squad:
                 self.dbConnection.updateProfile({"id": id}, {"$set": {"squad": "Coffee"}})
@@ -221,6 +223,7 @@ class Profile(commands.Cog):
                 await ctx.send(embed = embed)
                 role = ctx.guild.get_role(612788004926521365)
                 await ctx.author.add_roles(role)
+                await guild.get_channel(secret.SQUAD1_CHANNEL).send(self.meta.msgWelcomeSquad(ctx.author))
                 return
             else:
                 embed = discord.Embed(

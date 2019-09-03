@@ -16,7 +16,7 @@ class Meta:
 
     #isAdmin
     def isAdmin(self, member: discord.Member):
-        if member.id == secret.BOT_OWNER_ID:
+        if self.isBotOwner(member):
             return True
         if secret.ADMIN_ID in [role.id for role in member.roles]:
             return True
@@ -24,22 +24,35 @@ class Meta:
 
     #isStaff
     def isStaff(self, member: discord.Member):
-        if member.id == secret.BOT_OWNER_ID:
-                return True
+        if self.isBotOwner(member):
+            return True
         if secret.STAFF_ID in [role.id for role in member.roles]:
             return True
         return False
 
     #isMod
     def isMod(self, member: discord.Member):
-        if member.id == secret.BOT_OWNER_ID:
+        if self.isBotOwner(member):
             return True
         if secret.MOD_ID in [role.id for role in member.roles]:
             return True
         return False
 
+    #verified
     def isVerified(self, member: discord.Member):
         if secret.VERIFIED_ID in [role.id for role in member.roles]:
+            return True
+        return False
+
+    #certified
+    def isCertified(self, member: discord.Member):
+        if secret.CERTIFIED_ID in [role.id for role in member.roles]:
+            return True
+        return False
+
+    #blindfolded
+    def isRestricted(self, member: discord.Member):
+        if secret.RESTRICTED_ID in [role.id for role in member.roles]:
             return True
         return False
 
@@ -64,6 +77,17 @@ class Meta:
             color = discord.Color.teal()
         )
         return embed
+
+    def msgWelcomeSquad(self, member: discord.Member = None):
+        if member is None:
+            return
+
+        user = self.getProfile(member)
+        squad = user['squad']
+
+        msg = '**__🎉 Let\'s all welcome <@' + str(member.id) + '> to the '+squad+' Squad! 🎉__**'
+        msg += '\n> Say hello to your new teammate! You\'ll be working with them during events.'
+        return msg
 
     def getProfile(self, member: discord.Member = None):
         if member is None:
@@ -128,6 +152,18 @@ class Meta:
 
         return False
 
+    def getChannelOwnerID(self, channel: discord.TextChannel):
+        return int(channel.name[channel.name.rfind('-')+1:])
+
+    def isChannelOwner(self, member: discord.Member, channel: discord.TextChannel):
+        return member.id == self.getChannelOwnerID(channel)
+
+    def isSupportChannel(self, channel: discord.TextChannel):
+        return channel.name.lower().startswith('s-')
+
+    def isModMailChannel(self, channel: discord.TextChannel):
+        return channel.name.lower().startswith('mm-')
+
 class Global(commands.Cog):
 
     def __init__(self, client, database, meta):
@@ -172,7 +208,7 @@ class Global(commands.Cog):
             await ctx.send(embed = embed)
 
     @commands.command()
-    async def verify(self, ctx, squad = None):
+    async def verify(self, ctx, *, squad = None):
         member = ctx.author
         if not self.meta.isVerified(member):
             guild = ctx.guild
@@ -197,19 +233,22 @@ class Global(commands.Cog):
             await casual.send(msg)
             #delete command
             await ctx.message.delete()
-
+            print(squad)
             if squad != None:
                 id = member.id
-                user = self.getProfile(member)
+                user = self.meta.getProfile(member)
+                guild = ctx.guild
 
                 if 'tea' in squad:
                     self.dbConnection.updateProfile({"id": id}, {"$set": {"squad": "Tea"}})
                     role = ctx.guild.get_role(612788003542401035)
                     await ctx.author.add_roles(role)
+                    await guild.get_channel(secret.SQUAD2_CHANNEL).send(self.meta.msgWelcomeSquad(member))
                 elif 'coffee' in squad:
                     self.dbConnection.updateProfile({"id": id}, {"$set": {"squad": "Coffee"}})
                     role = ctx.guild.get_role(612788004926521365)
                     await ctx.author.add_roles(role)
+                    await guild.get_channel(secret.SQUAD1_CHANNEL).send(self.meta.msgWelcomeSquad(member))
                 else:
                     embed = discord.Embed(
                         title = 'That Squad doesn\'t exist. Please choose either Coffee or Tea.',
@@ -259,6 +298,107 @@ class Global(commands.Cog):
             color = discord.Color.teal()
         )
         await ctx.send(embed = embed)
+
+    #switch
+    @commands.command(aliases=['swapST', 'swap', 'switchST'])
+    async def switch(self, ctx):
+        isAdmin = self.meta.isAdmin(ctx.author)
+        isMod = self.meta.isMod(ctx.author)
+        isCertified = self.meta.isCertified(ctx.author)
+        isChannelOwner = self.meta.isChannelOwner(ctx.author, ctx.channel)
+        log = ctx.guild.get_channel(secret.LOG_CHANNEL)
+        channel = ctx.channel
+        guild = ctx.guild
+
+        if not isAdmin:
+            if ((not isMod) and (not isChannelOwner) and (not isCertified)) or (not self.meta.isSupportChannel(channel)):
+                embed = discord.Embed(
+                    title = 'Sorry, that command can only be used in Support Ticket channels by the Support Ticket Owner, Certifieds, or Moderators+.',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+                return
+
+        if channel.is_nsfw():
+            #change to sfw
+            await channel.edit(nsfw = False)
+            await channel.edit(sync_permissions = True)
+
+            await log.send('<@' + str(ctx.author.id) + '> has switched ' + '<#' + str(channel.id) + '> to SFW.')
+
+            embed = discord.Embed(
+                title = 'Switched support channel to SFW! ✅',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+        else:
+            await channel.edit(nsfw = True)
+            #await newChannel.set_permissions(guild.default_role, read_messages=False)
+            await channel.set_permissions(guild.get_role(secret.VERIFIED_ID), read_messages=False)
+            await channel.set_permissions(self.client.get_user(self.meta.getChannelOwnerID(channel)), read_messages=True)
+            await channel.set_permissions(guild.get_role(secret.NSFW_ID), read_messages=True)
+
+            await log.send('<@' + str(ctx.author.id) + '> has switched ' + '<#' + str(channel.id) + '> to NSFW.')
+
+            embed = discord.Embed(
+                title = 'Switched support channel to NSFW! ✅',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+
+    #archive
+    @commands.command(aliases=['archivest'])
+    async def archive(self, ctx):
+        isAdmin = self.meta.isAdmin(ctx.author)
+        isMod = self.meta.isMod(ctx.author)
+        isChannelOwner = self.meta.isChannelOwner(ctx.author, ctx.channel)
+        log = ctx.guild.get_channel(secret.LOG_CHANNEL)
+        channel = ctx.channel
+
+        if not isAdmin:
+            if (not isMod and not isChannelOwner) or (not self.meta.isSupportChannel(channel) and not self.meta.isModMailChannel(channel)):
+                embed = discord.Embed(
+                    title = 'Sorry, that command can only be used in Support Ticket channels by the Support Ticket Owner or Moderators+.',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+                return
+
+        category = 0
+        for c in ctx.guild.categories:
+            if c.name.lower() == 'archive':
+                category = c #Archive
+
+        if self.meta.isSupportChannel(channel) or self.meta.isModMailChannel(channel):
+            user = self.client.get_user(self.meta.getChannelOwnerID(channel))
+
+            embed = discord.Embed(
+                title = 'Thanks for talking with us!',
+                description = 'If you felt a Listener was supportive, you can use the command `+helpedby @user` in #botspam to show them how much you appreciated their help!',
+                color = discord.Color.teal()
+            )
+            embed.set_thumbnail(url = 'https://cdn.discordapp.com/emojis/602887275289772052.png?v=1')
+
+            try:
+                await user.send(embed = embed)
+            except:
+                print('Could not send private message.')
+
+            await log.send('Support Ticket or ModMail Ticket [**' + channel.name + '**] has been archived.')
+
+        await ctx.message.channel.edit(name = 'archived-'+ channel.name)
+        await ctx.message.channel.edit(category = category, sync_permissions = True)
+
+    #close/delete
+    @commands.command(aliases=['delete'])
+    async def close(self, ctx):
+        if self.meta.isAdmin(ctx.author):
+            await ctx.message.channel.delete(reason='Deleted by ' + ctx.author.name)
+        else:
+            await ctx.send(embed = self.meta.embedNoAccess())
+
+    #lock
+
 
     '''
     #edit msg example
