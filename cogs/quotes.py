@@ -68,7 +68,8 @@ class Profile(commands.Cog):
         desc = 'Total: `' + str(numQuotes) + '`'
 
         for doc in quotes:
-            desc += '\n[ **' + str(doc['_id']) + '** ]: ' + str(doc['quote'])
+            #desc += '\n[ **' + str(doc['_id']) + '** ]: ' + str(doc['quote'])
+            desc += '\n' + str(doc['_id'])
 
         embed.add_field(name=title,value=desc)
         pic = member.avatar_url

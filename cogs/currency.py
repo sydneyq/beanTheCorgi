@@ -307,7 +307,7 @@ class Currency(commands.Cog):
             if self.meta.changeHelped(member, -1):
                 embed = discord.Embed(
                     title = 'Derepped ' + member.name + '!',
-                    description = member.name + '\'s rep count: ' + str(helped),
+                    description = member.name + '\'s rep count: ' + str(user['helped']),
                     color = discord.Color.teal()
                 )
                 await ctx.send(embed = embed)

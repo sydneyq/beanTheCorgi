@@ -369,7 +369,7 @@ class Global(commands.Cog):
             if c.name.lower() == 'archive':
                 category = c #Archive
 
-        if self.meta.isSupportChannel(channel) or self.meta.isModMailChannel(channel):
+        if self.meta.isSupportChannel(channel):
             user = self.client.get_user(self.meta.getChannelOwnerID(channel))
 
             embed = discord.Embed(
