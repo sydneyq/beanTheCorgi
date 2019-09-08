@@ -465,7 +465,7 @@ class Store(commands.Cog):
         return
 
     #members can gift coin companions or lotto tickets
-    @commands.command(aliases=['donate'])
+    @commands.command(aliases=['donate', 'give'])
     async def gift(self, ctx, member: discord.Member, *, item = 'gift'):
         if ctx.author == member:
             embed = discord.Embed(
@@ -487,6 +487,7 @@ class Store(commands.Cog):
         member = self.meta.getProfile(member)
         item = item.lower()
         coins = user['coins']
+        given = user['given']
 
         if item == 'gift' or item == 'coin gift' or item == 'coins' or item == 'coingift':
             if user['gifts'] > 0:
@@ -506,6 +507,10 @@ class Store(commands.Cog):
                     description = '<@' + str(member_discord.id) + '> is now `' + str(amt) + '` coins richer!',
                     color = discord.Color.teal()
                 )
+
+                given += 1
+                self.dbConnection.updateProfile({"id": ctx.author.id}, {"$set": {"given": given}})
+
                 await ctx.send(embed = embed)
             else:
                 embed = discord.Embed(
@@ -516,198 +521,17 @@ class Store(commands.Cog):
                 await ctx.send(embed = embed)
         else:
             isFound = False
-            for c in self.store['Coin Companions']:
-                if c['name'].lower() == item:
+            c = ''
+            for comp in self.store['Coin Companions']:
+                if comp['name'].lower() == item:
                     isFound = True
-                    price = c['price'] * -1
-                    if (coins - price) >= 0:
-                        embed = discord.Embed(
-                            title = 'Gift Confirmation',
-                            description = 'Buy `' + c['name'] + '` for <@' + str(member.id) + '>?\nReact to this message with a ✅ for yes, ⛔ for no.\nYou have 60 seconds to decide!',
-                            color = discord.Color.teal()
-                        )
-                        await ctx.send(embed = embed)
+                    c = comp
 
-                        msgs = []
-                        async for msg in ctx.channel.history(limit=1):
-                            if (msg.author.id == 592436047175221259 or msg.author.id == 432038389663924225):
-                                msgs.append(msg)
-                                break
-
-                        msg = msgs[0]
-                        await msg.add_reaction('✅')
-                        await msg.add_reaction('⛔')
-
-                        emoji = ''
-
-                        def check(reaction, user2):
-                            nonlocal emoji
-                            emoji = str(reaction.emoji)
-                            return user2 == ctx.author and (str(reaction.emoji) == '✅' or str(reaction.emoji) == '⛔')
-
-                        try:
-                            reaction, user2 = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
-                        except asyncio.TimeoutError:
-                            await channel.send('Timed out.')
-                        else:
-                            if emoji == '⛔':
-                                embed = discord.Embed(
-                                    title = 'Gift canceled.',
-                                    color = discord.Color.teal()
-                                )
-                                await ctx.send(embed = embed)
-                                return
-
-                            self.dbConnection.updateProfile({"id": id}, {"$set": {"companion": ''}})
-
-                            embed = discord.Embed(
-                                title = 'Accept Gift?',
-                                description = '<@' + str(member.id) + '>, would you like `' + c['name'] + '` to be your new Companion?\nReact to this message with a ✅ for yes, ⛔ for no.\nYou have 60 seconds to decide!',
-                                color = discord.Color.teal()
-                            )
-                            await ctx.send(embed = embed)
-
-                            msgs = []
-                            async for msg in ctx.channel.history(limit=1):
-                                if (msg.author.id == 592436047175221259 or msg.author.id == 432038389663924225):
-                                    msgs.append(msg)
-                                    break
-
-                            msg = msgs[0]
-                            await msg.add_reaction('✅')
-                            await msg.add_reaction('⛔')
-
-                            emoji = ''
-
-                            def check(reaction, user3):
-                                nonlocal emoji
-                                emoji = str(reaction.emoji)
-                                return user3 == member and (str(reaction.emoji) == '✅' or str(reaction.emoji) == '⛔')
-
-                            try:
-                                reaction, user3 = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
-                            except asyncio.TimeoutError:
-                                await channel.send('Timed out.')
-                            else:
-                                if emoji == '⛔':
-                                    embed = discord.Embed(
-                                        title = 'Gift canceled.',
-                                        color = discord.Color.teal()
-                                    )
-                                    await ctx.send(embed = embed)
-                                    return
-
-                                self.dbConnection.updateProfile({"id": member.id}, {"$set": {"companion": c['name']}})
-
-                                embed = discord.Embed(
-                                    title = ctx.author.name + ' gifted ' + member.name + ' a `' + c['name'] + '`',
-                                    color = discord.Color.teal()
-                                )
-                                await ctx.send(embed = embed)
-                                return
-                    else:
-                        embed = discord.Embed(
-                            title = 'You can\'t seem to afford that item.',
-                            color = discord.Color.teal()
-                        )
-                        await ctx.send(embed = embed)
-                        return
-            for c in self.store['Evolvable Companions']:
-                if c['name'].lower() == item:
-                    isFound = True
-                    price = c['price'] * -1
-                    if (coins - price) >= 0:
-                        embed = discord.Embed(
-                            title = 'Gift Confirmation ' + secret.GIFT_EMOJI,
-                            description = 'Buy `' + c['name'] + '` for <@' + str(member_discord.id) + '> with ' + str(c['price']) + ' coins?\nReact to this message with a ✅ for yes, ⛔ for no.\nYou have 60 seconds to decide!',
-                            color = discord.Color.teal()
-                        )
-                        await ctx.send(embed = embed)
-
-                        msgs = []
-                        async for msg in ctx.channel.history(limit=1):
-                            if (msg.author.id == 592436047175221259 or msg.author.id == 432038389663924225):
-                                msgs.append(msg)
-                                break
-
-                        msg = msgs[0]
-                        await msg.add_reaction('✅')
-                        await msg.add_reaction('⛔')
-
-                        emoji = ''
-
-                        def check(reaction, user2):
-                            nonlocal emoji
-                            emoji = str(reaction.emoji)
-                            return user2 == ctx.author and (str(reaction.emoji) == '✅' or str(reaction.emoji) == '⛔')
-
-                        try:
-                            reaction, user2 = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
-                        except asyncio.TimeoutError:
-                            await channel.send('Timed out.')
-                        else:
-                            if emoji == '⛔':
-                                embed = discord.Embed(
-                                    title = 'Gift canceled.',
-                                    color = discord.Color.teal()
-                                )
-                                await ctx.send(embed = embed)
-                                return
-
-                            embed = discord.Embed(
-                                title = 'Accept Gift? ' + secret.GIFT_EMOJI,
-                                description = '<@' + str(member_discord.id) + '>, would you like `' + c['name'] + '` to be your new Companion?\nReact to this message with a ✅ for yes, ⛔ for no.\nYou have 60 seconds to decide!',
-                                color = discord.Color.teal()
-                            )
-                            await ctx.send(embed = embed)
-
-                            msgs = []
-                            async for msg in ctx.channel.history(limit=1):
-                                if (msg.author.id == 592436047175221259 or msg.author.id == 432038389663924225):
-                                    msgs.append(msg)
-                                    break
-
-                            msg = msgs[0]
-                            await msg.add_reaction('✅')
-                            await msg.add_reaction('⛔')
-
-                            emoji = ''
-
-                            def check(reaction, user3):
-                                nonlocal emoji
-                                emoji = str(reaction.emoji)
-                                return user3 == member_discord and (str(reaction.emoji) == '✅' or str(reaction.emoji) == '⛔')
-
-                            try:
-                                reaction, user3 = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
-                            except asyncio.TimeoutError:
-                                await channel.send('Timed out.')
-                            else:
-                                if emoji == '⛔':
-                                    embed = discord.Embed(
-                                        title = 'Gift canceled.',
-                                        color = discord.Color.teal()
-                                    )
-                                    await ctx.send(embed = embed)
-                                    return
-
-                                self.dbConnection.updateProfile({"id": member_discord.id}, {"$set": {"companion": c['name']}})
-                                coins = coins - int(c['price'])
-                                self.dbConnection.updateProfile({"id": ctx.author.id}, {"$set": {"coins": coins}})
-
-                                embed = discord.Embed(
-                                    title = ctx.author.name + ' gifted ' + member_discord.name + ' a `' + c['name'] + '`! ' + secret.GIFT_EMOJI,
-                                    color = discord.Color.teal()
-                                )
-                                await ctx.send(embed = embed)
-                                return
-                    else:
-                        embed = discord.Embed(
-                            title = 'You can\'t seem to afford that item.',
-                            color = discord.Color.teal()
-                        )
-                        await ctx.send(embed = embed)
-                        return
+            if not isFound:
+                for comp in self.store['Evolvable Companions']:
+                    if comp['name'].lower() == item:
+                        isFound = True
+                        c = comp
 
             if not isFound:
                 embed = discord.Embed(
@@ -716,6 +540,101 @@ class Store(commands.Cog):
                 )
                 await ctx.send(embed = embed)
                 return
+
+            price = int(c['price'])
+            if coins - price < 0:
+                embed = discord.Embed(
+                    title = 'You can\'t seem to afford that item.',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+                return
+
+            coins = coins - price
+            embed = discord.Embed(
+                title = 'Gift Confirmation',
+                description = 'Buy `' + c['name'] + '` for <@' + str(member_discord.id) + '>?\nReact to this message with a ✅ for yes, ⛔ for no.\nYou have 60 seconds to decide!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+
+            msgs = []
+            async for msg in ctx.channel.history(limit=1):
+                if (msg.author.id == 592436047175221259 or msg.author.id == 432038389663924225):
+                    msgs.append(msg)
+                    break
+
+            msg = msgs[0]
+            await msg.add_reaction('✅')
+            await msg.add_reaction('⛔')
+
+            emoji = ''
+            def check(reaction, user2):
+                nonlocal emoji
+                emoji = str(reaction.emoji)
+                return user2 == ctx.author and (str(reaction.emoji) == '✅' or str(reaction.emoji) == '⛔')
+
+            try:
+                reaction, user2 = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
+            except asyncio.TimeoutError:
+                await channel.send('Timed out.')
+            else:
+                if emoji == '⛔':
+                    embed = discord.Embed(
+                        title = 'Gift canceled.',
+                        color = discord.Color.teal()
+                    )
+                    await ctx.send(embed = embed)
+                    return
+                embed = discord.Embed(
+                    title = 'Accept Gift?',
+                    description = '<@' + str(member_discord.id) + '>, would you like `' + c['name'] + '` to be your new Companion?\nReact to this message with a ✅ for yes, ⛔ for no.\nYou have 60 seconds to decide!',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+
+                msgs = []
+                async for msg in ctx.channel.history(limit=1):
+                    if (msg.author.id == 592436047175221259 or msg.author.id == 432038389663924225):
+                        msgs.append(msg)
+                        break
+
+                msg = msgs[0]
+                await msg.add_reaction('✅')
+                await msg.add_reaction('⛔')
+
+                emoji = ''
+
+                def check(reaction, user3):
+                    nonlocal emoji
+                    emoji = str(reaction.emoji)
+                    return user3 == member_discord and (str(reaction.emoji) == '✅' or str(reaction.emoji) == '⛔')
+
+                try:
+                    reaction, user3 = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
+                except asyncio.TimeoutError:
+                    await channel.send('Timed out.')
+                else:
+                    if emoji == '⛔':
+                        embed = discord.Embed(
+                            title = 'Gift canceled.',
+                            color = discord.Color.teal()
+                        )
+                        await ctx.send(embed = embed)
+                        return
+
+                    self.dbConnection.updateProfile({"id": member_discord.id}, {"$set": {"companion": c['name']}})
+                    self.dbConnection.updateProfile({"id": ctx.author.id}, {"$set": {"coins": coins}})
+
+                    given += 1
+                    self.dbConnection.updateProfile({"id": ctx.author.id}, {"$set": {"given": given}})
+
+                    embed = discord.Embed(
+                        title = ctx.author.name + ' gifted ' + member_discord.name + ' `' + c['name'] + '`! ' + secret.GIFT_EMOJI,
+                        color = discord.Color.teal()
+                    )
+                    await ctx.send(embed = embed)
+                    return
 
 def setup(client):
     database_connection = Database()

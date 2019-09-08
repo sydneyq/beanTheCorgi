@@ -172,7 +172,14 @@ class Global(commands.Cog):
         self.client = client
         self.meta = meta
         self.dbConnection = database
-
+    '''
+    @commands.command()
+    async def test(self, ctx):
+        if self.meta.isBotOwner(ctx.author):
+            #self.dbConnection.makeColumn("gifts", 0)
+            self.dbConnection.makeColumn("given", 0)
+            print("Done!")
+    '''
     @commands.command()
     async def ping(self, ctx):
         if (self.meta.isAdmin(ctx.message.author)):

@@ -262,14 +262,6 @@ class Profile(commands.Cog):
             )
             await ctx.send(embed = embed)
             return
-    '''
-    @commands.command()
-    async def test(self, ctx):
-        if self.meta.isBotOwner(ctx.author):
-            #self.dbConnection.makeColumn("gifts", 0)
-            self.dbConnection.makeColumn("affinity", "")
-            print("Done!")
-    '''
 
     #   Goes through certain elements of a users data in the database
     #   and puts them into an embed to send to the user through the bot
@@ -304,6 +296,7 @@ class Profile(commands.Cog):
             msg2 = 'No affinity yet. Set one with `+affinity`!'
         else:
             msg2 = user['affinity']
+            emoji = ''
             if msg2 == 'Fire':
                 emoji = secret.FIRE_EMOJI
             elif msg2 == 'Earth':
@@ -322,7 +315,7 @@ class Profile(commands.Cog):
             spouse = 'N/A'
         else:
             spouse = '<@' + str(user['spouse']) + '>'
-        embed.add_field(name="Spouse", value=spouse, inline=True)
+        embed.add_field(name="Soulmate", value=spouse, inline=True)
 
         #Companion
         companion = user['companion']
@@ -380,6 +373,9 @@ class Profile(commands.Cog):
 
         if 'Listeners' in [role.name for role in member.roles]:
             ack = ack + secret.LISTENER_EMOJI + ' '
+
+        if user['given'] >= 20:
+            ack = ack + secret.SANTA_EMOJI + ' '
 
         if (ack != ''):
             embed.add_field(name="Badges", value=ack, inline=False)

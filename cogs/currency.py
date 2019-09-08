@@ -54,15 +54,18 @@ class Currency(commands.Cog):
         gifts = user['gifts']
         embed.add_field(name=secret.GIFT_EMOJI + " Gifts", value='`' + str(gifts) + '`', inline=True)
 
+        #Gifts Given
+        embed.add_field(name=secret.SANTA_EMOJI + " Gifts Given", value= '`'+ str(user['given']) + '`', inline=True)
+
         embed.set_thumbnail(url = pic)
         await ctx.send(embed = embed)
 
     @commands.command()
-    async def setCompanion(self, ctx, *, companion):
+    async def setCompanion(self, ctx, member: discord.Member, *, companion):
         if ctx.author.id != secret.BOT_OWNER_ID:
             return
         else:
-            id = ctx.author.id
+            id = member.id
             self.dbConnection.updateProfile({"id": id}, {"$set": {"companion": companion}})
             embed = discord.Embed(
                 title = 'Consider it done! ✅',
@@ -131,8 +134,8 @@ class Currency(commands.Cog):
             await ctx.send(embed = embed)
             return
 
-    @commands.command()
-    async def give(self, ctx, member: discord.Member, amt, *, reason = ''):
+    @commands.command(aliases=['givecoins', 'agive', 'admgive'])
+    async def admingive(self, ctx, member: discord.Member, amt, *, reason = ''):
         if not self.meta.isAdmin(ctx.author):
             return
 
@@ -219,8 +222,8 @@ class Currency(commands.Cog):
 
         await log.send(msg)
 
-    @commands.command()
-    async def take(self, ctx, member: discord.Member, amt, *, reason = ''):
+    @commands.command(aliases=['atake', 'admtake', 'takecoins'])
+    async def admintake(self, ctx, member: discord.Member, amt, *, reason = ''):
         if not self.meta.isAdmin(ctx.author):
             return
 
