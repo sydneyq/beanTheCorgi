@@ -44,15 +44,15 @@ class Currency(commands.Cog):
         #Achievements
         #   helped
         helped = user['helped']
-        embed.add_field(name="Help Points", value=helped, inline=True)
+        embed.add_field(name=secret.HELPED_EMOJI + " Help Points", value='`' + str(helped) + '`', inline=True)
 
         #   coins
         coins = user['coins']
-        embed.add_field(name="Coins", value=coins, inline=True)
+        embed.add_field(name=secret.COIN_EMOJI + " Coins", value='`' + str(coins) + '`', inline=True)
 
         #   coins
         gifts = user['gifts']
-        embed.add_field(name="Gifts", value=gifts, inline=True)
+        embed.add_field(name=secret.GIFT_EMOJI + " Gifts", value='`' + str(gifts) + '`', inline=True)
 
         embed.set_thumbnail(url = pic)
         await ctx.send(embed = embed)
@@ -270,7 +270,7 @@ class Currency(commands.Cog):
                 self.dbConnection.updateProfile({"id": id}, {"$set": {"helped": helped}})
                 embed = discord.Embed(
                     title = 'Repped ' + member.name + '!',
-                    description = member.name + '\'s rep count: ' + str(helped),
+                    description = member.name + '\'s rep count: ' + str(helped) + ' ' + secret.HELPED_EMOJI,
                     color = discord.Color.teal()
                 )
                 await ctx.send(embed = embed)

@@ -23,7 +23,7 @@ class Event(commands.Cog):
     async def points(self, ctx):
         embed2 = discord.Embed(
             title = 'Squad Points',
-            description = '**Tea Squad:** `' + str(self.tea_score) + '`\n**Coffee Squad:** `' + str(self.coffee_score) + '`',
+            description = secret.TEA_EMOJI + ' **Tea Squad:** `' + str(self.tea_score) + '`\n' + secret.COFFEE_EMOJI + ' **Coffee Squad:** `' + str(self.coffee_score) + '`',
             color = discord.Color.teal()
         )
 

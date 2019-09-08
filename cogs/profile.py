@@ -6,6 +6,7 @@ import json
 import os
 import asyncio
 import random
+import secret
 
 class Profile(commands.Cog):
 
@@ -106,19 +107,19 @@ class Profile(commands.Cog):
         coffeeStr = '`' + str(coffeeMembers) + '` Members | `' + str(coffeeHelped) + '` Helped\n' + coffee_affinities + '\nMost Helpful Member(s):\n' + coffeeTop
 
         #emojis
-        teaName = 'Tea Squad '
-        coffeeName = 'Coffee Squad '
+        teaName = secret.TEA_EMOJI + ' Tea Squad '
+        coffeeName = secret.COFFEE_EMOJI + ' Coffee Squad '
 
         if teaMembers > coffeeMembers:
-            teaName = teaName + '🙌🏻'
+            teaName = teaName + ' ' + secret.PEOPLE_EMOJI
         elif teaMembers < coffeeMembers:
-            coffeeName = coffeeName + '🙌🏻'
+            coffeeName = coffeeName + ' ' + secret.PEOPLE_EMOJI
 
         if teaHelped > coffeeHelped:
-            teaName = teaName + '🏆'
+            teaName = teaName + ' ' + secret.HELPED2_EMOJI
         elif teaHelped < coffeeHelped:
-            coffeeName = coffeeName + '🏆'
-
+            coffeeName = coffeeName + ' ' + secret.HELPED2_EMOJI
+        '''
         if tea_earth > coffee_earth:
             teaName = teaName + '🌱'
         elif tea_earth < coffee_earth:
@@ -138,7 +139,7 @@ class Profile(commands.Cog):
             teaName = teaName + '💧'
         elif tea_water < coffee_water:
             coffeeName = coffeeName + '💧'
-
+        '''
         embed.add_field(name=teaName,value=teaStr)
         embed.add_field(name=coffeeName,value=coffeeStr, inline=False)
 
@@ -288,11 +289,11 @@ class Profile(commands.Cog):
         #Basics
         if (user['squad'] == "Tea"):
             embed = discord.Embed(color=0xe99c3e)
-            embed.add_field(name="Squad", value=user['squad'], inline=True)
+            embed.add_field(name="Squad", value=secret.TEA_EMOJI + ' ' + user['squad'], inline=True)
             embed.set_author(name = name, icon_url = 'https://cdn2.stylecraze.com/wp-content/uploads/2015/04/2072_11-Surprising-Benefits-And-Uses-Of-Marijuana-Tea_shutterstock_231770824.jpg')
         elif (user['squad'] == "Coffee"):
             embed = discord.Embed(color=0xace605)
-            embed.add_field(name="Squad", value=user['squad'], inline=True)
+            embed.add_field(name="Squad", value=secret.COFFEE_EMOJI + ' ' + user['squad'], inline=True)
             embed.set_author(name = name, icon_url = 'https://www.caffesociety.co.uk/assets/recipe-images/latte-small.jpg')
         else:
             embed = discord.Embed(color = discord.Color.teal())
@@ -303,7 +304,15 @@ class Profile(commands.Cog):
             msg2 = 'No affinity yet. Set one with `+affinity`!'
         else:
             msg2 = user['affinity']
-        embed.add_field(name='Affinity', value=msg2, inline=True)
+            if msg2 == 'Fire':
+                emoji = secret.FIRE_EMOJI
+            elif msg2 == 'Earth':
+                emoji = secret.EARTH_EMOJI
+            elif msg2 == 'Air':
+                emoji = secret.AIR_EMOJI
+            elif msg2 == 'Water':
+                emoji = secret.WATER_EMOJI
+        embed.add_field(name='Affinity', value=emoji + ' ' + msg2, inline=True)
 
         embed.set_footer(text = 'Mind Café', icon_url = 'https://media.discordapp.net/attachments/591611902459641856/593267453363224588/Bean_Icon.png')
 
@@ -351,7 +360,7 @@ class Profile(commands.Cog):
 
             msg = companion
             if isSpecial:
-                msg = "[🌟] " + companion
+                msg = secret.SPECIAL_EMOJI + ' ' + companion
         else:
             msg = 'No companion yet. Get one at `+store`!'
 
@@ -359,24 +368,20 @@ class Profile(commands.Cog):
 
         #Acknowledgements
         ack = ''
-        if self.meta.isAdmin(member):
-            ack = ack + 'Server Administrator\n'
-        elif self.meta.isMod(member):
-            ack = ack + 'Server Moderator\n'
-        elif self.meta.isStaff(member):
-            ack = ack + 'Server Staff\n'
+        if self.meta.isStaff(member):
+            ack = ack + secret.STAFF_EMOJI + ' '
 
         if 'Certifying Team' in [role.name for role in member.roles]:
-            ack = ack + 'Certifying Team Member\n'
+            ack = ack + secret.CERTIFYINGTEAM_EMOJI + ' '
 
-        if 'Certified in Active Listening' in [role.name for role in member.roles]:
-            ack = ack + 'Certified in Active Listening\n'
+        if self.meta.isCertified(member):
+            ack = ack + secret.CERTIFIED_EMOJI + ' '
 
         if 'Listeners' in [role.name for role in member.roles]:
-            ack = ack + 'Listener\n'
+            ack = ack + secret.LISTENER_EMOJI + ' '
 
         if (ack != ''):
-            embed.add_field(name="Acknowledgements", value=ack, inline=False)
+            embed.add_field(name="Badges", value=ack, inline=False)
 
         embed.set_thumbnail(url = pic)
         await ctx.send(embed=embed)
