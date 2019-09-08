@@ -8,6 +8,7 @@ import os
 import asyncio
 from numpy.random import choice
 import secret
+import datetime
 
 class Cooldown(commands.Cog):
 
@@ -22,13 +23,25 @@ class Cooldown(commands.Cog):
         with open(filename) as json_file:
             self.store = json.load(json_file)
 
-    @commands.cooldown(1, 60*60*24, commands.BucketType.user)
+    #@commands.cooldown(1, 60*60*24, commands.BucketType.user)
     @commands.command(aliases=['treasurehunt', 'treasure'])
     async def daily(self, ctx):
         id = ctx.message.author.id
 
         user = self.meta.getProfile(ctx.author)
 
+        #datetime check
+        if not user['daily'] == '':
+            if not self.meta.hasBeen24Hours(user['daily'], self.meta.getDateTime()):
+                minutes = self.meta.getMinuteDifference(user['daily'], self.meta.getDateTime())
+                embed = discord.Embed(
+                    title = 'Sorry, you need to wait `' + str(minutes) + '` more minutes!' ,
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+                return
+
+        #companion check
         companion = user['companion']
         if companion == '':
             embed = discord.Embed(
@@ -37,6 +50,9 @@ class Cooldown(commands.Cog):
             )
             await ctx.send(embed = embed)
             return
+
+        #update datetime
+        self.dbConnection.updateProfile({"id": id}, {"$set": {"daily": self.meta.getDateTime()}})
 
         elem = ['gift', 'coins']
         wei = [.1, .9]

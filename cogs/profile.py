@@ -378,7 +378,7 @@ class Profile(commands.Cog):
             ack = ack + secret.SANTA_EMOJI + ' '
 
         if (ack != ''):
-            embed.add_field(name="Badges", value=ack, inline=False)
+            embed.add_field(name="Badges", value=ack, inline=True)
 
         embed.set_thumbnail(url = pic)
         await ctx.send(embed=embed)

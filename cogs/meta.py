@@ -3,6 +3,7 @@ from discord.ext import commands
 from discord.utils import get
 import secret
 from database import Database
+import datetime
 
 class Meta:
 
@@ -97,10 +98,43 @@ class Meta:
 
         profile = self.dbConnection.findProfile({"id": id})
         if profile is None:
-            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'spouse': 0, 'gifts': 0, 'affinity':''})
+            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'spouse': 0, 'gifts': 0, 'affinity':'', 'daily': ''})
             profile = self.dbConnection.findProfile({"id": id})
 
         return profile
+
+    def getDateTime(self):
+        x = datetime.datetime.now()
+        data = {
+            "weekday": int(x.strftime("%w")),
+            "hour": int(x.strftime("%H")),
+            "minute": int(x.strftime("%M"))
+        }
+        return data
+
+    def hasBeen24Hours(self, previous, current):
+        if previous['weekday'] == current['weekday']:
+            return False
+        elif (previous['weekday'] + 1 == current['weekday']) or (previous['weekday'] == 6 and current['weekday'] == 0):
+            if previous['hour'] > current['hour']:
+                return False
+            elif previous['hour'] == current['hour']:
+                if previous['minute'] > current['minute']:
+                    return False
+                else:
+                    return True
+            else:
+                return True
+        else:
+            return True
+
+    def getMinuteDifference(self, previous, current):
+        hours = previous['hour'] - current['hour']
+        hours *= 60
+        minutes = previous['minute'] - current['minute']
+        hours += minutes
+        day = 60*24
+        return day + hours
 
     def changeCoins(self, member: discord.Member, val: int):
         user = self.getProfile(member)
