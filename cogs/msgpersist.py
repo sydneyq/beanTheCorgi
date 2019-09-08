@@ -8,6 +8,9 @@ class MsgPersist(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        if isinstance(message.channel, discord.DMChannel):
+            return
+
         if not(message.author.id == 592436047175221259 or message.author.id == 432038389663924225):
             guild = self.client.get_guild(257751892241809408) #Mind Café
 

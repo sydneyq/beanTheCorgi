@@ -312,7 +312,8 @@ class Profile(commands.Cog):
                 emoji = secret.AIR_EMOJI
             elif msg2 == 'Water':
                 emoji = secret.WATER_EMOJI
-        embed.add_field(name='Affinity', value=emoji + ' ' + msg2, inline=True)
+            msg2 = emoji + ' ' + msg2
+        embed.add_field(name='Affinity', value=msg2, inline=True)
 
         embed.set_footer(text = 'Mind Café', icon_url = 'https://media.discordapp.net/attachments/591611902459641856/593267453363224588/Bean_Icon.png')
 
