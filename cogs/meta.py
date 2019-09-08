@@ -153,6 +153,8 @@ class Meta:
         return False
 
     def getChannelOwnerID(self, channel: discord.TextChannel):
+        if not '-' in channel.name:
+            return -1
         return int(channel.name[channel.name.rfind('-')+1:])
 
     def isChannelOwner(self, member: discord.Member, channel: discord.TextChannel):
