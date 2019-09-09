@@ -55,7 +55,7 @@ class Currency(commands.Cog):
         embed.add_field(name=secret.GIFT_EMOJI + " Gifts", value='`' + str(gifts) + '`', inline=True)
 
         #Gifts Given
-        embed.add_field(name=secret.SANTA_EMOJI + " Gifts Given", value= '`'+ str(user['gifted']) + '`', inline=True)
+        #embed.add_field(name=secret.SANTA_EMOJI + " Gifts Given", value= '`'+ str(user['gifted']) + '`', inline=True)
 
         embed.set_thumbnail(url = pic)
         await ctx.send(embed = embed)

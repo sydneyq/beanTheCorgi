@@ -34,8 +34,10 @@ class Cooldown(commands.Cog):
         if not user['daily'] == '':
             if not self.meta.hasBeen24Hours(user['daily'], self.meta.getDateTime()):
                 minutes = self.meta.getMinuteDifference(user['daily'], self.meta.getDateTime())
+                hr = int(minutes / 60)
+                min = minutes % 60
                 embed = discord.Embed(
-                    title = 'Sorry, you need to wait `' + str(minutes) + '` more minutes!' ,
+                    title = 'Sorry, you need to wait `'+str(hr)+'` hours and `' + str(min) + '` more minutes!' ,
                     color = discord.Color.teal()
                 )
                 await ctx.send(embed = embed)
