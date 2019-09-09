@@ -98,7 +98,7 @@ class Meta:
 
         profile = self.dbConnection.findProfile({"id": id})
         if profile is None:
-            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'spouse': 0, 'gifts': 0, 'affinity':'', 'daily': ''})
+            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'spouse': 0, 'gifts': 0, 'affinity':'', 'gifted':0, 'daily': ''})
             profile = self.dbConnection.findProfile({"id": id})
 
         return profile
@@ -122,19 +122,31 @@ class Meta:
                 if previous['minute'] > current['minute']:
                     return False
                 else:
+                    #print('All')
                     return True
             else:
+                #print('Hour')
                 return True
         else:
+            #print('Weekday')
+            #print('Previous: ' + str(previous['weekday']))
+            #print('Previous + 1: ' + str(previous['weekday'] + 1))
+            #print('Current:' + str(current['weekday']))
             return True
 
     def getMinuteDifference(self, previous, current):
-        hours = previous['hour'] - current['hour']
-        hours *= 60
-        minutes = previous['minute'] - current['minute']
-        hours += minutes
-        day = 60*24
-        return day + hours
+        minutes = 0
+        if previous['weekday'] != current['weekday']:
+            minutes += 24 - current['hour'] + previous['hour']
+        else:
+            minutes += current['hour'] - previous['hour']
+
+        minutes *= 60
+
+        if previous['minute'] > current['minute']:
+            minutes += (previous['minute'] - current['minute'])
+
+        return abs(minutes - 1440)
 
     def changeCoins(self, member: discord.Member, val: int):
         user = self.getProfile(member)
@@ -206,14 +218,15 @@ class Global(commands.Cog):
         self.client = client
         self.meta = meta
         self.dbConnection = database
-    '''
+
     @commands.command()
     async def test(self, ctx):
         if self.meta.isBotOwner(ctx.author):
+            #self.dbConnection.renameColumn("given", "gifted")
             #self.dbConnection.makeColumn("gifts", 0)
-            self.dbConnection.makeColumn("given", 0)
+            #self.dbConnection.makeColumn("daily", '')
             print("Done!")
-    '''
+
     @commands.command()
     async def ping(self, ctx):
         if (self.meta.isAdmin(ctx.message.author)):

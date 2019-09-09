@@ -21,16 +21,8 @@ class Profile(commands.Cog):
         with open(filename) as json_file:
             self.store = json.load(json_file)
 
-    @commands.command(aliases=['squads', 's', 'sq', 'leaderboard'])
-    async def squadCount(self, ctx):
-        embed = discord.Embed(
-            title = 'Squad Count',
-            color = discord.Color.teal()
-        )
-
-        #tea
-        #total members
-        tea = self.dbConnection.findProfiles({'squad' : 'Tea'})
+    def getStats(self, squad):
+        tea = self.dbConnection.findProfiles({'squad' : squad})
         teaMembers = tea.count()
 
         #total helped
@@ -39,13 +31,19 @@ class Profile(commands.Cog):
         #top squad member
         teaTop = ''
         teaTopHelped = 0
+        teaGifted = 0
+        teaTopGifted = 0
+        teaTopGifter = ''
+        '''
         tea_water = 0
         tea_fire = 0
         tea_air = 0
         tea_earth = 0
+        '''
 
         for doc in tea:
             #affinities
+            '''
             aff = doc['affinity'].lower()
             if aff == 'water':
                 tea_water += 1
@@ -55,61 +53,38 @@ class Profile(commands.Cog):
                 tea_fire += 1
             elif aff == 'earth':
                 tea_earth += 1
+            '''
             #helped
             teaHelped += doc['helped']
             if doc['helped'] > teaTopHelped:
-                teaTop = '<@' + str(doc['id']) + '> (' + str(doc['helped']) + ')'
+                teaTop = '<@' + str(doc['id']) + '> (`' + str(doc['helped']) + '` Helped)'
                 teaTopHelped = doc['helped']
             elif doc['helped'] == teaTopHelped:
-                teaTop += '\n<@' + str(doc['id']) + '> (' + str(doc['helped']) + ')'
+                teaTop += '\n<@' + str(doc['id']) + '> (`' + str(doc['helped']) + '` Helped)'
+            #given
+            teaGifted += doc['gifted']
+            if doc['gifted'] > teaTopGifted:
+                teaTopGifter = '<@' + str(doc['id']) + '> (`' + str(doc['gifted']) + '` Gifts Given)'
+                teaTopGifted = doc['gifted']
+            elif doc['gifted'] == teaTopGifted:
+                teaTopGifter += '\n<@' + str(doc['id']) + '> (`' + str(doc['gifted']) + '` Gifts Given)'
 
-        tea_affinities = '`' + str(tea_earth) + '` Earth | `' + str(tea_air) + '` Air | `' + str(tea_fire) + '` Fire | `' + str(tea_water) + '` Water'
+        #tea_affinities = '`' + str(tea_earth) + '` Earth | `' + str(tea_air) + '` Air | `' + str(tea_fire) + '` Fire | `' + str(tea_water) + '` Water'
+        #teaStr = '`' + str(teaMembers) + '` Members | `' + str(teaHelped) + '` Helped\n ' + tea_affinities + '\nMost Helpful Member(s):\n' + teaTop
+        teaStr = '`' + str(teaMembers) + '` Members | `' + str(teaHelped) + '` Helped | `' + str(teaGifted) + '` Gifts Given\n**Most Helpful Member(s):**\n' + teaTop + '\n**Most Generous Member(s):**\n' + teaTopGifter
+        return teaStr
 
-        teaStr = '`' + str(teaMembers) + '` Members | `' + str(teaHelped) + '` Helped\n ' + tea_affinities + '\nMost Helpful Member(s):\n' + teaTop
-
-        #coffee
-        #tea
-        #total members
-        coffee = self.dbConnection.findProfiles({'squad' : 'Coffee'})
-        coffeeMembers = coffee.count()
-
-        #total helped
-        coffeeHelped = 0
-
-        #top squad member
-        coffeeTop = ''
-        coffeeTopHelped = 0
-        coffee_water = 0
-        coffee_fire = 0
-        coffee_air = 0
-        coffee_earth = 0
-
-        for doc in coffee:
-            #affinities
-            aff = doc['affinity'].lower()
-            if aff == 'water':
-                coffee_water += 1
-            elif aff == 'air':
-                coffee_air += 1
-            elif aff == 'fire':
-                coffee_fire += 1
-            elif aff == 'earth':
-                coffee_earth += 1
-            coffeeHelped += doc['helped']
-            if doc['helped'] > coffeeTopHelped:
-                coffeeTop = '<@' + str(doc['id']) + '> (' + str(doc['helped']) + ')'
-                coffeeTopHelped = doc['helped']
-            elif doc['helped'] == coffeeTopHelped:
-                coffeeTop += '\n<@' + str(doc['id']) + '> (' + str(doc['helped']) + ')'
-
-        coffee_affinities = '`' + str(coffee_earth) + '` Earth | `' + str(coffee_air) + '` Air | `' + str(coffee_fire) + '` Fire | `' + str(coffee_water) + '` Water'
-
-        coffeeStr = '`' + str(coffeeMembers) + '` Members | `' + str(coffeeHelped) + '` Helped\n' + coffee_affinities + '\nMost Helpful Member(s):\n' + coffeeTop
+    @commands.command(aliases=['squads', 's', 'stats', 'leaderboard'])
+    async def squadCount(self, ctx):
+        embed = discord.Embed(
+            title = 'Squad Leaderboard',
+            color = discord.Color.teal()
+        )
 
         #emojis
         teaName = secret.TEA_EMOJI + ' Tea Squad '
         coffeeName = secret.COFFEE_EMOJI + ' Coffee Squad '
-
+        '''
         if teaMembers > coffeeMembers:
             teaName = teaName + ' ' + secret.PEOPLE_EMOJI
         elif teaMembers < coffeeMembers:
@@ -119,6 +94,7 @@ class Profile(commands.Cog):
             teaName = teaName + ' ' + secret.HELPED2_EMOJI
         elif teaHelped < coffeeHelped:
             coffeeName = coffeeName + ' ' + secret.HELPED2_EMOJI
+        '''
         '''
         if tea_earth > coffee_earth:
             teaName = teaName + '🌱'
@@ -140,8 +116,8 @@ class Profile(commands.Cog):
         elif tea_water < coffee_water:
             coffeeName = coffeeName + '💧'
         '''
-        embed.add_field(name=teaName,value=teaStr)
-        embed.add_field(name=coffeeName,value=coffeeStr, inline=False)
+        embed.add_field(name=teaName,value=self.getStats('Tea'))
+        embed.add_field(name=coffeeName,value=self.getStats('Coffee'), inline=False)
 
         await ctx.send(embed = embed)
         return
@@ -374,7 +350,7 @@ class Profile(commands.Cog):
         if 'Listeners' in [role.name for role in member.roles]:
             ack = ack + secret.LISTENER_EMOJI + ' '
 
-        if user['given'] >= 20:
+        if user['gifted'] >= 20:
             ack = ack + secret.SANTA_EMOJI + ' '
 
         if (ack != ''):

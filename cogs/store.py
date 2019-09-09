@@ -487,7 +487,7 @@ class Store(commands.Cog):
         member = self.meta.getProfile(member)
         item = item.lower()
         coins = user['coins']
-        given = user['given']
+        gifted = user['gifted']
 
         if item == 'gift' or item == 'coin gift' or item == 'coins' or item == 'coingift':
             if user['gifts'] > 0:
@@ -508,8 +508,8 @@ class Store(commands.Cog):
                     color = discord.Color.teal()
                 )
 
-                given += 1
-                self.dbConnection.updateProfile({"id": ctx.author.id}, {"$set": {"given": given}})
+                gifted += 1
+                self.dbConnection.updateProfile({"id": ctx.author.id}, {"$set": {"gifted": gifted}})
 
                 await ctx.send(embed = embed)
             else:
@@ -626,8 +626,8 @@ class Store(commands.Cog):
                     self.dbConnection.updateProfile({"id": member_discord.id}, {"$set": {"companion": c['name']}})
                     self.dbConnection.updateProfile({"id": ctx.author.id}, {"$set": {"coins": coins}})
 
-                    given += 1
-                    self.dbConnection.updateProfile({"id": ctx.author.id}, {"$set": {"given": given}})
+                    gifted += 1
+                    self.dbConnection.updateProfile({"id": ctx.author.id}, {"$set": {"gifted": gifted}})
 
                     embed = discord.Embed(
                         title = ctx.author.name + ' gifted ' + member_discord.name + ' `' + c['name'] + '`! ' + secret.GIFT_EMOJI,

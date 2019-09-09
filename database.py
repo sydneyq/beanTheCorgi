@@ -52,3 +52,6 @@ class Database:
     #meta
     def makeColumn(self, title, value):
         self.db.profile.update({},{"$set": {title: value}},upsert=False,multi=True)
+
+    def renameColumn(self, old, new):
+        self.db.profile.update({},{"$rename": {old: new}},upsert=False,multi=True)
