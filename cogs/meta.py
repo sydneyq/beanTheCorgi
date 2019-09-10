@@ -103,6 +103,13 @@ class Meta:
 
         return profile
 
+    def profileDoesExist(self, id):
+        profile = self.dbConnection.findProfile({"id": id})
+        if profile is None:
+            return False
+        else:
+            return True
+
     def getDateTime(self):
         x = datetime.datetime.now()
         data = {

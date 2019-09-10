@@ -464,8 +464,14 @@ class Profile(commands.Cog):
             await ctx.send(embed = embed)
             return
 
+        spouse_name = 'spouse'
+        spouseExists = False
+        if self.meta.profileDoesExist(spouse):
+            spouseExists = True
+            spouse_name = self.client.get_user(spouse).name
+
         embed = discord.Embed(
-            title = 'Divorce ' + self.client.get_user(spouse).name + '?',
+            title = 'Divorce ' + spouse_name + '?',
             description = 'React to this message with a ✅ for yes, ⛔ for no.\nYou have 60 seconds to decide!',
             color = discord.Color.teal()
         )
@@ -496,10 +502,12 @@ class Profile(commands.Cog):
                 return
 
             self.dbConnection.updateProfile({"id": ctx.author.id}, {"$set": {"spouse": 0}})
-            self.dbConnection.updateProfile({"id": spouse}, {"$set": {"spouse": 0}})
+
+            if spouseExists:
+                self.dbConnection.updateProfile({"id": spouse}, {"$set": {"spouse": 0}})
 
             embed = discord.Embed(
-                title = 'Divorced ' + self.client.get_user(spouse).name + '.',
+                title = 'Divorced ' + spouse_name + '.',
                 color = discord.Color.teal()
             )
             await ctx.send(embed = embed)
@@ -508,6 +516,9 @@ class Profile(commands.Cog):
     @commands.Cog.listener()
     async def on_member_remove(self, member):
         id = member.id
+        user = self.meta.getProfile(id)
+        if user['spouse'] != 0:
+            self.dbConnection.updateProfile({"id": user['spouse']}, {"$set": {"spouse": 0}})
         self.dbConnection.removeProfile({"id": id})
 
 def setup(client):
