@@ -71,7 +71,7 @@ class Profile(commands.Cog):
                 teaTopGifter += '\n<@' + str(doc['id']) + '> (`' + str(doc['gifted']) + '` Gifts Given)'
             '''
         #tea_affinities = '`' + str(tea_earth) + '` Earth | `' + str(tea_air) + '` Air | `' + str(tea_fire) + '` Fire | `' + str(tea_water) + '` Water'
-        teaStr = '`' + str(teaMembers) + '` Members | `' + str(teaHelped) + '` Helped\n ' + tea_affinities + '\n**Most Helpful Member(s):**\n' + teaTop
+        teaStr = '`' + str(teaMembers) + '` Members | `' + str(teaHelped) + '` Helped\n**Most Helpful Member(s):**\n' + teaTop
         #teaStr = '`' + str(teaMembers) + '` Members | `' + str(teaHelped) + '` Helped | `' + str(teaGifted) + '` Gifts Given\n**Most Helpful Member(s):**\n' + teaTop + '\n**Most Generous Member(s):**\n' + teaTopGifter
         return teaStr
 

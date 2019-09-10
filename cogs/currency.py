@@ -255,6 +255,7 @@ class Currency(commands.Cog):
     @commands.command(aliases=['helpedby', 'thanks'])
     async def rep(self, ctx):
         members = ctx.message.mentions
+        log = ctx.guild.get_channel(secret.REP_CHANNEL)
 
         for member in members:
             if ctx.author.id == member.id and not self.meta.isBotOwner(ctx.author):
@@ -278,16 +279,8 @@ class Currency(commands.Cog):
                 )
                 await ctx.send(embed = embed)
 
-            #finding log channel
-            guild = ctx.guild
-            for ch in guild.text_channels:
-                if ch.name.lower() == 'log':
-                    log = guild.get_channel(ch.id)
-                    break
-
-            msg = '**<@' + str(member.id) + '>** was repped by <@' + str(ctx.author.id) + '>.'
-
-            await log.send(msg)
+                msg = secret.HELPED2_EMOJI + ' **<@' + str(member.id) + '>** was repped by <@' + str(ctx.author.id) + '>. `['+str(helped-1)+'->'+str(helped)+']` <@&'+str(secret.MOD_ID)+'>'
+                await log.send(msg)
 
     @commands.command(aliases=['removehelped'])
     async def derep(self, ctx):
@@ -295,31 +288,26 @@ class Currency(commands.Cog):
             return
 
         members = ctx.message.mentions
-
-        #finding log channel
-        guild = ctx.guild
-        for ch in guild.text_channels:
-            if ch.name.lower() == 'log':
-                log = guild.get_channel(ch.id)
-                break
+        log = ctx.guild.get_channel(secret.REP_CHANNEL)
 
         for member in members:
             id = member.id
             user = self.meta.getProfile(member)
 
-            if self.meta.changeHelped(member, -1):
-                embed = discord.Embed(
-                    title = 'Derepped ' + member.name + '!',
-                    description = member.name + '\'s rep count: ' + str(user['helped']),
-                    color = discord.Color.teal()
-                )
-                await ctx.send(embed = embed)
+            helped = user['helped']
+            helped -= 1
+            self.dbConnection.updateProfile({"id": id}, {"$set": {"helped": helped}})
 
-                msg = '**<@' + str(member.id) + '>** was derepped by <@' + str(ctx.author.id) + '>.'
+            embed = discord.Embed(
+                title = 'Derepped ' + member.name + '!',
+                description = member.name + '\'s rep count: ' + str(user['helped']),
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
 
-                await log.send(msg)
-            else:
-                await ctx.send(embed = self.meta.embedOops())
+            msg = '**<@' + str(member.id) + '>** was derepped by <@' + str(ctx.author.id) + '>. `['+str(helped+1)+'->'+str(helped)+']`'
+
+            await log.send(msg)
 
 def setup(client):
     database_connection = Database()
