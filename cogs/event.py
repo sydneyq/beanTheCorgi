@@ -175,8 +175,7 @@ class Event(commands.Cog):
         if random.random() < .1:
             #check timestamp
             past_timestamp = self.dbConnection.findMeta({'id':'server'})['typerace']
-            cur_min = self.meta.getDateTime()['minute']
-            if past_timestamp == '' or abs(cur_min - past_timestamp['minute']) >= 30:
+            if past_timestamp == '' or self.meta.hasBeen10Minutes(past_timestamp, self.meta.getDateTime()):
                 self.dbConnection.updateMeta({'id':'server'}, {'$set': {'typerace': self.meta.getDateTime()}})
                 casual = 257751892241809408
                 casual2 = 599757443362193408

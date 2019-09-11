@@ -170,6 +170,20 @@ class Meta:
             #print('Current:' + str(current['weekday']))
             return True
 
+    def hasBeen10Minutes(self, previous, current):
+        if previous['hour'] == current['hour']:
+            if abs(previous['minute'] - current['minute']) >= 30:
+                return True
+            else:
+                return False
+        elif abs(previous['hour'] - current['hour']) == 1:
+            if ((60 - previous['minute']) + current['minute']) >= 30:
+                return True
+            else:
+                return False
+        else:
+            return True
+
     def getMinuteDifference(self, previous, current):
         minutes = 0
         if previous['weekday'] != current['weekday']:
