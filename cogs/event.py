@@ -172,18 +172,23 @@ class Event(commands.Cog):
     async def on_message(self, message):
         if message.author.bot:
             return
-        if random.random() < .02:
+        if random.random() < .1:
             #check timestamp
             past_timestamp = self.dbConnection.findMeta({'id':'server'})['typerace']
-            if past_timestamp == '' or self.meta.getMinuteDifference(past_timestamp, self.meta.getDateTime()) >= 10:
+            cur_min = self.meta.getDateTime()['minute']
+            if past_timestamp == '' or abs(cur_min - past_timestamp['minute']) >= 30:
+                self.dbConnection.updateMeta({'id':'server'}, {'$set': {'typerace': self.meta.getDateTime()}})
                 casual = 257751892241809408
                 casual2 = 599757443362193408
+                #casual = 593153723610693632 #cmd
+                #casual2 = 593153723610693632 #cmd
                 #vc_chat = 595384066618949692
                 channels = [casual, casual2]
                 channel = random.choice(channels)
+                channel = message.guild.get_channel(channel)
 
                 string = random.choice(self.strings)
-                amt = 25
+                amt = 50
                 altered = ''
 
                 punctuation = ['!', '@', '&', '.']
@@ -569,106 +574,106 @@ class Event(commands.Cog):
         return
     '''
 
-        #karaoke event
-        '''
-        @commands.Cog.listener()
-        async def on_message(self, message):
-            if not isinstance(message.channel, discord.TextChannel):
-                return
+    #karaoke event
+    '''
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if not isinstance(message.channel, discord.TextChannel):
+            return
 
-            if ('karaoke' in message.channel.name):
-                id = message.author.id
-                if ('add me' in message.content.lower()):
-                    if id not in self.queue:
-                        self.queue.append(id)
-                        embed = discord.Embed(
-                            title = 'Added you to the queue!',
-                            color = discord.Color.teal()
-                        )
-                        await message.channel.send(embed = embed)
-                    else:
-                        embed = discord.Embed(
-                            title = 'You\'re already in the queue!',
-                            color = discord.Color.teal()
-                        )
-                        await message.channel.send(embed = embed)
-                elif ('remove me' in message.content.lower()):
-                    if id in self.queue:
-                        embed = discord.Embed(
-                            title = 'I\'ve removed you from the queue.',
-                            color = discord.Color.teal()
-                        )
-                        await message.channel.send(embed = embed)
-
-                        self.queue.remove(id)
-                    else:
-                        embed = discord.Embed(
-                            title = 'You\'re not in the queue!',
-                            color = discord.Color.teal()
-                        )
-                        await message.channel.send(embed = embed)
-                elif ('queue' in message.content.lower()):
-                    say = ''
-
-                    for id in self.queue:
-                        say += self.client.get_user(id).name + '\n'
+        if ('karaoke' in message.channel.name):
+            id = message.author.id
+            if ('add me' in message.content.lower()):
+                if id not in self.queue:
+                    self.queue.append(id)
                     embed = discord.Embed(
-                        title = 'Current Queue',
-                        color = discord.Color.teal(),
-                        description = say
-                    )
-                    await message.channel.send(embed = embed)
-                elif 'skip' == message.content.lower() and ('angels' in [role.name for role in message.author.roles] or 'mechanic' in [role.name for role in message.author.roles]):
-                    self.queue.pop()
-                    embed = discord.Embed(
-                        title = 'I\'ve skipped to the next person.',
+                        title = 'Added you to the queue!',
                         color = discord.Color.teal()
                     )
                     await message.channel.send(embed = embed)
-                    self.queue.remove(id)
-        '''
-
-        #team names in names event
-        '''
-        @commands.command(aliases=['snames'])
-        async def squadnames(self, ctx):
-            guild = ctx.guild
-            members = guild.members
-
-            embed = discord.Embed(
-                title = 'Squad Names',
-                color = discord.Color.teal()
-            )
-
-            tea = 0
-            teaMembers = ''
-            coffee = 0
-            coffeeMembers = ''
-
-            for member in members:
-                if not self.meta.isVerified(member):
-                    continue
-                if member.nick is not None:
-                    if self.meta.hasWord(member.nick, 'tea'):
-                        tea += 1
-                        teaMembers += '<@' + str(member.id) + '>\n'
-                    if self.meta.hasWord(member.nick, 'coffee'):
-                        coffee += 1
-                        coffeeMembers += '<@' + str(member.id) + '>\n'
                 else:
-                    if self.meta.hasWord(member.name, 'tea'):
-                        tea += 1
-                        teaMembers += '<@' + str(member.id) + '>\n'
-                    if self.meta.hasWord(member.name, 'coffee'):
-                        coffee += 1
-                        coffeeMembers += '<@' + str(member.id) + '>\n'
+                    embed = discord.Embed(
+                        title = 'You\'re already in the queue!',
+                        color = discord.Color.teal()
+                    )
+                    await message.channel.send(embed = embed)
+            elif ('remove me' in message.content.lower()):
+                if id in self.queue:
+                    embed = discord.Embed(
+                        title = 'I\'ve removed you from the queue.',
+                        color = discord.Color.teal()
+                    )
+                    await message.channel.send(embed = embed)
 
-            embed.add_field(name='Members with \"tea\"', value= '`' + str(tea) + '` Members\n' + teaMembers)
-            embed.add_field(name='Members with \"coffee\"', value= '`' + str(coffee) + '` Members\n' + coffeeMembers)
+                    self.queue.remove(id)
+                else:
+                    embed = discord.Embed(
+                        title = 'You\'re not in the queue!',
+                        color = discord.Color.teal()
+                    )
+                    await message.channel.send(embed = embed)
+            elif ('queue' in message.content.lower()):
+                say = ''
 
-            await ctx.send(embed = embed)
-            return
-        '''
+                for id in self.queue:
+                    say += self.client.get_user(id).name + '\n'
+                embed = discord.Embed(
+                    title = 'Current Queue',
+                    color = discord.Color.teal(),
+                    description = say
+                )
+                await message.channel.send(embed = embed)
+            elif 'skip' == message.content.lower() and ('angels' in [role.name for role in message.author.roles] or 'mechanic' in [role.name for role in message.author.roles]):
+                self.queue.pop()
+                embed = discord.Embed(
+                    title = 'I\'ve skipped to the next person.',
+                    color = discord.Color.teal()
+                )
+                await message.channel.send(embed = embed)
+                self.queue.remove(id)
+    '''
+
+    #team names in names event
+    '''
+    @commands.command(aliases=['snames'])
+    async def squadnames(self, ctx):
+        guild = ctx.guild
+        members = guild.members
+
+        embed = discord.Embed(
+            title = 'Squad Names',
+            color = discord.Color.teal()
+        )
+
+        tea = 0
+        teaMembers = ''
+        coffee = 0
+        coffeeMembers = ''
+
+        for member in members:
+            if not self.meta.isVerified(member):
+                continue
+            if member.nick is not None:
+                if self.meta.hasWord(member.nick, 'tea'):
+                    tea += 1
+                    teaMembers += '<@' + str(member.id) + '>\n'
+                if self.meta.hasWord(member.nick, 'coffee'):
+                    coffee += 1
+                    coffeeMembers += '<@' + str(member.id) + '>\n'
+            else:
+                if self.meta.hasWord(member.name, 'tea'):
+                    tea += 1
+                    teaMembers += '<@' + str(member.id) + '>\n'
+                if self.meta.hasWord(member.name, 'coffee'):
+                    coffee += 1
+                    coffeeMembers += '<@' + str(member.id) + '>\n'
+
+        embed.add_field(name='Members with \"tea\"', value= '`' + str(tea) + '` Members\n' + teaMembers)
+        embed.add_field(name='Members with \"coffee\"', value= '`' + str(coffee) + '` Members\n' + coffeeMembers)
+
+        await ctx.send(embed = embed)
+        return
+    '''
 
 def setup(client):
     database_connection = Database()

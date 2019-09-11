@@ -57,6 +57,9 @@ class Database:
     def findMeta(self, findCriteria):
         return self.db.meta.find_one(findCriteria)
 
+    def updateMeta(self, updateCritera, change):
+        self.db.meta.update(updateCritera, change)
+
     #db
     def makeColumn(self, title, value):
         self.db.profile.update({},{"$set": {title: value}},upsert=False,multi=True)

@@ -30,7 +30,7 @@ class Store(commands.Cog):
         with open(filename3) as json_file:
             self.ids = json.load(json_file)
 
-    @commands.command(aliases=['shop', 'companions', 'pets', '$', 'sh', 'st'])
+    @commands.command(aliases=['shop', 'companion', 'companions', 'pets', '$', 'sh', 'st'])
     async def store(self, ctx, type: str = None):
         id = ctx.author.id
         user = self.meta.getProfile(ctx.author)
