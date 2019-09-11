@@ -19,6 +19,16 @@ class Battle(commands.Cog):
     @commands.command(aliases=['challenge'])
     async def battle(self, ctx, channel: discord.TextChannel = None):
         return
+
+        #check both have 25 coins
+
+        #check affinities and assign advantages
+            #water -> chance to heal
+            #air -> chance to avoid
+            #earth -> higher hp
+            #fire -> higher atk
+
+
         message = ctx.message
         if not self.meta.isAdmin(message.author):
             return

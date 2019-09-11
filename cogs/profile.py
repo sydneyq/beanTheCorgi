@@ -89,14 +89,16 @@ class Profile(commands.Cog):
         if self.meta.isStaff(member):
             if self.meta.isBotOwner(member):
                 str = str + self.emojis['BotDeveloper'] + ' '
-            elif self.meta.isAdmin(member):
+
+            if self.meta.isAdmin(member):
                 str = str + self.emojis['Administrator'] + ' '
-            elif self.meta.isMod(member):
-                str = str + self.emojis['Moderator'] + ' '
-            elif self.meta.isEventCoordinator(member):
-                str = str + self.emojis['EventCoordinator'] + ' '
-            elif self.meta.isMarketingOfficer(member):
-                str = str + self.emojis['MarketingOfficer'] + ' '
+            else:
+                if self.meta.isMod(member):
+                    str = str + self.emojis['Moderator'] + ' '
+                if self.meta.isEventCoordinator(member):
+                    str = str + self.emojis['EventCoordinator'] + ' '
+                if self.meta.isMarketingOfficer(member):
+                    str = str + self.emojis['MarketingOfficer'] + ' '
 
         if self.meta.hasRole(member, 'Certifying Team'):
             str = str + self.emojis['CertifyingTeam'] + ' '
@@ -388,6 +390,8 @@ class Profile(commands.Cog):
 
         #Acknowledgements
         badges = self.getBadges(member)
+        if badges == '':
+            badges = 'No badges yet.'
         embed.add_field(name="Badges", value=badges, inline=True)
 
         embed.set_thumbnail(url = pic)

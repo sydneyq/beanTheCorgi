@@ -127,7 +127,7 @@ class Meta:
 
         profile = self.dbConnection.findProfile({"id": id})
         if profile is None:
-            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'spouse': 0, 'gifts': 0, 'affinity':'', 'daily': ''})
+            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'spouse': 0, 'gifts': 0, 'affinity':'', 'daily': '', 'badges':[]})
             profile = self.dbConnection.findProfile({"id": id})
 
         return profile
@@ -255,14 +255,24 @@ class Global(commands.Cog):
         self.meta = meta
         self.dbConnection = database
 
+        dirname = os.path.dirname(__file__)
+        filename2 = os.path.join(dirname, 'docs/emojis.json')
+        filename3 = os.path.join(dirname, 'docs/ids.json')
+
+        with open(filename2) as json_file:
+            self.emojis = json.load(json_file)
+
+        with open(filename3) as json_file:
+            self.ids = json.load(json_file)
+
     @commands.command()
     async def test(self, ctx):
         if self.meta.isBotOwner(ctx.author):
             #self.dbConnection.renameColumn("given", "gifted")
             #self.dbConnection.makeColumn("gifts", 0)
             #self.dbConnection.makeColumn("daily", '')
-            self.dbConnection.removeColumn("badges")
-            self.dbConnection.makeColumn("badges", [])
+            #self.dbConnection.removeColumn("badges")
+            #self.dbConnection.makeColumn("badges", [])
             #user = self.meta.getProfile(ctx.author)
             #badges = user['badges']
             #badges.append("Test")

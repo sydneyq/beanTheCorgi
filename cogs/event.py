@@ -19,6 +19,41 @@ class Event(commands.Cog):
         self.tea_score = 0
         self.coffee_score = 0
 
+        self.strings = ['the quick brown fox jumps over the lazy dog', #1
+        'bean the corgi is the goodest boy', #2
+        'tea and coffee make the world go round', #3
+        'with great power comes great responsibility', #4
+        'elementary my dear watson', #5
+        'the snack that smiles back', #6
+        'take a deep breath', #7
+        'sorry earth is closed today', #8
+        'i am right where i am supposed to be', #9
+        'houston we have a problem', #10
+        'you had me at hello world', #11
+        'keep your friends close and your enemies closer', #12
+        'today is going to be a good day', #13
+        'adventure is out there', #14
+        'there is no one i would rather be than me', #15
+        'hakuna matata what a wonderful phrase', #16
+        'no one deserves to be forgotten', #17
+        'i could do this all day', #18
+        'i have been falling for thirty minutes', #19
+        'come with me where dreams are born and time is never planned', #20
+        'i wanna be the very best like no one ever was', #21
+        'we are a product of the stories we tell ourselves', #22
+        'let us learn to show our friendship for a man when he is alive and not after he is dead', #23
+        'a man can learn more from defeat than success or victory', #24
+        'when there are clouds in the sky you will get by', #25
+        'if you do not like where you are move you are not a tree', #26
+        'i think you are confused for it is you who will taste defeat', #27
+        'we used google cloud platform to predict how clouds will behave', #28
+        'it is bed o clock you best be sleeping', #29
+        'when you cannot sleep at night it is because you are awake', #30
+        'does the sun shine for man to tell it where to cast its rays',
+        'the wilderness must be explored',
+        'no one deserves to fade away',
+        'a wilderness explorer is a friend to all be it plants or fish or tiny mole']
+
         dirname = os.path.dirname(__file__)
         filename2 = os.path.join(dirname, 'docs/emojis.json')
         filename3 = os.path.join(dirname, 'docs/ids.json')
@@ -57,106 +92,6 @@ class Event(commands.Cog):
 
         await ctx.send(embed = embed2)
 
-    #karaoke event
-    '''
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        if not isinstance(message.channel, discord.TextChannel):
-            return
-
-        if ('karaoke' in message.channel.name):
-            id = message.author.id
-            if ('add me' in message.content.lower()):
-                if id not in self.queue:
-                    self.queue.append(id)
-                    embed = discord.Embed(
-                        title = 'Added you to the queue!',
-                        color = discord.Color.teal()
-                    )
-                    await message.channel.send(embed = embed)
-                else:
-                    embed = discord.Embed(
-                        title = 'You\'re already in the queue!',
-                        color = discord.Color.teal()
-                    )
-                    await message.channel.send(embed = embed)
-            elif ('remove me' in message.content.lower()):
-                if id in self.queue:
-                    embed = discord.Embed(
-                        title = 'I\'ve removed you from the queue.',
-                        color = discord.Color.teal()
-                    )
-                    await message.channel.send(embed = embed)
-
-                    self.queue.remove(id)
-                else:
-                    embed = discord.Embed(
-                        title = 'You\'re not in the queue!',
-                        color = discord.Color.teal()
-                    )
-                    await message.channel.send(embed = embed)
-            elif ('queue' in message.content.lower()):
-                say = ''
-
-                for id in self.queue:
-                    say += self.client.get_user(id).name + '\n'
-                embed = discord.Embed(
-                    title = 'Current Queue',
-                    color = discord.Color.teal(),
-                    description = say
-                )
-                await message.channel.send(embed = embed)
-            elif 'skip' == message.content.lower() and ('angels' in [role.name for role in message.author.roles] or 'mechanic' in [role.name for role in message.author.roles]):
-                self.queue.pop()
-                embed = discord.Embed(
-                    title = 'I\'ve skipped to the next person.',
-                    color = discord.Color.teal()
-                )
-                await message.channel.send(embed = embed)
-                self.queue.remove(id)
-    '''
-
-    #team names in names event
-    '''
-    @commands.command(aliases=['snames'])
-    async def squadnames(self, ctx):
-        guild = ctx.guild
-        members = guild.members
-
-        embed = discord.Embed(
-            title = 'Squad Names',
-            color = discord.Color.teal()
-        )
-
-        tea = 0
-        teaMembers = ''
-        coffee = 0
-        coffeeMembers = ''
-
-        for member in members:
-            if not self.meta.isVerified(member):
-                continue
-            if member.nick is not None:
-                if self.meta.hasWord(member.nick, 'tea'):
-                    tea += 1
-                    teaMembers += '<@' + str(member.id) + '>\n'
-                if self.meta.hasWord(member.nick, 'coffee'):
-                    coffee += 1
-                    coffeeMembers += '<@' + str(member.id) + '>\n'
-            else:
-                if self.meta.hasWord(member.name, 'tea'):
-                    tea += 1
-                    teaMembers += '<@' + str(member.id) + '>\n'
-                if self.meta.hasWord(member.name, 'coffee'):
-                    coffee += 1
-                    coffeeMembers += '<@' + str(member.id) + '>\n'
-
-        embed.add_field(name='Members with \"tea\"', value= '`' + str(tea) + '` Members\n' + teaMembers)
-        embed.add_field(name='Members with \"coffee\"', value= '`' + str(coffee) + '` Members\n' + coffeeMembers)
-
-        await ctx.send(embed = embed)
-        return
-    '''
     #@commands.cooldown(1, 60*60*24, commands.BucketType.user)
     #@commands.Cog.listener()
     #@commands.cooldown(1, 180, commands.BucketType.guild)
@@ -172,43 +107,8 @@ class Event(commands.Cog):
 
         await ctx.message.delete()
 
-        strings = ['the quick brown fox jumps over the lazy dog', #1
-        'bean the corgi is the goodest boy', #2
-        'tea and coffee make the world go round', #3
-        'with great power comes great responsibility', #4
-        'elementary my dear watson', #5
-        'the snack that smiles back', #6
-        'take a deep breath', #7
-        'sorry earth is closed today', #8
-        'i am right where i am supposed to be', #9
-        'houston we have a problem', #10
-        'you had me at hello world', #11
-        'keep your friends close and your enemies closer', #12
-        'today is going to be a good day', #13
-        'adventure is out there', #14
-        'there is no one i would rather be than me', #15
-        'hakuna matata what a wonderful phrase', #16
-        'no one deserves to be forgotten', #17
-        'i could do this all day', #18
-        'i have been falling for thirty minutes', #19
-        'come with me where dreams are born and time is never planned', #20
-        'i wanna be the very best like no one ever was', #21
-        'we are a product of the stories we tell ourselves', #22
-        'let us learn to show our friendship for a man when he is alive and not after he is dead', #23
-        'a man can learn more from defeat than success or victory', #24
-        'when there are clouds in the sky you will get by', #25
-        'if you do not like where you are move you are not a tree', #26
-        'i think you are confused for it is you who will taste defeat', #27
-        'we used google cloud platform to predict how clouds will behave', #28
-        'it is bed o clock you best be sleeping', #29
-        'when you cannot sleep at night it is because you are awake', #30
-        'does the sun shine for man to tell it where to cast its rays',
-        'the wilderness must be explored',
-        'no one deserves to fade away',
-        'a wilderness explorer is a friend to all be it plants or fish or tiny mole']
-
         #for round in range(0, rounds):
-        string = random.choice(strings)
+        string = random.choice(self.strings)
         amt = 25
         altered = ''
 
@@ -267,6 +167,63 @@ class Event(commands.Cog):
         '''
         await channel.send(embed = embed2)
         return
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author.bot:
+            return
+        if random.random() < .02:
+            #check timestamp
+            past_timestamp = self.dbConnection.findMeta({'id':'server'})['typerace']
+            if past_timestamp == '' or self.meta.getMinuteDifference(past_timestamp, self.meta.getDateTime()) >= 10:
+                casual = 257751892241809408
+                casual2 = 599757443362193408
+                #vc_chat = 595384066618949692
+                channels = [casual, casual2]
+                channel = random.choice(channels)
+
+                string = random.choice(self.strings)
+                amt = 25
+                altered = ''
+
+                punctuation = ['!', '@', '&', '.']
+                for ch in string:
+                    altered += ch + random.choice(punctuation)
+
+                altered = altered[:-1]
+
+                embed = discord.Embed(
+                    title = 'Game On: Win ' + str(amt) + ' Coins!',
+                    #title = 'Game On: Squad Racers!',
+                    color = discord.Color.teal()
+                )
+
+                embed.add_field(name='Be the first to type the sentence without any punctuation or symbols!',
+                value='`' + altered + '`')
+                await channel.send(embed = embed)
+
+                def check(m):
+                    return m.content.lower() == string and m.channel == channel
+
+                msg = await self.client.wait_for('message', check=check)
+
+                user = self.meta.getProfile(msg.author)
+
+                coins = user['coins'] + amt
+                self.dbConnection.updateProfile({"id": msg.author.id}, {"$set": {"coins": coins}})
+
+                embed2 = discord.Embed(
+                    title = msg.author.name + ', you\'ve just earned ' + str(amt) + ' coins!',
+                    description = 'Your total: `' + str(coins) + '` coins',
+                    color = discord.Color.teal()
+                )
+
+                await channel.send(embed = embed2)
+                return
+            else:
+                return
+        else:
+            return
 
     '''
     @commands.command()
@@ -611,6 +568,107 @@ class Event(commands.Cog):
 
         return
     '''
+
+        #karaoke event
+        '''
+        @commands.Cog.listener()
+        async def on_message(self, message):
+            if not isinstance(message.channel, discord.TextChannel):
+                return
+
+            if ('karaoke' in message.channel.name):
+                id = message.author.id
+                if ('add me' in message.content.lower()):
+                    if id not in self.queue:
+                        self.queue.append(id)
+                        embed = discord.Embed(
+                            title = 'Added you to the queue!',
+                            color = discord.Color.teal()
+                        )
+                        await message.channel.send(embed = embed)
+                    else:
+                        embed = discord.Embed(
+                            title = 'You\'re already in the queue!',
+                            color = discord.Color.teal()
+                        )
+                        await message.channel.send(embed = embed)
+                elif ('remove me' in message.content.lower()):
+                    if id in self.queue:
+                        embed = discord.Embed(
+                            title = 'I\'ve removed you from the queue.',
+                            color = discord.Color.teal()
+                        )
+                        await message.channel.send(embed = embed)
+
+                        self.queue.remove(id)
+                    else:
+                        embed = discord.Embed(
+                            title = 'You\'re not in the queue!',
+                            color = discord.Color.teal()
+                        )
+                        await message.channel.send(embed = embed)
+                elif ('queue' in message.content.lower()):
+                    say = ''
+
+                    for id in self.queue:
+                        say += self.client.get_user(id).name + '\n'
+                    embed = discord.Embed(
+                        title = 'Current Queue',
+                        color = discord.Color.teal(),
+                        description = say
+                    )
+                    await message.channel.send(embed = embed)
+                elif 'skip' == message.content.lower() and ('angels' in [role.name for role in message.author.roles] or 'mechanic' in [role.name for role in message.author.roles]):
+                    self.queue.pop()
+                    embed = discord.Embed(
+                        title = 'I\'ve skipped to the next person.',
+                        color = discord.Color.teal()
+                    )
+                    await message.channel.send(embed = embed)
+                    self.queue.remove(id)
+        '''
+
+        #team names in names event
+        '''
+        @commands.command(aliases=['snames'])
+        async def squadnames(self, ctx):
+            guild = ctx.guild
+            members = guild.members
+
+            embed = discord.Embed(
+                title = 'Squad Names',
+                color = discord.Color.teal()
+            )
+
+            tea = 0
+            teaMembers = ''
+            coffee = 0
+            coffeeMembers = ''
+
+            for member in members:
+                if not self.meta.isVerified(member):
+                    continue
+                if member.nick is not None:
+                    if self.meta.hasWord(member.nick, 'tea'):
+                        tea += 1
+                        teaMembers += '<@' + str(member.id) + '>\n'
+                    if self.meta.hasWord(member.nick, 'coffee'):
+                        coffee += 1
+                        coffeeMembers += '<@' + str(member.id) + '>\n'
+                else:
+                    if self.meta.hasWord(member.name, 'tea'):
+                        tea += 1
+                        teaMembers += '<@' + str(member.id) + '>\n'
+                    if self.meta.hasWord(member.name, 'coffee'):
+                        coffee += 1
+                        coffeeMembers += '<@' + str(member.id) + '>\n'
+
+            embed.add_field(name='Members with \"tea\"', value= '`' + str(tea) + '` Members\n' + teaMembers)
+            embed.add_field(name='Members with \"coffee\"', value= '`' + str(coffee) + '` Members\n' + coffeeMembers)
+
+            await ctx.send(embed = embed)
+            return
+        '''
 
 def setup(client):
     database_connection = Database()

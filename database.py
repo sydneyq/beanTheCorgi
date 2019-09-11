@@ -54,6 +54,10 @@ class Database:
         return self.db.badge.find_one(findCriteria)
 
     #meta
+    def findMeta(self, findCriteria):
+        return self.db.meta.find_one(findCriteria)
+
+    #db
     def makeColumn(self, title, value):
         self.db.profile.update({},{"$set": {title: value}},upsert=False,multi=True)
 
