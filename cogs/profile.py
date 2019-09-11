@@ -91,7 +91,7 @@ class Profile(commands.Cog):
                 str = str + self.emojis['BotDeveloper'] + ' '
             elif self.meta.isAdmin(member):
                 str = str + self.emojis['Administrator'] + ' '
-            elif self.meta.isModerator(member):
+            elif self.meta.isMod(member):
                 str = str + self.emojis['Moderator'] + ' '
             elif self.meta.isEventCoordinator(member):
                 str = str + self.emojis['EventCoordinator'] + ' '

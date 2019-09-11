@@ -491,15 +491,34 @@ class Store(commands.Cog):
             )
             await ctx.send(embed = embed)
             return
+
+        user = self.meta.getProfile(ctx.author)
+
         if member.bot:
+            if member.id == 592436047175221259:
+                badges = user['badges']
+                if random.random() < .05 and 'GiftedByBean' not in badges:
+                    embed = discord.Embed(
+                        title = 'Wow, thanks so much! Here, take a gift: ' + self.dbConnection.findBadge({'id':'GiftedByBean'})['literal'],
+                        color = discord.Color.teal()
+                    )
+                    await ctx.send(embed = embed)
+                    badges.append('GiftedByBean')
+                    self.dbConnection.updateProfile({"id": id}, {"$set": {"badges": badges}})
+                else:
+                    embed = discord.Embed(
+                        title = 'Oh, thanks! I appreciate the gesture.',
+                        color = discord.Color.teal()
+                    )
+                    await ctx.send(embed = embed)
+                    return
             embed = discord.Embed(
-                title = 'You can\'t gift a bot!',
+                title = 'You can\'t gift a bot that\'s not me!',
                 color = discord.Color.teal()
             )
             await ctx.send(embed = embed)
             return
 
-        user = self.meta.getProfile(ctx.author)
         member_discord = member
         member = self.meta.getProfile(member)
         item = item.lower()
