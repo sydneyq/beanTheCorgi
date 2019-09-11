@@ -17,9 +17,17 @@ class Profile(commands.Cog):
 
         dirname = os.path.dirname(__file__)
         filename = os.path.join(dirname, 'docs/store.json')
+        filename2 = os.path.join(dirname, 'docs/emojis.json')
+        filename3 = os.path.join(dirname, 'docs/ids.json')
 
         with open(filename) as json_file:
             self.store = json.load(json_file)
+
+        with open(filename2) as json_file:
+            self.emojis = json.load(json_file)
+
+        with open(filename3) as json_file:
+            self.ids = json.load(json_file)
 
     def getStats(self, squad):
         tea = self.dbConnection.findProfiles({'squad' : squad})
@@ -75,6 +83,47 @@ class Profile(commands.Cog):
         #teaStr = '`' + str(teaMembers) + '` Members | `' + str(teaHelped) + '` Helped | `' + str(teaGifted) + '` Gifts Given\n**Most Helpful Member(s):**\n' + teaTop + '\n**Most Generous Member(s):**\n' + teaTopGifter
         return teaStr
 
+    def getBadges(self, member: discord.Member):
+        str = ''
+
+        if self.meta.isStaff(member):
+            if self.meta.isBotOwner(member):
+                str = str + self.emojis['BotDeveloper'] + ' '
+            elif self.meta.isAdmin(member):
+                str = str + self.emojis['Administrator'] + ' '
+            elif self.meta.isModerator(member):
+                str = str + self.emojis['Moderator'] + ' '
+            elif self.meta.isEventCoordinator(member):
+                str = str + self.emojis['EventCoordinator'] + ' '
+            elif self.meta.isMarketingOfficer(member):
+                str = str + self.emojis['MarketingOfficer'] + ' '
+
+        if self.meta.hasRole(member, 'Certifying Team'):
+            str = str + self.emojis['CertifyingTeam'] + ' '
+
+        if self.meta.isCertified(member):
+            str = str + self.emojis['Certified'] + ' '
+
+        if self.meta.hasRole(member, 'Listeners'):
+            str = str + self.emojis['Listener'] + ' '
+
+        if self.meta.hasRole(member, 'Corgi Call Responders'):
+            str = str + self.emojis['CorgiCallResponder'] + ' '
+
+        user = self.meta.getProfile(member)
+
+        if user['helped'] >= 10:
+            str = str + self.emojis['HelpPts10'] + ' '
+
+        if self.meta.hasRole(member, '○° bubble tea °○'):
+            str = str + self.emojis['Recruited10'] + ' '
+
+        badges = user['badges']
+        for badge in badges:
+            str = str + self.dbConnection.findBadge({"id":badge})['literal'] + ' '
+
+        return str
+
     @commands.command(aliases=['squads', 's', 'stats', 'leaderboard'])
     async def squadCount(self, ctx):
         embed = discord.Embed(
@@ -83,8 +132,8 @@ class Profile(commands.Cog):
         )
 
         #emojis
-        teaName = secret.TEA_EMOJI + ' Tea Squad '
-        coffeeName = secret.COFFEE_EMOJI + ' Coffee Squad '
+        teaName = self.emojis['Tea'] + ' Tea Squad '
+        coffeeName = self.emojis['Coffee'] + ' Coffee Squad '
         '''
         if teaMembers > coffeeMembers:
             teaName = teaName + ' ' + secret.PEOPLE_EMOJI
@@ -190,7 +239,7 @@ class Profile(commands.Cog):
                 await ctx.send(embed = embed)
                 role = ctx.guild.get_role(612788003542401035)
                 await ctx.author.add_roles(role)
-                await guild.get_channel(secret.SQUAD2_CHANNEL).send(self.meta.msgWelcomeSquad(ctx.author))
+                await guild.get_channel(self.ids['SQUAD_TEA_CHANNEL']).send(self.meta.msgWelcomeSquad(ctx.author))
                 return
             elif 'coffee' in squad:
                 self.dbConnection.updateProfile({"id": id}, {"$set": {"squad": "Coffee"}})
@@ -201,7 +250,7 @@ class Profile(commands.Cog):
                 await ctx.send(embed = embed)
                 role = ctx.guild.get_role(612788004926521365)
                 await ctx.author.add_roles(role)
-                await guild.get_channel(secret.SQUAD1_CHANNEL).send(self.meta.msgWelcomeSquad(ctx.author))
+                await guild.get_channel(self.ids['SQUAD_COFFEE_CHANNEL']).send(self.meta.msgWelcomeSquad(ctx.author))
                 return
             else:
                 embed = discord.Embed(
@@ -258,11 +307,11 @@ class Profile(commands.Cog):
         #Basics
         if (user['squad'] == "Tea"):
             embed = discord.Embed(color=0xe99c3e)
-            embed.add_field(name="Squad", value=secret.TEA_EMOJI + ' ' + user['squad'], inline=True)
+            embed.add_field(name="Squad", value=self.emojis['Tea'] + ' ' + user['squad'], inline=True)
             embed.set_author(name = name, icon_url = 'https://cdn2.stylecraze.com/wp-content/uploads/2015/04/2072_11-Surprising-Benefits-And-Uses-Of-Marijuana-Tea_shutterstock_231770824.jpg')
         elif (user['squad'] == "Coffee"):
             embed = discord.Embed(color=0xace605)
-            embed.add_field(name="Squad", value=secret.COFFEE_EMOJI + ' ' + user['squad'], inline=True)
+            embed.add_field(name="Squad", value=self.emojis['Coffee'] + ' ' + user['squad'], inline=True)
             embed.set_author(name = name, icon_url = 'https://www.caffesociety.co.uk/assets/recipe-images/latte-small.jpg')
         else:
             embed = discord.Embed(color = discord.Color.teal())
@@ -275,13 +324,13 @@ class Profile(commands.Cog):
             msg2 = user['affinity']
             emoji = ''
             if msg2 == 'Fire':
-                emoji = secret.FIRE_EMOJI
+                emoji = self.emojis['Fire']
             elif msg2 == 'Earth':
-                emoji = secret.EARTH_EMOJI
+                emoji = self.emojis['Earth']
             elif msg2 == 'Air':
-                emoji = secret.AIR_EMOJI
+                emoji = self.emojis['Air']
             elif msg2 == 'Water':
-                emoji = secret.WATER_EMOJI
+                emoji = self.emojis['Water']
             msg2 = emoji + ' ' + msg2
         embed.add_field(name='Affinity', value=msg2, inline=True)
 
@@ -331,31 +380,15 @@ class Profile(commands.Cog):
 
             msg = companion
             if isSpecial:
-                msg = secret.SPECIAL_EMOJI + ' ' + companion
+                msg = self.emojis['Special'] + ' ' + companion
         else:
             msg = 'No companion yet. Get one at `+store`!'
 
         embed.add_field(name="Companion", value=msg, inline=True)
 
         #Acknowledgements
-        ack = ''
-        if self.meta.isStaff(member):
-            ack = ack + secret.STAFF_EMOJI + ' '
-
-        if 'Certifying Team' in [role.name for role in member.roles]:
-            ack = ack + secret.CERTIFYINGTEAM_EMOJI + ' '
-
-        if self.meta.isCertified(member):
-            ack = ack + secret.CERTIFIED_EMOJI + ' '
-
-        if 'Listeners' in [role.name for role in member.roles]:
-            ack = ack + secret.LISTENER_EMOJI + ' '
-
-        #if user['gifted'] >= 20:
-        #    ack = ack + secret.SANTA_EMOJI + ' '
-
-        if (ack != ''):
-            embed.add_field(name="Badges", value=ack, inline=True)
+        badges = self.getBadges(member)
+        embed.add_field(name="Badges", value=badges, inline=True)
 
         embed.set_thumbnail(url = pic)
         await ctx.send(embed=embed)
@@ -516,7 +549,7 @@ class Profile(commands.Cog):
     @commands.Cog.listener()
     async def on_member_remove(self, member):
         id = member.id
-        user = self.meta.getProfile(id)
+        user = self.meta.getProfile(member)
         if user['spouse'] != 0:
             self.dbConnection.updateProfile({"id": user['spouse']}, {"$set": {"spouse": 0}})
         self.dbConnection.removeProfile({"id": id})

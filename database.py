@@ -49,9 +49,16 @@ class Database:
     def countQuotes(self, findCriteria):
         return self.db.quote.count(findCriteria)
 
+    #badges
+    def findBadge(self, findCriteria):
+        return self.db.badge.find_one(findCriteria)
+
     #meta
     def makeColumn(self, title, value):
         self.db.profile.update({},{"$set": {title: value}},upsert=False,multi=True)
 
     def renameColumn(self, old, new):
         self.db.profile.update({},{"$rename": {old: new}},upsert=False,multi=True)
+
+    def removeColumn(self, col):
+        self.db.profile.update({},{"$unset":{col: 1}},upsert=False,multi=True)

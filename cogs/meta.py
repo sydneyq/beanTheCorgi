@@ -4,11 +4,30 @@ from discord.utils import get
 import secret
 from database import Database
 import datetime
+import json
+import os
 
 class Meta:
 
     def __init__(self, database):
         self.dbConnection = database
+
+        dirname = os.path.dirname(__file__)
+        filename2 = os.path.join(dirname, 'docs/emojis.json')
+        filename3 = os.path.join(dirname, 'docs/ids.json')
+
+        with open(filename2) as json_file:
+            self.emojis = json.load(json_file)
+
+        with open(filename3) as json_file:
+            self.ids = json.load(json_file)
+
+    def hasRole(self, member:discord.Member, rolename):
+        rolename = rolename.lower()
+        if rolename in [role.name.lower() for role in member.roles]:
+            return True
+        else:
+            return False
 
     def isBotOwner(self, member: discord.Member):
         if member.id == secret.BOT_OWNER_ID:
@@ -19,7 +38,7 @@ class Meta:
     def isAdmin(self, member: discord.Member):
         if self.isBotOwner(member):
             return True
-        if secret.ADMIN_ID in [role.id for role in member.roles]:
+        if self.ids['ADMIN_ROLE'] in [role.id for role in member.roles]:
             return True
         return False
 
@@ -27,7 +46,7 @@ class Meta:
     def isStaff(self, member: discord.Member):
         if self.isBotOwner(member):
             return True
-        if secret.STAFF_ID in [role.id for role in member.roles]:
+        if self.ids['STAFF_ROLE'] in [role.id for role in member.roles]:
             return True
         return False
 
@@ -35,25 +54,35 @@ class Meta:
     def isMod(self, member: discord.Member):
         if self.isBotOwner(member):
             return True
-        if secret.MOD_ID in [role.id for role in member.roles]:
+        if self.ids['MOD_ROLE'] in [role.id for role in member.roles]:
+            return True
+        return False
+
+    def isEventCoordinator(self, member: discord.Member):
+        if self.ids['EVENTCOORDINATOR_ROLE'] in [role.id for role in member.roles]:
+            return True
+        return False
+
+    def isMarketingOfficer(self, member: discord.Member):
+        if self.ids['MARKETINGOFFICER_ROLE'] in [role.id for role in member.roles]:
             return True
         return False
 
     #verified
     def isVerified(self, member: discord.Member):
-        if secret.VERIFIED_ID in [role.id for role in member.roles]:
+        if self.ids['VERIFIED_ROLE'] in [role.id for role in member.roles]:
             return True
         return False
 
     #certified
     def isCertified(self, member: discord.Member):
-        if secret.CERTIFIED_ID in [role.id for role in member.roles]:
+        if self.ids['CERTIFIED_ROLE'] in [role.id for role in member.roles]:
             return True
         return False
 
     #blindfolded
     def isRestricted(self, member: discord.Member):
-        if secret.RESTRICTED_ID in [role.id for role in member.roles]:
+        if self.ids['BLINDFOLDED_ROLE'] in [role.id for role in member.roles]:
             return True
         return False
 
@@ -98,7 +127,7 @@ class Meta:
 
         profile = self.dbConnection.findProfile({"id": id})
         if profile is None:
-            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'spouse': 0, 'gifts': 0, 'affinity':'', 'gifted':0, 'daily': ''})
+            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'spouse': 0, 'gifts': 0, 'affinity':'', 'daily': ''})
             profile = self.dbConnection.findProfile({"id": id})
 
         return profile
@@ -232,6 +261,13 @@ class Global(commands.Cog):
             #self.dbConnection.renameColumn("given", "gifted")
             #self.dbConnection.makeColumn("gifts", 0)
             #self.dbConnection.makeColumn("daily", '')
+            #self.dbConnection.removeColumn("gifted")
+            #self.dbConnection.makeColumn("badges", [])
+            #user = self.meta.getProfile(ctx.author)
+            #badges = user['badges']
+            #badges.append("Test")
+            #self.dbConnection.updateProfile({"id": ctx.author.id}, {"$set": {"badges":badges}})
+
             print("Done!")
 
     @commands.command()
@@ -276,7 +312,7 @@ class Global(commands.Cog):
         if not self.meta.isVerified(member):
             guild = ctx.guild
             #spirits
-            verified_role = guild.get_role(secret.VERIFIED_ID)
+            verified_role = guild.get_role(self.ids['VERIFIED_ROLE'])
             await member.add_roles(verified_role)
             #basicroles
             basicroles = guild.get_role(593065193966403587)
@@ -289,7 +325,7 @@ class Global(commands.Cog):
             await member.add_roles(exclusive)
             #welcome
             #casual = guild.get_channel(secret.WORKSHOP_CHANNEL)
-            casual = guild.get_channel(secret.GENERAL_CHANNEL)
+            casual = guild.get_channel(self.ids['GENERAL_CHANNEL'])
             msg = '**__🎉 Let\'s all welcome <@' + str(member.id) + '> to Mind Cafe! 🎉__**'
             msg += '\n> **Need Support?** Take a look at <#601444570600964097> and get started in <#597026335835291659>.'
             msg += '\n> **Want to join a Squad?** Go to <#431191485933813765> and say `+profile` to get started.'
@@ -306,12 +342,12 @@ class Global(commands.Cog):
                     self.dbConnection.updateProfile({"id": id}, {"$set": {"squad": "Tea"}})
                     role = ctx.guild.get_role(612788003542401035)
                     await ctx.author.add_roles(role)
-                    await guild.get_channel(secret.SQUAD2_CHANNEL).send(self.meta.msgWelcomeSquad(member))
+                    await guild.get_channel(self.ids['SQUAD_TEA_CHANNEL']).send(self.meta.msgWelcomeSquad(member))
                 elif 'coffee' in squad:
                     self.dbConnection.updateProfile({"id": id}, {"$set": {"squad": "Coffee"}})
                     role = ctx.guild.get_role(612788004926521365)
                     await ctx.author.add_roles(role)
-                    await guild.get_channel(secret.SQUAD1_CHANNEL).send(self.meta.msgWelcomeSquad(member))
+                    await guild.get_channel(self.ids['SQUAD_COFFEE_CHANNEL']).send(self.meta.msgWelcomeSquad(member))
                 else:
                     embed = discord.Embed(
                         title = 'That Squad doesn\'t exist. Please choose either Coffee or Tea.',
@@ -369,7 +405,7 @@ class Global(commands.Cog):
         isMod = self.meta.isMod(ctx.author)
         isCertified = self.meta.isCertified(ctx.author)
         isChannelOwner = self.meta.isChannelOwner(ctx.author, ctx.channel)
-        log = ctx.guild.get_channel(secret.LOG_CHANNEL)
+        log = ctx.guild.get_channel(self.ids['LOG_CHANNEL'])
         channel = ctx.channel
         guild = ctx.guild
 
@@ -397,9 +433,9 @@ class Global(commands.Cog):
         else:
             await channel.edit(nsfw = True)
             #await newChannel.set_permissions(guild.default_role, read_messages=False)
-            await channel.set_permissions(guild.get_role(secret.VERIFIED_ID), read_messages=False)
+            await channel.set_permissions(guild.get_role(self.ids['VERIFIED_ROLE']), read_messages=False)
             await channel.set_permissions(self.client.get_user(self.meta.getChannelOwnerID(channel)), read_messages=True)
-            await channel.set_permissions(guild.get_role(secret.NSFW_ID), read_messages=True)
+            await channel.set_permissions(guild.get_role(self.ids['NSFW_ROLE']), read_messages=True)
 
             await log.send('<@' + str(ctx.author.id) + '> has switched ' + '<#' + str(channel.id) + '> to NSFW.')
 
@@ -415,7 +451,7 @@ class Global(commands.Cog):
         isAdmin = self.meta.isAdmin(ctx.author)
         isMod = self.meta.isMod(ctx.author)
         isChannelOwner = self.meta.isChannelOwner(ctx.author, ctx.channel)
-        log = ctx.guild.get_channel(secret.LOG_CHANNEL)
+        log = ctx.guild.get_channel(self.ids['LOG_CHANNEL'])
         channel = ctx.channel
 
         if not isAdmin:

@@ -376,6 +376,10 @@
         {
             "name":"Coin Gift",
             "price":75
+        },
+        {
+            "name":"HeckinRich Badge",
+            "price":1000
         }
     ]
 }

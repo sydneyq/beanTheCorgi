@@ -13,15 +13,22 @@ class Announce(commands.Cog):
     @commands.command()
     async def mcRolesHelp(self, ctx):
         if self.meta.isAdmin(ctx.author):
-            embed = discord.Embed(
+            channel = 584804029456973845
+            msg = 596064511685951501
+            channel.fetch_message(msg)
+            embeds = msg.embeds
+            embed = embeds[0]
+
+            embed2 = discord.Embed(
                 color = discord.Color.teal(),
                 description = 'React with the corresponding emoji to obtain/remove a role.'
             )
 
             embed.add_field(name = 'Helping Others Roles',
-            value = '🤝 - <@&300743585584906240>\nWant to be on the forefront of helping others? Become a listener and you\'ll get pinged whenever someone needs support!\n\n🎲 - <@&591484837932695582>\nGet notified whenever someone is bored and would like to socialize.\n\n🚀 - <@&591484887018766336>\n Get notified whenever someone is lonely and in need of a friend.')
+            value = '🤝 - <@&300743585584906240>\nWant to be on the forefront of helping others? Become a listener and you\'ll get pinged whenever someone needs support!\n\n🎲 - <@&591484837932695582>\nGet notified whenever someone is bored and would like to socialize.\n\n🚀 - <@&591484887018766336>\n Get notified whenever someone is lonely and in need of a friend.\n\n🚑 - <@&621036721915822094> \nGet pinged to help when no Listeners have responded for 20 minutes')
 
-            await ctx.send(embed = embed)
+            #await ctx.send(embed = embed)
+            await msg.edit(embed = embed2)
         else:
             embed = discord.Embed(
                 title = 'Sorry, you don\'t have permission to do that!',

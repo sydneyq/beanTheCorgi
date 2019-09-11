@@ -19,11 +19,34 @@ class Event(commands.Cog):
         self.tea_score = 0
         self.coffee_score = 0
 
+        dirname = os.path.dirname(__file__)
+        filename2 = os.path.join(dirname, 'docs/emojis.json')
+        filename3 = os.path.join(dirname, 'docs/ids.json')
+
+        with open(filename2) as json_file:
+            self.emojis = json.load(json_file)
+
+        with open(filename3) as json_file:
+            self.ids = json.load(json_file)
+
+    @commands.command(aliases=['2019'])
+    async def badge2019(self, ctx):
+        user = self.meta.getProfile(ctx.author)
+        badges = user['badges']
+        if '2019' not in badges:
+            badges.append('2019e')
+            self.dbConnection.updateProfile({"id": ctx.author.id}, {"$set": {"badges": badges}})
+            await ctx.send(embed = self.meta.embedDone())
+            return
+        else:
+            await ctx.send(embed = self.meta.embedOops())
+            return
+
     @commands.command(aliases=['pts'])
     async def points(self, ctx):
         embed2 = discord.Embed(
             title = 'Squad Points',
-            description = secret.TEA_EMOJI + ' **Tea Squad:** `' + str(self.tea_score) + '`\n' + secret.COFFEE_EMOJI + ' **Coffee Squad:** `' + str(self.coffee_score) + '`',
+            description = self.emojis['Tea'] + ' **Tea Squad:** `' + str(self.tea_score) + '`\n' + self.emojis['Coffee'] + ' **Coffee Squad:** `' + str(self.coffee_score) + '`',
             color = discord.Color.teal()
         )
 
@@ -181,6 +204,7 @@ class Event(commands.Cog):
         'when you cannot sleep at night it is because you are awake', #30
         'does the sun shine for man to tell it where to cast its rays',
         'the wilderness must be explored',
+        'no one deserves to fade away',
         'a wilderness explorer is a friend to all be it plants or fish or tiny mole']
 
         #for round in range(0, rounds):

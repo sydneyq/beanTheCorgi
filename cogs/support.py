@@ -4,6 +4,8 @@ from discord.utils import get
 from .meta import Meta
 from database import Database
 import secret
+import json
+import os
 
 class Support(commands.Cog):
 
@@ -11,6 +13,20 @@ class Support(commands.Cog):
         self.client = client
         self.dbConnection = database
         self.meta = meta
+
+        dirname = os.path.dirname(__file__)
+        filename = os.path.join(dirname, 'docs/store.json')
+        filename2 = os.path.join(dirname, 'docs/emojis.json')
+        filename3 = os.path.join(dirname, 'docs/ids.json')
+
+        with open(filename) as json_file:
+            self.store = json.load(json_file)
+
+        with open(filename2) as json_file:
+            self.emojis = json.load(json_file)
+
+        with open(filename3) as json_file:
+            self.ids = json.load(json_file)
 
     #support-ticket reset
     @commands.command(aliases=['resetST'])
@@ -282,7 +298,7 @@ class Support(commands.Cog):
             log = 0
             message = ctx.message
 
-            log = guild.get_channel(secret.LOG_CHANNEL)
+            log = guild.get_channel(self.ids['LOG_CHANNEL'])
 
             #finding support-ticket category
             for c in guild.categories:

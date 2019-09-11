@@ -18,9 +18,17 @@ class Store(commands.Cog):
 
         dirname = os.path.dirname(__file__)
         filename = os.path.join(dirname, 'docs/store.json')
+        filename2 = os.path.join(dirname, 'docs/emojis.json')
+        filename3 = os.path.join(dirname, 'docs/ids.json')
 
         with open(filename) as json_file:
             self.store = json.load(json_file)
+
+        with open(filename2) as json_file:
+            self.emojis = json.load(json_file)
+
+        with open(filename3) as json_file:
+            self.ids = json.load(json_file)
 
     @commands.command(aliases=['shop', 'companions', 'pets', '$', 'sh', 'st'])
     async def store(self, ctx, type: str = None):
@@ -32,7 +40,7 @@ class Store(commands.Cog):
 
         embed = discord.Embed(
             title = 'Store',
-            description = 'You have:\t`' + str(helped) + '` Helped ' + secret.HELPED_EMOJI + '\t`' + str(coins) + '` Coins ' + secret.COIN_EMOJI,
+            description = 'You have:\t`' + str(helped) + '` Helped ' + self.emojis['Helped'] + '\t`' + str(coins) + '` Coins ' + self.emojis['Coin'],
             color = discord.Color.teal()
         )
 
@@ -67,7 +75,7 @@ class Store(commands.Cog):
                     storeDesc += '\n`' + str(item['price']) + ' coins:` ' + item['name']
                     prevCost = item['price']
 
-            embed.add_field(name=secret.COIN_EMOJI + ' Coin Companions', value=storeDesc, inline=False)
+            embed.add_field(name=self.emojis['Coin'] + ' Coin Companions', value=storeDesc, inline=False)
 
             storeDesc_special = ''
             for item in self.store['Evolvable Companions']:
@@ -79,7 +87,7 @@ class Store(commands.Cog):
                     storeDesc_special += '\n`' + str(item['price']) + ' coins:` ' + item['name']
                     prevCost = item['price']
 
-            embed.add_field(name=secret.SPECIAL_EMOJI + ' Evolvable Companions', value=storeDesc_special, inline=False)
+            embed.add_field(name=self.emojis['Special'] + ' Evolvable Companions', value=storeDesc_special, inline=False)
 
             embed.set_footer(text = 'Earn coins by participating in server events! Read #about-profiles for more information. Access this store using "+store c".')
             await ctx.send(embed = embed)
@@ -100,7 +108,7 @@ class Store(commands.Cog):
                     storeDesc += '\n`' + str(item['price']) + ' helped:` ' + item['name']
                     prevCost = item['price']
 
-            embed.add_field(name=secret.HELPED_EMOJI + ' Helped Companions', value=storeDesc, inline=False)
+            embed.add_field(name=self.emojis['Helped'] + ' Helped Companions', value=storeDesc, inline=False)
             #embed.set_thumbnail(url = 'https://img.pngio.com/mario-bros-star-png-png-image-mario-bros-star-png-240_215.png')
             embed.set_footer(text = 'Earn Help Points by supporting others! Read #about-profiles for more information. Access this store using "+store h".')
             await ctx.send(embed = embed)
@@ -121,7 +129,7 @@ class Store(commands.Cog):
                     storeDesc += '\n`' + str(item['price']) + ' coins:` ' + item['name']
                     prevCost = item['price']
 
-            embed.add_field(name=secret.COIN_EMOJI + ' Items', value=storeDesc, inline=False)
+            embed.add_field(name=self.emojis['Coin'] + ' Items', value=storeDesc, inline=False)
             #embed.set_thumbnail(url = 'https://vignette.wikia.nocookie.net/mariokart/images/a/aa/Golden_Mushroom_-_Mario_Kart_Wii.png/revision/latest?cb=20180115185605')
             embed.set_footer(text = 'Earn coins by participating in server events! Read #about-profiles for more information. Access this store using "+store i".')
             await ctx.send(embed = embed)
@@ -142,7 +150,7 @@ class Store(commands.Cog):
                     storeDesc += '\n`' + str(item['price']) + ' coins:` ' + item['name']
                     prevCost = item['price']
 
-            embed.add_field(name=secret.SPECIAL_EMOJI + ' Evolvable Companions', value=storeDesc, inline=False)
+            embed.add_field(name=self.emojis['Special'] + ' Evolvable Companions', value=storeDesc, inline=False)
 
             storeDesc_special = ''
             for item in self.store['Evolved Companions']:
@@ -151,7 +159,7 @@ class Store(commands.Cog):
                 else:
                     storeDesc_special += ', ' + item['name']
 
-            embed.add_field(name=secret.SPECIAL_EMOJI + ' Evolved Companions', value=storeDesc_special, inline=False)
+            embed.add_field(name=self.emojis['Special'] + ' Evolved Companions', value=storeDesc_special, inline=False)
 
             embed.set_footer(text = 'Earn coins by participating in server events! Read #about-profiles for more information. Access this store using "+store s".')
             await ctx.send(embed = embed)
@@ -193,6 +201,9 @@ class Store(commands.Cog):
                         if random.random() < .1:
                             companion_name = 'Ditto'
                             title = 'Consider it — Oh? **Ditto** was caught! 🌟'
+                            badges = user['badges']
+                            badges.append('CaughtDitto')
+                            self.dbConnection.updateProfile({"id": id}, {"$set": {"badges": badges}})
 
                     self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "companion": companion_name}})
                     embed = discord.Embed(
@@ -257,18 +268,24 @@ class Store(commands.Cog):
                             self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "squad": 'Tea'}})
                             await ctx.author.add_roles(teaRole)
                             await ctx.author.remove_roles(coffeeRole)
-                            await guild.get_channel(secret.SQUAD2_CHANNEL).send(self.meta.msgWelcomeSquad(ctx.author))
+                            await guild.get_channel(self.ids['SQUAD_TEA_CHANNEL']).send(self.meta.msgWelcomeSquad(ctx.author))
                         else:
                             self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "squad": 'Coffee'}})
                             await ctx.author.add_roles(coffeeRole)
                             await ctx.author.remove_roles(teaRole)
-                            await guild.get_channel(secret.SQUAD1_CHANNEL).send(self.meta.msgWelcomeSquad(ctx.author))
-                        embed = discord.Embed(
-                            title = 'Consider it done! ✅',
-                            color = discord.Color.teal()
-                        )
-                        await ctx.send(embed = embed)
+                            await guild.get_channel(self.emojis['SQUAD_COFFEE_CHANNEL']).send(self.meta.msgWelcomeSquad(ctx.author))
+                        await ctx.send(embed = self.meta.embedDone())
                         return
+                    elif i['name'].lower() == 'heckinrich badge' or i['name'].lower() == 'heckinrich' or i['name'].lower() == 'badge' or i['name'].lower() == 'heckin rich badge' or i['name'].lower() == 'heckin rich':
+                        badges = user['badge']
+                        if 'HeckinRich' not in badges:
+                            badges.append('HeckinRich')
+                            self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "badges": badges}})
+                            await ctx.send(embed = self.meta.embedDone())
+                            return
+                        else:
+                            await ctx.send(embed = self.meta.embedOops())
+                            return
                     #buying an evolution
                     elif i['name'].lower() == 'affinity swap':
                         if user['affinity'] == '':
@@ -503,7 +520,7 @@ class Store(commands.Cog):
                 self.dbConnection.updateProfile({"id": member_discord.id}, {"$set": {"coins": giftee_coins}})
 
                 embed = discord.Embed(
-                    title = 'Gifted! ' + secret.GIFT_EMOJI,
+                    title = 'Gifted! ' + self.emojis['Gift'],
                     description = '<@' + str(member_discord.id) + '> is now `' + str(amt) + '` coins richer!',
                     color = discord.Color.teal()
                 )
@@ -630,7 +647,7 @@ class Store(commands.Cog):
                     self.dbConnection.updateProfile({"id": ctx.author.id}, {"$set": {"gifted": gifted}})
 
                     embed = discord.Embed(
-                        title = ctx.author.name + ' gifted ' + member_discord.name + ' `' + c['name'] + '`! ' + secret.GIFT_EMOJI,
+                        title = ctx.author.name + ' gifted ' + member_discord.name + ' `' + c['name'] + '`! ' + self.emojis['Gift'],
                         color = discord.Color.teal()
                     )
                     await ctx.send(embed = embed)

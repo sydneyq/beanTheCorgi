@@ -18,9 +18,17 @@ class Currency(commands.Cog):
 
         dirname = os.path.dirname(__file__)
         filename = os.path.join(dirname, 'docs/store.json')
+        filename2 = os.path.join(dirname, 'docs/emojis.json')
+        filename3 = os.path.join(dirname, 'docs/ids.json')
 
         with open(filename) as json_file:
             self.store = json.load(json_file)
+
+        with open(filename2) as json_file:
+            self.emojis = json.load(json_file)
+
+        with open(filename3) as json_file:
+            self.ids = json.load(json_file)
 
     @commands.command(aliases=['i', 'coins'])
     async def inventory(self, ctx, other: discord.Member = None):
@@ -44,18 +52,15 @@ class Currency(commands.Cog):
         #Achievements
         #   helped
         helped = user['helped']
-        embed.add_field(name=secret.HELPED_EMOJI + " Help Points", value='`' + str(helped) + '`', inline=True)
+        embed.add_field(name=self.emojis['Helped'] + " Help Points", value='`' + str(helped) + '`', inline=True)
 
         #   coins
         coins = user['coins']
-        embed.add_field(name=secret.COIN_EMOJI + " Coins", value='`' + str(coins) + '`', inline=True)
+        embed.add_field(name=self.emojis['Coin'] + " Coins", value='`' + str(coins) + '`', inline=True)
 
         #   coins
         gifts = user['gifts']
-        embed.add_field(name=secret.GIFT_EMOJI + " Gifts", value='`' + str(gifts) + '`', inline=True)
-
-        #Gifts Given
-        #embed.add_field(name=secret.SANTA_EMOJI + " Gifts Given", value= '`'+ str(user['gifted']) + '`', inline=True)
+        embed.add_field(name=self.emojis['Gift'] + " Gifts", value='`' + str(gifts) + '`', inline=True)
 
         embed.set_thumbnail(url = pic)
         await ctx.send(embed = embed)
@@ -255,7 +260,7 @@ class Currency(commands.Cog):
     @commands.command(aliases=['helpedby', 'thanks'])
     async def rep(self, ctx):
         members = ctx.message.mentions
-        log = ctx.guild.get_channel(secret.REP_CHANNEL)
+        log = ctx.guild.get_channel(self.ids['REP_CHANNEL'])
 
         for member in members:
             if ctx.author.id == member.id and not self.meta.isBotOwner(ctx.author):
@@ -274,12 +279,12 @@ class Currency(commands.Cog):
                 self.dbConnection.updateProfile({"id": id}, {"$set": {"helped": helped}})
                 embed = discord.Embed(
                     title = 'Repped ' + member.name + '!',
-                    description = member.name + '\'s rep count: ' + str(helped) + ' ' + secret.HELPED_EMOJI,
+                    description = member.name + '\'s rep count: ' + str(helped) + ' ' + self.emojis['Helped'],
                     color = discord.Color.teal()
                 )
                 await ctx.send(embed = embed)
 
-                msg = secret.HELPED2_EMOJI + ' **<@' + str(member.id) + '>** was repped by <@' + str(ctx.author.id) + '>. `['+str(helped-1)+'->'+str(helped)+']` <@&'+str(secret.MOD_ID)+'>'
+                msg = self.emojis['Helped2'] + ' **<@' + str(member.id) + '>** was repped by <@' + str(ctx.author.id) + '>. `['+str(helped-1)+'->'+str(helped)+']` <@&'+str(self.ids['MOD_ROLE'])+'>'
                 await log.send(msg)
 
     @commands.command(aliases=['removehelped'])
@@ -288,7 +293,7 @@ class Currency(commands.Cog):
             return
 
         members = ctx.message.mentions
-        log = ctx.guild.get_channel(secret.REP_CHANNEL)
+        log = ctx.guild.get_channel(self.ids['REP_CHANNEL'])
 
         for member in members:
             id = member.id
@@ -300,7 +305,7 @@ class Currency(commands.Cog):
 
             embed = discord.Embed(
                 title = 'Derepped ' + member.name + '!',
-                description = member.name + '\'s rep count: ' + str(user['helped']),
+                description = member.name + '\'s rep count: ' + str(helped),
                 color = discord.Color.teal()
             )
             await ctx.send(embed = embed)
