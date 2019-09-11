@@ -494,24 +494,7 @@ class Store(commands.Cog):
 
         user = self.meta.getProfile(ctx.author)
 
-        if member.bot:
-            if member.id == 592436047175221259:
-                badges = user['badges']
-                if random.random() < .05 and 'GiftedByBean' not in badges:
-                    embed = discord.Embed(
-                        title = 'Wow, thanks so much! Here, take a gift: ' + self.dbConnection.findBadge({'id':'GiftedByBean'})['literal'],
-                        color = discord.Color.teal()
-                    )
-                    await ctx.send(embed = embed)
-                    badges.append('GiftedByBean')
-                    self.dbConnection.updateProfile({"id": id}, {"$set": {"badges": badges}})
-                else:
-                    embed = discord.Embed(
-                        title = 'Oh, thanks! I appreciate the gesture.',
-                        color = discord.Color.teal()
-                    )
-                    await ctx.send(embed = embed)
-                    return
+        if member.bot and member.id != 592436047175221259:
             embed = discord.Embed(
                 title = 'You can\'t gift a bot that\'s not me!',
                 color = discord.Color.teal()
@@ -523,7 +506,7 @@ class Store(commands.Cog):
         member = self.meta.getProfile(member)
         item = item.lower()
         coins = user['coins']
-        gifted = user['gifted']
+        badges = user['badges']
 
         if item == 'gift' or item == 'coin gift' or item == 'coins' or item == 'coingift':
             if user['gifts'] > 0:
@@ -538,16 +521,31 @@ class Store(commands.Cog):
                 giftee_coins = member['coins'] + int(amt)
                 self.dbConnection.updateProfile({"id": member_discord.id}, {"$set": {"coins": giftee_coins}})
 
-                embed = discord.Embed(
-                    title = 'Gifted! ' + self.emojis['Gift'],
-                    description = '<@' + str(member_discord.id) + '> is now `' + str(amt) + '` coins richer!',
-                    color = discord.Color.teal()
-                )
-
-                gifted += 1
-                self.dbConnection.updateProfile({"id": ctx.author.id}, {"$set": {"gifted": gifted}})
-
-                await ctx.send(embed = embed)
+                #bean
+                if member_discord.id == 592436047175221259:
+                    if random.random() < .05 and 'GiftedByBean' not in badges:
+                        embed = discord.Embed(
+                            title = 'Wow, thanks so much! Here, take a gift: ' + self.dbConnection.findBadge({'id':'GiftedByBean'})['literal'],
+                            color = discord.Color.teal()
+                        )
+                        await ctx.send(embed = embed)
+                        badges.append('GiftedByBean')
+                        self.dbConnection.updateProfile({"id": id}, {"$set": {"badges": badges}})
+                        return
+                    else:
+                        embed = discord.Embed(
+                            title = 'Oh, thanks! I appreciate the gesture.',
+                            color = discord.Color.teal()
+                        )
+                        await ctx.send(embed = embed)
+                        return
+                else:
+                    embed = discord.Embed(
+                        title = 'Gifted! ' + self.emojis['Gift'],
+                        description = '<@' + str(member_discord.id) + '> is now `' + str(amt) + '` coins richer!',
+                        color = discord.Color.teal()
+                    )
+                    await ctx.send(embed = embed)
             else:
                 embed = discord.Embed(
                     title = 'You haven\'t bought any gifts from the Item Store yet!',
@@ -661,9 +659,6 @@ class Store(commands.Cog):
 
                     self.dbConnection.updateProfile({"id": member_discord.id}, {"$set": {"companion": c['name']}})
                     self.dbConnection.updateProfile({"id": ctx.author.id}, {"$set": {"coins": coins}})
-
-                    gifted += 1
-                    self.dbConnection.updateProfile({"id": ctx.author.id}, {"$set": {"gifted": gifted}})
 
                     embed = discord.Embed(
                         title = ctx.author.name + ' gifted ' + member_discord.name + ' `' + c['name'] + '`! ' + self.emojis['Gift'],

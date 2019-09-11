@@ -34,7 +34,7 @@ class Event(commands.Cog):
         user = self.meta.getProfile(ctx.author)
         badges = user['badges']
         if '2019' not in badges:
-            badges.append('2019e')
+            badges.append('2019')
             self.dbConnection.updateProfile({"id": ctx.author.id}, {"$set": {"badges": badges}})
             await ctx.send(embed = self.meta.embedDone())
             return

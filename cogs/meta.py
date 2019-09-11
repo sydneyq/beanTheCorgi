@@ -261,8 +261,8 @@ class Global(commands.Cog):
             #self.dbConnection.renameColumn("given", "gifted")
             #self.dbConnection.makeColumn("gifts", 0)
             #self.dbConnection.makeColumn("daily", '')
-            #self.dbConnection.removeColumn("gifted")
-            #self.dbConnection.makeColumn("badges", [])
+            self.dbConnection.removeColumn("badges")
+            self.dbConnection.makeColumn("badges", [])
             #user = self.meta.getProfile(ctx.author)
             #badges = user['badges']
             #badges.append("Test")
