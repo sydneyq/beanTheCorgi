@@ -87,7 +87,7 @@ class Help(commands.Cog):
         await ctx.send(embed = embed)
         return
 
-    @commands.command(aliases=['badgelist', 'badges'])
+    @commands.command(aliases=['badgelist', 'badge'])
     async def badges(self, ctx):
         embed = discord.Embed(
             title = 'Badge List',
