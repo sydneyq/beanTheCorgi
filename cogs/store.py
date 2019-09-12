@@ -534,7 +534,7 @@ class Store(commands.Cog):
                         return
                     else:
                         embed = discord.Embed(
-                            title = 'Oh, thanks! I appreciate the gesture.',
+                            title = 'Oh, thanks! I appreciate it!',
                             color = discord.Color.teal()
                         )
                         await ctx.send(embed = embed)

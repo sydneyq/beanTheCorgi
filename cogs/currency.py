@@ -289,7 +289,7 @@ class Currency(commands.Cog):
 
     @commands.command(aliases=['removehelped'])
     async def derep(self, ctx):
-        if not self.meta.isAdmin(ctx.author):
+        if not self.meta.isMod(ctx.author):
             return
 
         members = ctx.message.mentions
