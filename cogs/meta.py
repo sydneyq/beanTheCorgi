@@ -477,15 +477,6 @@ class Global(commands.Cog):
         log = ctx.guild.get_channel(self.ids['LOG_CHANNEL'])
         channel = ctx.channel
 
-        if not isAdmin:
-            if (not isMod and not isChannelOwner) or (not self.meta.isSupportChannel(channel) and not self.meta.isModMailChannel(channel)):
-                embed = discord.Embed(
-                    title = 'Sorry, that command can only be used in Support Ticket channels by the Support Ticket Owner or Moderators+.',
-                    color = discord.Color.teal()
-                )
-                await ctx.send(embed = embed)
-                return
-
         category = 0
         for c in ctx.guild.categories:
             if c.name.lower() == 'archive':
@@ -493,30 +484,34 @@ class Global(commands.Cog):
 
         if self.meta.isSupportChannel(channel):
             isChannelOwner = self.meta.isChannelOwner(ctx.author, ctx.channel)
-            if isChannelOwner or isMod:
-                user = self.client.get_user(self.meta.getChannelOwnerID(channel))
-
-                embed = discord.Embed(
-                    title = 'Thanks for talking with us!',
-                    description = 'If you felt a Listener was supportive, you can use the command `+helpedby @user` in #botspam to show them how much you appreciated their help!',
-                    color = discord.Color.teal()
-                )
-                embed.set_thumbnail(url = 'https://cdn.discordapp.com/emojis/602887275289772052.png?v=1')
-
-                try:
-                    await user.send(embed = embed)
-                except:
-                    print('Could not send private message.')
-
-                await log.send('Support Ticket [**' + channel.name + '**] has been archived.')
-            else:
+            if not isChannelOwner and not isMod:
                 await ctx.send(embed = self.meta.embedNoAccess())
                 return
+
+            user = self.client.get_user(self.meta.getChannelOwnerID(channel))
+
+            embed = discord.Embed(
+                title = 'Thanks for talking with us!',
+                description = 'If you felt a Listener was supportive, you can use the command `+helpedby @user` in #botspam to show them how much you appreciated their help!',
+                color = discord.Color.teal()
+            )
+            embed.set_thumbnail(url = 'https://cdn.discordapp.com/emojis/602887275289772052.png?v=1')
+
+            try:
+                await user.send(embed = embed)
+            except:
+                print('Could not send private message.')
+
+            await log.send('Support Ticket [**' + channel.name + '**] has been archived.')
         elif self.meta.isModMailChannel(channel):
             if not isMod:
                 await ctx.send(embed = self.meta.embedNoAccess())
                 return
             await log.send('ModMail Ticket [**' + channel.name + '**] has been archived.')
+        else:
+            if not isAdmin:
+                await ctx.send(embed = self.meta.embedNoAccess())
+                return
 
         await ctx.message.channel.edit(name = 'archived-'+ channel.name)
         await ctx.message.channel.edit(category = category, sync_permissions = True)
@@ -530,7 +525,6 @@ class Global(commands.Cog):
             await ctx.send(embed = self.meta.embedNoAccess())
 
     #lock
-
 
     '''
     #edit msg example

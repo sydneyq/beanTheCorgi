@@ -30,9 +30,9 @@ class TempEvent(commands.Cog):
 
     @commands.command(aliases=['influence', 'justsayit', 'repeatafterme'])
     async def influencer(self, ctx):
-        tea_words = ['leaf', 'teabag']
-        coffee_words = ['latte', 'creamer']
-        '''
+        #tea_words = ['leaf', 'teabag']
+        #coffee_words = ['latte', 'creamer']
+
         tea_words = ['melon', #1
         'extinguish', #2
         'pringle', #3
@@ -41,7 +41,7 @@ class TempEvent(commands.Cog):
         'hyena', #6
         'withstand', #7
         'delight', #8
-        'beanstalk', #9
+        'fell', #9
         'mumble', #10
         'prone', #11
         'device', #12
@@ -49,7 +49,7 @@ class TempEvent(commands.Cog):
         'wisp', #14
         'crepe']
         coffee_words = ['leap', #1
-        'gummybear', #2
+        'bottle', #2
         'robotic', #3
         'tony', #4
         'chuck', #5
@@ -63,15 +63,15 @@ class TempEvent(commands.Cog):
         'cheddar', #13
         'mingle', #14
         'photographer']
-        '''
+
+        guild = ctx.guild
         tea_index = 0
         coffee_index = 0
-        influencer_channel = 621737388674252820
-        guild = ctx.guild
-        #tea_channel = guild.get_channel(self.ids['SQUAD_TEA_CHANNEL'])
-        #coffee_channel = guild.get_channel(self.ids['SQUAD_COFFEE_CHANNEL'])
-        tea_channel = guild.get_channel(self.ids['WORKSHOP_CHANNEL'])
-        coffee_channel = guild.get_channel(self.ids['WORKSHOP_CHANNEL'])
+        influencer_channel = guild.get_channel(621737388674252820)
+        tea_channel = guild.get_channel(self.ids['SQUAD_TEA_CHANNEL'])
+        coffee_channel = guild.get_channel(self.ids['SQUAD_COFFEE_CHANNEL'])
+        #tea_channel = guild.get_channel(self.ids['WORKSHOP_CHANNEL'])
+        #coffee_channel = guild.get_channel(self.ids['WORKSHOP_CHANNEL'])
         tea_icon = 'https://cdn.discordapp.com/attachments/591611902459641856/613918428293627914/teamteaBean.png'
         coffee_icon = 'https://cdn.discordapp.com/attachments/591611902459641856/613918442034298890/teamcoffeeBean.png'
 
@@ -108,6 +108,7 @@ class TempEvent(commands.Cog):
                 description = '+1 point to ' + squad + '!\n' + message.jump_url,
                 color = discord.Color.teal()
             )
+            embed.add_field(name='Current Points', value='Tea Squad: `' + str(self.tea_score) + '`\nCoffee Squad: `' + str(self.coffee_score) + '`')
             embed.set_thumbnail(url = url)
             return embed
 
@@ -116,11 +117,11 @@ class TempEvent(commands.Cog):
             nonlocal coffee_icon
 
             url = tea_icon
-            enemy_squad = 'Coffee'
+            enemy_squad = 'Tea'
 
             if squad == 'Coffee':
                 url = coffee_icon
-                enemy_squad
+                enemy_squad = 'Coffee'
 
             embed = discord.Embed(
                 title = squad + ' got ' + enemy_squad + ' to say all their words!',
@@ -141,10 +142,10 @@ class TempEvent(commands.Cog):
             def check(m):
                 #tea got a coffee to say it?
                 nonlocal tea_trigger
-                tea_trigger = tea_words(tea_index) in m.content.lower()
+                tea_trigger = tea_words[tea_index] in m.content.lower()
                 #coffee got a tea to say it?
                 nonlocal coffee_trigger
-                coffee_trigger = coffee_words(coffee_index) in m.content.lower()
+                coffee_trigger = coffee_words[coffee_index] in m.content.lower()
                 #check is in public channel
                 return (tea_trigger or coffee_trigger) and m.channel.category_id == 363477215377358848
 
@@ -156,17 +157,17 @@ class TempEvent(commands.Cog):
                 continue
             if tea_trigger and squad == 'Coffee':
                 self.tea_score += 1
-                await influencer_channel.send(embed = embedGotcha('Tea', msg, tea_words(tea_index)))
+                await influencer_channel.send(embed = embedGotcha('Tea', msg, tea_words[tea_index]))
                 tea_index += 1
-                if tea_index == len(tea_words):
+                if tea_index >= len(tea_words):
                     await influencer_channel.send(embed = embedWon('Tea'))
                 await tea_channel.send(embed = embedNext('Tea', tea_words[tea_index]))
                 continue
             elif coffee_trigger and squad == 'Tea':
                 self.coffee_score += 1
-                await influencer_channel.send(embed = embedGotcha('Coffee', msg, coffee_words(coffee_index)))
+                await influencer_channel.send(embed = embedGotcha('Coffee', msg, coffee_words[coffee_index]))
                 coffee_index += 1
-                if coffee_index == len(coffee_words):
+                if coffee_index >= len(coffee_words):
                     await influencer_channel.send(embed = embedWon('Coffee'))
                     return
                 await coffee_channel.send(embed = embedNext('Coffee', coffee_words[coffee_index]))
