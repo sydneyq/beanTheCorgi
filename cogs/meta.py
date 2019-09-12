@@ -474,7 +474,6 @@ class Global(commands.Cog):
     async def archive(self, ctx):
         isAdmin = self.meta.isAdmin(ctx.author)
         isMod = self.meta.isMod(ctx.author)
-        isChannelOwner = self.meta.isChannelOwner(ctx.author, ctx.channel)
         log = ctx.guild.get_channel(self.ids['LOG_CHANNEL'])
         channel = ctx.channel
 
@@ -493,21 +492,31 @@ class Global(commands.Cog):
                 category = c #Archive
 
         if self.meta.isSupportChannel(channel):
-            user = self.client.get_user(self.meta.getChannelOwnerID(channel))
+            isChannelOwner = self.meta.isChannelOwner(ctx.author, ctx.channel)
+            if isChannelOwner or isMod:
+                user = self.client.get_user(self.meta.getChannelOwnerID(channel))
 
-            embed = discord.Embed(
-                title = 'Thanks for talking with us!',
-                description = 'If you felt a Listener was supportive, you can use the command `+helpedby @user` in #botspam to show them how much you appreciated their help!',
-                color = discord.Color.teal()
-            )
-            embed.set_thumbnail(url = 'https://cdn.discordapp.com/emojis/602887275289772052.png?v=1')
+                embed = discord.Embed(
+                    title = 'Thanks for talking with us!',
+                    description = 'If you felt a Listener was supportive, you can use the command `+helpedby @user` in #botspam to show them how much you appreciated their help!',
+                    color = discord.Color.teal()
+                )
+                embed.set_thumbnail(url = 'https://cdn.discordapp.com/emojis/602887275289772052.png?v=1')
 
-            try:
-                await user.send(embed = embed)
-            except:
-                print('Could not send private message.')
+                try:
+                    await user.send(embed = embed)
+                except:
+                    print('Could not send private message.')
 
-            await log.send('Support Ticket or ModMail Ticket [**' + channel.name + '**] has been archived.')
+                await log.send('Support Ticket [**' + channel.name + '**] has been archived.')
+            else:
+                await ctx.send(embed = self.meta.embedNoAccess())
+                return
+        elif self.meta.isModMailChannel(channel):
+            if not isMod:
+                await ctx.send(embed = self.meta.embedNoAccess())
+                return
+            await log.send('ModMail Ticket [**' + channel.name + '**] has been archived.')
 
         await ctx.message.channel.edit(name = 'archived-'+ channel.name)
         await ctx.message.channel.edit(category = category, sync_permissions = True)
