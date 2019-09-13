@@ -362,8 +362,12 @@
 
     "Items" : [
         {
+            "name":"HeckinRich Badge",
+            "price":1000
+        },
+        {
             "name":"Squad Swap",
-            "price":700
+            "price":500
         },
         {
             "name":"Affinity Swap",
@@ -376,10 +380,6 @@
         {
             "name":"Coin Gift",
             "price":75
-        },
-        {
-            "name":"HeckinRich Badge",
-            "price":1000
         }
     ]
 }

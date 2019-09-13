@@ -390,9 +390,12 @@ class Profile(commands.Cog):
 
         #Acknowledgements
         badges = self.getBadges(member)
+        numBadges = 0
         if badges == '':
             badges = 'No badges yet.'
-        embed.add_field(name="Badges", value=badges, inline=True)
+        else:
+            numBadges = badges.count('<')
+        embed.add_field(name="Badges (`" + str(numBadges) + "`)", value=badges, inline=True)
 
         embed.set_thumbnail(url = pic)
         await ctx.send(embed=embed)
