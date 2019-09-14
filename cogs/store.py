@@ -276,8 +276,8 @@ class Store(commands.Cog):
                             await guild.get_channel(self.emojis['SQUAD_COFFEE_CHANNEL']).send(self.meta.msgWelcomeSquad(ctx.author))
                         await ctx.send(embed = self.meta.embedDone())
                         return
-                    elif i['name'].lower() == 'heckinrich badge' or i['name'].lower() == 'heckinrich' or i['name'].lower() == 'badge' or i['name'].lower() == 'heckin rich badge' or i['name'].lower() == 'heckin rich':
-                        badges = user['badge']
+                    elif i['name'].lower() == 'heckinrich badge' or i['name'].lower() == 'heckinrich' or i['name'].lower() == 'heckin rich badge' or i['name'].lower() == 'heckin rich':
+                        badges = user['badges']
                         if 'HeckinRich' not in badges:
                             badges.append('HeckinRich')
                             self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "badges": badges}})
@@ -286,6 +286,7 @@ class Store(commands.Cog):
                         else:
                             await ctx.send(embed = self.meta.embedOops())
                             return
+                        return
                     #buying an evolution
                     elif i['name'].lower() == 'affinity swap':
                         if user['affinity'] == '':

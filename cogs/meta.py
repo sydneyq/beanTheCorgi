@@ -304,11 +304,7 @@ class Global(commands.Cog):
         if (self.meta.isAdmin(ctx.message.author)):
             await self.client.change_presence(status=discord.Status.online, activity=discord.Game(msg))
         else:
-            embed = discord.Embed(
-                title = 'Sorry, you don\'t have permission to do that!',
-                color = discord.Color.teal()
-            )
-            await ctx.send(embed = embed)
+            await ctx.send(embed = self.meta.embedNoAccess())
 
     @commands.command()
     async def echo(self, ctx, channel: discord.TextChannel, *, message):
