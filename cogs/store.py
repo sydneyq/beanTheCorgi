@@ -255,7 +255,7 @@ class Store(commands.Cog):
                 return
 
         for i in self.store['Items']:
-            if i['name'].lower() == input.lower():
+            if input.lower() in i['name'].lower():
                 if coins >= i['price']:
                     coins -= i['price']
 
@@ -275,6 +275,15 @@ class Store(commands.Cog):
                             await ctx.author.remove_roles(teaRole)
                             await guild.get_channel(self.emojis['SQUAD_COFFEE_CHANNEL']).send(self.meta.msgWelcomeSquad(ctx.author))
                         await ctx.send(embed = self.meta.embedDone())
+                        return
+                    elif i['name'].lower() == 'booster' or i['name'].lower() == 'affinity booster':
+                        if not user['booster']:
+                            self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "booster": True}})
+                            await ctx.send(embed = self.meta.embedDone())
+                            return
+                        else:
+                            await ctx.send(embed = self.meta.embedOops())
+                            return
                         return
                     elif i['name'].lower() == 'heckinrich badge' or i['name'].lower() == 'heckinrich' or i['name'].lower() == 'heckin rich badge' or i['name'].lower() == 'heckin rich':
                         badges = user['badges']
@@ -302,6 +311,7 @@ class Store(commands.Cog):
                             description = '🌱 - Earth\n🎐 - Air\n🔥 - Fire\n💧 - Water\n⛔ - Cancel',
                             color = discord.Color.teal()
                         )
+                        embed.set_footer(text='You\'ll lose your booster if you have one by changing affinities.')
                         await ctx.send(embed = embed)
 
                         msg = ctx.channel.last_message
@@ -341,7 +351,8 @@ class Store(commands.Cog):
                             elif emoji == '💧':
                                 aff = 'Water'
 
-                            self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "affinity": aff}})
+                            self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins}})
+                            self.meta.changeAffinity(ctx.author, aff)
 
                             embed = discord.Embed(
                                 title = 'Consider it done! ✅\nYour affinity is now `' + aff + '`.',
@@ -349,7 +360,7 @@ class Store(commands.Cog):
                             )
                             await ctx.send(embed = embed)
                             return
-                    elif i['name'].lower() == 'evolution stone':
+                    elif i['name'].lower() == 'evolution stone' or i['name'].lower() == 'evo stone':
                         companion = user['companion']
                         if companion == 'Eevee':
                             choices = ['Flareon',

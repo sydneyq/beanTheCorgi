@@ -33,15 +33,24 @@ class Battle(commands.Cog):
 
         pic = member.avatar_url
 
+        boost = '\nBooster detected!: '
+
         desc = 'Affinity: `' + aff + '` '
         if aff == 'Fire':
             desc += '(+5 ATK)'
+            boost += '(+10% Critical Chance)'
         elif aff == 'Earth':
             desc += '(+50 HP)'
+            boost += '(+10% Absorb Chance)'
         elif aff == 'Water':
             desc += '(+30% Heal Chance)'
+            boost += '(+20 Heal)'
         elif aff == 'Air':
-            desc += '(+30% Avoid Chance)'
+            desc += '(+20% Avoid Chance)'
+            boost += '(+10% Reflect Chance)'
+
+        if user['booster']:
+            desc += boost
 
         embed = discord.Embed(
             title = name + '\'s Battle Card',
@@ -55,12 +64,21 @@ class Battle(commands.Cog):
         hp = stats['hp']
         embed.add_field(name="Health (HP)", value='`' + str(hp) + '`', inline=True)
 
+        critical = stats['critical_chance']
+        if critical != 0:
+            embed.add_field(name="Criticial", value='`' + str(int(critical * 100)) + '%`', inline=True)
+
+        absorb = stats['absorb_chance']
+        if absorb != 0:
+            embed.add_field(name="Absorption", value='`' + str(int(absorb * 100)) + '%`', inline=True)
+
         avoid = stats['avoid_chance']
         if avoid != 0:
             embed.add_field(name="Avoidance", value='`' + str(int(avoid * 100)) + '%`', inline=True)
 
-        #avoid = stats['reflect_chance']
-        #embed.add_field(name=s"Reflection", value='`' + str(reflect) + '`', inline=True)
+        reflect = stats['reflect_chance']
+        if reflect != 0:
+            embed.add_field(name="Reflection", value='`' + str(int(reflect * 100)) + '%`', inline=True)
 
         heal_chance = stats['heal_chance']
         if heal_chance != 0:
@@ -80,24 +98,38 @@ class Battle(commands.Cog):
         #water
         heal_chance = .3 if aff == 'Water' else 0
         #water buff: amt healed
-        heal = 15
+        heal = 20
         #earth
-        #earth buff: amt more hp
         hp = 170 if aff == 'Earth' else 120
+        #earth buff: change dmg to hp
+        absorb_chance = 0
         #air
-        avoid_chance = .3 if aff == 'Air' else 0
+        avoid_chance = .2 if aff == 'Air' else 0
         #air buff: reflect chance
         reflect_chance = 0
         #fire
-        #fire buff: amt more atk
         atk = 25 if aff == 'Fire' else 20
+        #fire buff: chance of 10 dmg more than cap
+        critical_chance = 0
+
+        if p_user['booster']:
+            if aff == 'Water':
+                heal += 20
+            elif aff == 'Earth':
+                absorb_chance += .1
+            elif aff == 'Air':
+                reflect_chance += .1
+            elif aff == 'Fire':
+                critical_chance += .1
 
         stats = {
             "heal_chance":heal_chance,
             "heal":heal,
             "hp":hp,
+            "absorb_chance":absorb_chance,
             "avoid_chance":avoid_chance,
             "reflect_chance":reflect_chance,
+            "critical_chance":critical_chance,
             "atk":atk
         }
         return stats
@@ -126,6 +158,7 @@ class Battle(commands.Cog):
         p2_user = self.meta.getProfile(p2)
         reflect = False
         avoid = False
+        absorb = False
 
         if bet < 0:
             embed = discord.Embed(
@@ -204,6 +237,12 @@ class Battle(commands.Cog):
                 battle_desc += '\n**' + player2.name + '** reflected `' + str(dmg) + '` damage to **' + player1.name + '**!'
             elif avoid:
                 battle_desc += '\n**' + player2.name + '** avoided **' + player1.name + '**\'s attack!'
+            elif absorb:
+                p2_st['hp'] += dmg
+                battle_desc += '\n**' + player2.name + '** absorbed **' + player1.name + '**\'s attack of `' + str(dmg) + '` as health!'
+            elif random.random() < p1_st['critical_chance']:
+                p2_st['hp'] -= (p1_st['atk'] + 10)
+                battle_desc += '\nCritical Hit! **' + player1.name + '** did `' + str(dmg) + '` damage to **' + player2.name + '**!'
             else:
                 p2_st['hp'] -= dmg
                 battle_desc += '\n**' + player1.name + '** did `' + str(dmg) + '` damage to **' + player2.name + '**!'
@@ -211,6 +250,7 @@ class Battle(commands.Cog):
             #reset avoid and reflect flags
             reflect = False
             avoid = False
+            absorb = False
 
             #reflect for next round
             if random.random() < p1_st['reflect_chance']:
@@ -218,6 +258,9 @@ class Battle(commands.Cog):
             #elif avoid for next round
             elif random.random() < p1_st['avoid_chance']:
                 avoid = True
+            #elif absorb for next round
+            elif random.random() < p1_st['absorb_chance']:
+                absorb = True
 
             nonlocal p1
             nonlocal p1_stats

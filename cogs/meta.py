@@ -127,7 +127,7 @@ class Meta:
 
         profile = self.dbConnection.findProfile({"id": id})
         if profile is None:
-            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'spouse': 0, 'gifts': 0, 'affinity':'', 'daily': '', 'badges':[]})
+            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'spouse': 0, 'gifts': 0, 'affinity':'', 'daily': '', 'badges':[], 'booster': False})
             profile = self.dbConnection.findProfile({"id": id})
 
         return profile
@@ -138,6 +138,28 @@ class Meta:
             return False
         else:
             return True
+
+    def hasBadge(self, member: discord.Member, badge):
+        user = self.getProfile(member)
+        badges = user['badges']
+        if badge in badges:
+            return True
+        else:
+            return False
+
+    def addBadgeToProfile(self, member: discord.Member, badge):
+        user = self.getProfile(member)
+        badges = user['badges']
+        badges.append(badge)
+        self.dbConnection.updateProfile({"id": member.id}, {"$set": {"badges": badges}})
+
+    def changeAffinity(self, member: discord.Member, affinity):
+        self.addBadgeToProfile(member, affinity)
+
+        if self.hasBadge(member, 'Fire') and self.hasBadge(member, 'Water') and self.hasBadge(member, 'Earth') and self.hasBadge(member, 'Air'):
+            self.addBadgeToProfile(member, 'Avatar')
+
+        self.dbConnection.updateProfile({"id": member.id}, {"$set": {"affinity": affinity, "booster":False}})
 
     def getDateTime(self):
         x = datetime.datetime.now()
@@ -282,15 +304,16 @@ class Global(commands.Cog):
     @commands.command()
     async def test(self, ctx):
         if self.meta.isBotOwner(ctx.author):
+            guild = ctx.guild
             #self.dbConnection.renameColumn("given", "gifted")
-            #self.dbConnection.makeColumn("gifts", 0)
-            #self.dbConnection.makeColumn("daily", '')
+            self.dbConnection.makeColumn("booster", False)
             #self.dbConnection.removeColumn("badges")
-            #self.dbConnection.makeColumn("badges", [])
-            #user = self.meta.getProfile(ctx.author)
-            #badges = user['badges']
-            #badges.append("Test")
-            #self.dbConnection.updateProfile({"id": ctx.author.id}, {"$set": {"badges":badges}})
+
+            profiles = self.dbConnection.findProfiles({})
+            for profile in profiles:
+                if profile['affinity'] != '':
+                    user = guild.get_member(profile['id'])
+                    self.meta.addBadgeToProfile(user, profile['affinity'])
 
             print("Done!")
 
