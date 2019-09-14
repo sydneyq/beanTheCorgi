@@ -18,11 +18,108 @@ class Battle(commands.Cog):
         self.meta = meta
 
     @commands.command(aliases=['card', 'bc', 'fightcard'])
-    async def battlecard(self, ctx):
-        return
+    async def battlecard(self, ctx, other: discord.Member = None):
+        if other == None:
+            member = ctx.author
+            id = ctx.author.id
+        else:
+            member = other
+            id = other.id
+
+        user = self.meta.getProfile(member)
+        name = self.client.get_user(id).name
+        aff = user['affinity']
+        stats = self.get_battle_stats(user, aff)
+
+        pic = member.avatar_url
+
+        desc = 'Affinity: `' + aff + '` '
+        if aff == 'Fire':
+            desc += '(+10 ATK)'
+        elif aff == 'Earth':
+            desc += '(+50 HP)'
+        elif aff == 'Water':
+            desc += '(+20% Heal Chance)'
+        elif aff == 'Air':
+            desc += '(+30% Avoid Chance)'
+
+        embed = discord.Embed(
+            title = name + '\'s Battle Card',
+            description = desc,
+            color = discord.Color.teal()
+        )
+
+        atk = stats['atk']
+        embed.add_field(name="Attack Power (ATK)", value='`' + str(atk) + '`', inline=True)
+
+        hp = stats['hp']
+        embed.add_field(name="Health (HP)", value='`' + str(hp) + '`', inline=True)
+
+        avoid = stats['avoid_chance']
+        if avoid != 0:
+            embed.add_field(name="Avoidance", value='`' + str(int(avoid * 100)) + '%`', inline=True)
+
+        #avoid = stats['reflect_chance']
+        #embed.add_field(name=s"Reflection", value='`' + str(reflect) + '`', inline=True)
+
+        heal_chance = stats['heal_chance']
+        if heal_chance != 0:
+            embed.add_field(name="Heal Chance", value='`' + str(int(heal_chance * 100)) + '%`', inline=True)
+            heal = stats['heal']
+            embed.add_field(name="Heal", value='`' + str(heal) + '`', inline=True)
+
+        embed.set_thumbnail(url = pic)
+        await ctx.send(embed = embed)
+
+    def get_battle_stats(self, p_user, aff):
+        #water -> chance to heal
+        #air -> chance to avoid
+        #earth -> higher hp
+        #fire -> higher atk
+
+        #water
+        heal_chance = .2 if aff == 'Water' else 0
+        #water buff: amt healed
+        heal = 10
+        #earth
+        #earth buff: amt more hp
+        hp = 150 if aff == 'Earth' else 100
+        #air
+        avoid_chance = .3 if aff == 'Air' else 0
+        #air buff: reflect atk
+        reflect_chance = 0
+        #fire
+        #fire buff: amt more atk
+        atk = 30 if aff == 'Fire' else 20
+
+        stats = {
+            "heal_chance":heal_chance,
+            "heal":heal,
+            "hp":hp,
+            "avoid_chance":avoid_chance,
+            "reflect_chance":reflect_chance,
+            "atk":atk
+        }
+        return stats
 
     @commands.command(aliases=['challenge'])
     async def battle(self, ctx, member: discord.Member, bet: int = 0):
+        if member.bot:
+            embed = discord.Embed(
+                title = 'You can\'t challenge a bot!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
+
+        if member == ctx.author:
+            embed = discord.Embed(
+                title = 'You can\'t challenge yourself!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
+
         p1 = ctx.author
         p2 = member
         p1_user = self.meta.getProfile(p1)
@@ -35,7 +132,7 @@ class Battle(commands.Cog):
                 title = 'The bet amount has to be 0 or more!',
                 color = discord.Color.teal()
             )
-            await channel.send(embed = embed)
+            await ctx.send(embed = embed)
             return
 
         #check both have bet coins
@@ -44,7 +141,7 @@ class Battle(commands.Cog):
                 title = 'Sorry, one of you doesn\'t have enough coins to bet that much!',
                 color = discord.Color.teal()
             )
-            await channel.send(embed = embed)
+            await ctx.send(embed = embed)
             return
 
         if p1_user['affinity'] == '' or p2_user['affinity'] == '':
@@ -52,7 +149,7 @@ class Battle(commands.Cog):
                 title = 'Sorry, one of you doesn\'t have an affinity!',
                 color = discord.Color.teal()
             )
-            await channel.send(embed = embed)
+            await ctx.send(embed = embed)
             return
 
         #accept challenge?
@@ -148,39 +245,17 @@ class Battle(commands.Cog):
 
             #ctx.send(embed, delete_after=5)
 
-        def get_battle_stats(p_user, aff):
-            #water -> chance to heal
-            #air -> chance to avoid
-            #earth -> higher hp
-            #fire -> higher atk
-
-            #water
-            heal_chance = .2 if aff == 'Water' else 0
-            #water buff: amt healed
-            heal = 10
-            #earth
-            #earth buff: amt more hp
-            hp = 150 if aff == 'Earth' else 100
-            #air
-            avoid_chance = .3 if aff == 'Air' else 0
-            #air buff: reflect atk
-            reflect_chance = 0
-            #fire
-            #fire buff: amt more atk
-            atk = 25 if aff == 'Fire' else 20
-
-            stats = {
-                "heal_chance":heal_chance,
-                "heal":heal,
-                "hp":hp,
-                "avoid_chance":avoid_chance,
-                "reflect_chance":reflect_chance,
-                "atk":atk
-            }
-            return stats
-
         def battle_win(p1, p1_user, p2, p2_user):
             nonlocal bet
+
+            if not (p1_user['coins'] >= bet and p2_user['coins'] >= bet):
+                embed = discord.Embed(
+                    title = p1.name + ' won!',
+                    description = 'Oops, I couldn\'t change your coins! Does someone have less than the bet amount?',
+                    color = discord.Color.teal()
+                )
+                return
+
             p1_coins = p1_user['coins'] + bet
             p2_coins = p2_user['coins'] - bet
 
@@ -205,8 +280,8 @@ class Battle(commands.Cog):
             #    color = discord.Color.teal()
             #)
 
-            p1_stats = get_battle_stats(p1_user, p1_user['affinity'])
-            p2_stats = get_battle_stats(p2_user, p2_user['affinity'])
+            p1_stats = self.get_battle_stats(p1_user, p1_user['affinity'])
+            p2_stats = self.get_battle_stats(p2_user, p2_user['affinity'])
 
             while (p1_stats['hp'] > 0 and p2_stats['hp'] > 0):
                 embed = discord.Embed(

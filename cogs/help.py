@@ -58,7 +58,9 @@ class Help(commands.Cog):
         `store [c/h/i/e]` - AKA `shop`, `st`. See the store.
         `buy <item/companion>` - AKA `set`. Buy or set a Companion from the Store.
         `release` - Release your Companion.
-        `gift <@user> [item/companion]` - Gift a coin gift or Companion to someone."""
+        `gift <@user> [item/companion]` - Gift a coin gift or Companion to someone.
+        `battle <user> [coinAmount]` - Challenge someone to a battle with affinities.
+        `battlecard [@user]` - See the battle stats of someone."""
         embed.add_field(name = 'Companion and Store Commands', value = store_commands)
 
         await ctx.send(embed = embed)
