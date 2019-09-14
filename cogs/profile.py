@@ -184,14 +184,13 @@ class Profile(commands.Cog):
             await ctx.send(embed = embed)
             return
 
-        affinity = affinity.lower()
-        affinity = affinity.capitalize()
+        affinity = affinity.lower().capitalize()
 
         id = ctx.author.id
         user = self.meta.getProfile(ctx.author)
 
         if user['affinity'] is None or user['affinity'] == '':
-            self.dbConnection.updateProfile({"id": id}, {"$set": {"affinity": affinity}})
+            self.meta.changeAffinity(ctx.author, affinity)
             await ctx.send(embed = self.meta.embedDone())
             return
         else:
@@ -201,6 +200,14 @@ class Profile(commands.Cog):
             )
             await ctx.send(embed = embed)
             return
+
+    @commands.command()
+    async def givebadge(self, ctx, member: discord.Member, *, badge):
+        if not self.meta.isAdmin(ctx.author):
+            return
+        else:
+            self.meta.addBadgeToProfile(member, badge)
+            await ctx.send(embed = self.meta.embedDone())
 
     @commands.command()
     async def squad(self, ctx, *, squad = None):

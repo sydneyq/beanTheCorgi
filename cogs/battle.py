@@ -46,7 +46,7 @@ class Battle(commands.Cog):
             desc += '(+30% Heal Chance)'
             boost += '(+20 Heal)'
         elif aff == 'Air':
-            desc += '(+20% Avoid Chance)'
+            desc += '(+30% Avoid Chance)'
             boost += '(+10% Reflect Chance)'
 
         if user['booster']:
@@ -104,7 +104,7 @@ class Battle(commands.Cog):
         #earth buff: change dmg to hp
         absorb_chance = 0
         #air
-        avoid_chance = .2 if aff == 'Air' else 0
+        avoid_chance = .3 if aff == 'Air' else 0
         #air buff: reflect chance
         reflect_chance = 0
         #fire
@@ -204,7 +204,7 @@ class Battle(commands.Cog):
         try:
             reaction, user = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
         except asyncio.TimeoutError:
-            await channel.send('Timed out.')
+            await ctx.send('Timed out.')
         else:
             if emoji == '⛔':
                 embed_d = discord.Embed(
@@ -223,6 +223,7 @@ class Battle(commands.Cog):
         def battle_turn(player1, p1_st, player2, p2_st):
             nonlocal reflect
             nonlocal avoid
+            nonlocal absorb
             battle_desc = ''
 
             #heal?
@@ -241,7 +242,7 @@ class Battle(commands.Cog):
                 p2_st['hp'] += dmg
                 battle_desc += '\n**' + player2.name + '** absorbed **' + player1.name + '**\'s attack of `' + str(dmg) + '` as health!'
             elif random.random() < p1_st['critical_chance']:
-                p2_st['hp'] -= (p1_st['atk'] + 10)
+                p2_st['hp'] -= (p1_st['atk'] + 5)
                 battle_desc += '\nCritical Hit! **' + player1.name + '** did `' + str(dmg) + '` damage to **' + player2.name + '**!'
             else:
                 p2_st['hp'] -= dmg

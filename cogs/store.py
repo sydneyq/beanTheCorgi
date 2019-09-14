@@ -255,7 +255,7 @@ class Store(commands.Cog):
                 return
 
         for i in self.store['Items']:
-            if input.lower() in i['name'].lower():
+            if input.lower() == i['name'].lower():
                 if coins >= i['price']:
                     coins -= i['price']
 
@@ -276,7 +276,7 @@ class Store(commands.Cog):
                             await guild.get_channel(self.emojis['SQUAD_COFFEE_CHANNEL']).send(self.meta.msgWelcomeSquad(ctx.author))
                         await ctx.send(embed = self.meta.embedDone())
                         return
-                    elif i['name'].lower() == 'booster' or i['name'].lower() == 'affinity booster':
+                    elif i['name'].lower() == 'affinity booster':
                         if not user['booster']:
                             self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "booster": True}})
                             await ctx.send(embed = self.meta.embedDone())
@@ -285,7 +285,7 @@ class Store(commands.Cog):
                             await ctx.send(embed = self.meta.embedOops())
                             return
                         return
-                    elif i['name'].lower() == 'heckinrich badge' or i['name'].lower() == 'heckinrich' or i['name'].lower() == 'heckin rich badge' or i['name'].lower() == 'heckin rich':
+                    elif i['name'].lower() == 'heckinrich badge':
                         badges = user['badges']
                         if 'HeckinRich' not in badges:
                             badges.append('HeckinRich')
@@ -360,7 +360,7 @@ class Store(commands.Cog):
                             )
                             await ctx.send(embed = embed)
                             return
-                    elif i['name'].lower() == 'evolution stone' or i['name'].lower() == 'evo stone':
+                    elif i['name'].lower() == 'evolution stone':
                         companion = user['companion']
                         if companion == 'Eevee':
                             choices = ['Flareon',

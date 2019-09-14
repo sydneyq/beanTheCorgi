@@ -154,7 +154,8 @@ class Meta:
         self.dbConnection.updateProfile({"id": member.id}, {"$set": {"badges": badges}})
 
     def changeAffinity(self, member: discord.Member, affinity):
-        self.addBadgeToProfile(member, affinity)
+        if not (affinity in self.getProfile(member)['badges']):
+            self.addBadgeToProfile(member, affinity)
 
         if self.hasBadge(member, 'Fire') and self.hasBadge(member, 'Water') and self.hasBadge(member, 'Earth') and self.hasBadge(member, 'Air'):
             self.addBadgeToProfile(member, 'Avatar')
