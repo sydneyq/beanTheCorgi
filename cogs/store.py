@@ -178,7 +178,8 @@ class Store(commands.Cog):
         user = self.meta.getProfile(ctx.author)
         id = ctx.author.id
 
-        coins = user['coins']
+        original_coins = user['coins']
+        coins = original_coins
         helped = user['helped']
         c = 0
 
@@ -279,7 +280,12 @@ class Store(commands.Cog):
                     elif i['name'].lower() == 'affinity booster':
                         if not user['booster']:
                             self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "booster": True}})
-                            await ctx.send(embed = self.meta.embedDone())
+                            user = self.meta.getProfile(ctx.author)
+                            if user['coins'] == original_coins - i['price']:
+                                await ctx.send(embed = self.meta.embedDone())
+                            else:
+                                self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": (original_coins - i['price'])}})
+                                await ctx.send('Error 417. <@' + str(secret.BOT_OWNER_ID) + '>')
                             return
                         else:
                             await ctx.send(embed = self.meta.embedOops())

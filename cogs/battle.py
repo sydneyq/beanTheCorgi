@@ -17,7 +17,7 @@ class Battle(commands.Cog):
         self.dbConnection = database
         self.meta = meta
 
-    @commands.command(aliases=['card', 'bc', 'fightcard'])
+    @commands.command(aliases=['card', 'bc', 'fightcard', 'b'])
     async def battlecard(self, ctx, other: discord.Member = None):
         if other == None:
             member = ctx.author
@@ -38,16 +38,16 @@ class Battle(commands.Cog):
         desc = 'Affinity: `' + aff + '` '
         if aff == 'Fire':
             desc += '(+5 ATK)'
-            boost += '(+10% Critical Chance)'
+            boost += '(+20% Critical Chance)'
         elif aff == 'Earth':
             desc += '(+50 HP)'
-            boost += '(+10% Absorb Chance)'
+            boost += '(+20% Absorb Chance)'
         elif aff == 'Water':
             desc += '(+30% Heal Chance)'
             boost += '(+20 Heal)'
         elif aff == 'Air':
-            desc += '(+30% Avoid Chance)'
-            boost += '(+10% Reflect Chance)'
+            desc += '(+20% Avoid Chance)'
+            boost += '(+20% Reflect Chance)'
 
         if user['booster']:
             desc += boost
@@ -104,7 +104,7 @@ class Battle(commands.Cog):
         #earth buff: change dmg to hp
         absorb_chance = 0
         #air
-        avoid_chance = .3 if aff == 'Air' else 0
+        avoid_chance = .2 if aff == 'Air' else 0
         #air buff: reflect chance
         reflect_chance = 0
         #fire
@@ -116,11 +116,11 @@ class Battle(commands.Cog):
             if aff == 'Water':
                 heal += 20
             elif aff == 'Earth':
-                absorb_chance += .1
+                absorb_chance += .2
             elif aff == 'Air':
-                reflect_chance += .1
+                reflect_chance += .2
             elif aff == 'Fire':
-                critical_chance += .1
+                critical_chance += .2
 
         stats = {
             "heal_chance":heal_chance,
@@ -205,6 +205,7 @@ class Battle(commands.Cog):
             reaction, user = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
         except asyncio.TimeoutError:
             await ctx.send('Timed out.')
+            return
         else:
             if emoji == '⛔':
                 embed_d = discord.Embed(
@@ -295,8 +296,8 @@ class Battle(commands.Cog):
                 )
                 return
 
-            p1_coins = p1_user['coins'] + bet
-            p2_coins = p2_user['coins'] - bet
+            p1_coins = self.meta.getProfile(p1_user['id'])['coins'] + bet
+            p2_coins = self.meta.getProfile(p2_user['id'])['coins'] - bet
 
             desc = '**' + p1.name + '\'s coins:** `' + str(p1_user['coins']) + '` -> `' + str(p1_coins) + '`\n'
             desc += '**' + p2.name + '\'s coins:** `' + str(p2_user['coins']) + '` -> `' + str(p2_coins) + '`'

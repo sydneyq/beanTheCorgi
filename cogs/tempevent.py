@@ -91,7 +91,7 @@ class TempEvent(commands.Cog):
             embed.add_field(name='Your new word is: `' + word + '`', value='If the word is in another word or mixed capitals, it still counts!')
             embed.set_thumbnail(url = url)
             return embed
-
+        '''
         def embedPoint(squad):
             nonlocal tea_icon
             nonlocal coffee_icon
@@ -111,6 +111,7 @@ class TempEvent(commands.Cog):
             embed.add_field(name='Current Points', value='Tea Squad: `' + str(self.tea_score) + '`\nCoffee Squad: `' + str(self.coffee_score) + '`')
             embed.set_thumbnail(url = url)
             return embed
+            '''
 
         def embedGotcha(squad, message, word):
             nonlocal tea_icon
@@ -176,7 +177,7 @@ class TempEvent(commands.Cog):
                 continue
             if tea_trigger and squad == 'Coffee':
                 self.tea_score += 1
-                await msg.channel.send(embed = embedPoint('Tea'))
+                await msg.channel.send(embed = embedGotcha('Tea', msg, tea_words[tea_index]))
                 await influencer_channel.send(embed = embedGotcha('Tea', msg, tea_words[tea_index]))
                 tea_index += 1
                 if tea_index >= len(tea_words):
@@ -185,7 +186,7 @@ class TempEvent(commands.Cog):
                 continue
             elif coffee_trigger and squad == 'Tea':
                 self.coffee_score += 1
-                await msg.channel.send(embed = embedPoint('Coffee'))
+                await msg.channel.send(embed = embedGotcha('Coffee', msg, coffee_words[coffee_index]))
                 await influencer_channel.send(embed = embedGotcha('Coffee', msg, coffee_words[coffee_index]))
                 coffee_index += 1
                 if coffee_index >= len(coffee_words):
