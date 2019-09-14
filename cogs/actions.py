@@ -7,12 +7,12 @@ class Actions(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    def action(msg, gif, action_done, action_undone):
+    def action(self, msg, gif, action_done, action_undone):
         mentions = msg.mentions
         names = ''
 
-        for name in mentions:
-            names += name + ', '
+        for mention in mentions:
+            names += mention.name + ', '
 
         if names != '':
             embed = discord.Embed(
@@ -31,7 +31,7 @@ class Actions(commands.Cog):
 
 
     @commands.command(pass_context=True)
-    async def boop(self, ctx, *, msg = ''):
+    async def boop(self, ctx):
         responses = ['https://media1.tenor.com/images/083ccb85ea107a76b5030cbcb43cbf36/tenor.gif?itemid=7296714',
         'https://media.tenor.com/images/f6f87118730878c578e0f188da5270fc/tenor.gif',
         'https://media2.giphy.com/media/12BGUcW8xxpPRS/giphy.gif',
@@ -42,10 +42,10 @@ class Actions(commands.Cog):
         'https://i.imgur.com/dkLJLrt.gif?noredirect',
         'https://media1.tenor.com/images/5bd848735bbb12a2b7fa0561de918a0c/tenor.gif?itemid=5375919']
 
-        await ctx.send(embed = self.action(msg, random.choice(responses), 'booped', 'boop'))
+        await ctx.send(embed = self.action(ctx.message, random.choice(responses), 'booped', 'boop'))
 
     @commands.command(pass_context=True)
-    async def pat(self, ctx, *, msg = ''):
+    async def pat(self, ctx):
         responses = ['https://cdn.discordapp.com/attachments/257751892241809408/597979644725166097/unknown.gif',
         'https://i.gifer.com/7A80.gif',
         'https://media1.tenor.com/images/9bd2eb038544102aa4bb36fb8b0d01f9/tenor.gif?itemid=12437651',
@@ -58,7 +58,7 @@ class Actions(commands.Cog):
         'https://thumbs.gfycat.com/AlarmedAmpleFox-size_restricted.gif',
         'https://media1.tenor.com/images/b89e2aa380639d37b9521b72a266d498/tenor.gif?itemid=4215410']
 
-        await ctx.send(embed = self.action(msg, random.choice(responses), 'patted', 'patpat'))
+        await ctx.send(embed = self.action(ctx.message, random.choice(responses), 'patted', 'patpat'))
 
     @commands.command()
     async def blep(self, ctx):
@@ -82,7 +82,7 @@ class Actions(commands.Cog):
         await ctx.send(embed = embed)
 
     @commands.command(pass_context=True)
-    async def hug(self, ctx, *, msg = ''):
+    async def hug(self, ctx):
         responses = ['https://media1.giphy.com/media/Lb3vIJjaSIQWA/source.gif',
         'https://treasuredscriptcom.files.wordpress.com/2018/09/hiro-hugging-baymax1.gif',
         'https://media.giphy.com/media/17Q92poP1qJwI/giphy.gif',
@@ -94,10 +94,10 @@ class Actions(commands.Cog):
         'https://66.media.tumblr.com/51a12abd75d1f8f6f9a3846e6d2bd528/tumblr_inline_nmm9z1X2sS1s8zbfz_500.gif',
         'https://66.media.tumblr.com/c27d1adbe7410191d24c8f62a68695a9/tumblr_inline_nmmazxORzb1s8zbfz_500.gif']
 
-        await ctx.send(embed = self.action(msg, random.choice(responses), 'hugged', 'hug'))
+        await ctx.send(embed = self.action(ctx.message, random.choice(responses), 'hugged', 'hug'))
 
     @commands.command(aliases=['hit'])
-    async def punch(self, ctx, *, msg = ''):
+    async def punch(self, ctx):
         responses = ['https://media1.tenor.com/images/e27431e7f3ae7f5e2e8fc4fe4f399754/tenor.gif',
         'https://media.giphy.com/media/A9sF6v36DEoF2/giphy.gif',
         'https://media1.tenor.com/images/023ab6036cecc5f2950fb5cada385e2c/tenor.gif',
@@ -116,10 +116,10 @@ class Actions(commands.Cog):
         'https://media1.tenor.com/images/3def875ba3e6d95048763aa78182fbfc/tenor.gif',
         'https://thumbs.gfycat.com/WeepyOrderlyAngelwingmussel-size_restricted.gif',
         'https://media1.tenor.com/images/d43dbf172a5a795134e54f01ea71e791/tenor.gif']
-        await ctx.send(embed = self.action(msg, random.choice(responses), 'punched', 'punch'))
+        await ctx.send(embed = self.action(ctx.message, random.choice(responses), 'punched', 'punch'))
 
     @commands.command(aliases=['highfive', 'hi5', 'hifive'])
-    async def high5(self, ctx, *, msg = ''):
+    async def high5(self, ctx):
         responses = ['http://25.media.tumblr.com/f958003a5b13cd0470afc736373ab519/tumblr_n0os0yvKQw1tnvwmho1_500.gif',
         'https://media2.giphy.com/media/3oEduV4SOS9mmmIOkw/source.gif',
         'https://i.kym-cdn.com/photos/images/original/001/243/126/c3f.gif',
@@ -132,7 +132,7 @@ class Actions(commands.Cog):
         'https://media2.giphy.com/media/3oEjHV0z8S7WM4MwnK/giphy.gif',
         'https://i.pinimg.com/originals/fc/b1/44/fcb1446b74166b0860ace50ed8b33686.gif']
 
-        await ctx.send(embed = self.action(msg, random.choice(responses), 'hugged', 'hug'))
+        await ctx.send(embed = self.action(ctx.message, random.choice(responses), 'highfived', 'highfive'))
 
 
 def setup(client):
