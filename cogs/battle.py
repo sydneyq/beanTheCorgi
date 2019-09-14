@@ -35,11 +35,11 @@ class Battle(commands.Cog):
 
         desc = 'Affinity: `' + aff + '` '
         if aff == 'Fire':
-            desc += '(+10 ATK)'
+            desc += '(+5 ATK)'
         elif aff == 'Earth':
             desc += '(+50 HP)'
         elif aff == 'Water':
-            desc += '(+20% Heal Chance)'
+            desc += '(+30% Heal Chance)'
         elif aff == 'Air':
             desc += '(+30% Avoid Chance)'
 
@@ -78,19 +78,19 @@ class Battle(commands.Cog):
         #fire -> higher atk
 
         #water
-        heal_chance = .2 if aff == 'Water' else 0
+        heal_chance = .3 if aff == 'Water' else 0
         #water buff: amt healed
-        heal = 10
+        heal = 15
         #earth
         #earth buff: amt more hp
-        hp = 150 if aff == 'Earth' else 100
+        hp = 170 if aff == 'Earth' else 120
         #air
         avoid_chance = .3 if aff == 'Air' else 0
-        #air buff: reflect atk
+        #air buff: reflect chance
         reflect_chance = 0
         #fire
         #fire buff: amt more atk
-        atk = 30 if aff == 'Fire' else 20
+        atk = 25 if aff == 'Fire' else 20
 
         stats = {
             "heal_chance":heal_chance,
@@ -191,11 +191,6 @@ class Battle(commands.Cog):
             nonlocal reflect
             nonlocal avoid
             battle_desc = ''
-
-            #FLAG: not making sense because
-            #for reflect and avoid to work
-            #we need to be on the other person's turn
-            #but for heal we need to be on ours
 
             #heal?
             if random.random() < p1_st['heal_chance']:
