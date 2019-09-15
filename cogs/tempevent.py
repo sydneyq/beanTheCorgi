@@ -28,12 +28,26 @@ class TempEvent(commands.Cog):
         with open(filename3) as json_file:
             self.ids = json.load(json_file)
 
+    @commands.command(aliases=['changepts'])
+    async def changePoints(self, ctx, squad, pts:int):
+        if not self.meta.isBotOwner(ctx.author):
+            return
+        else:
+            if squad == 'Coffee':
+                self.coffee_score = pts
+            elif squad == 'Tea':
+                self.tea_score = pts
+            await ctx.send(embed = self.meta.embedDone())
+
     @commands.command(aliases=['influence', 'justsayit', 'repeatafterme'])
     async def influencer(self, ctx):
+        if not self.meta.isAdmin(ctx.author):
+            return
+
         #tea_words = ['leaf', 'teapot']
         #coffee_words = ['latte', 'creamer']
 
-        tea_words = ['fill', #1
+        tea_words = ['stripe', #1
         'calm', #2
         'engine', #3
         'line', #4
@@ -48,9 +62,9 @@ class TempEvent(commands.Cog):
         'parachute', #13
         'charge', #14
         'dry']
-        coffee_words = ['pull', #1
-        'wizard', #2
-        'military', #3
+        coffee_words = ['drop', #1
+        'hero', #2
+        'invent', #3
         'hint', #4
         'mime', #5
         'film', #6
@@ -67,7 +81,7 @@ class TempEvent(commands.Cog):
         guild = ctx.guild
         tea_index = 0
         coffee_index = 0
-        influencer_channel = guild.get_channel(621737388674252820)
+        influencer_channel = guild.get_channel(622465906152570880)
         tea_channel = guild.get_channel(self.ids['SQUAD_TEA_CHANNEL'])
         coffee_channel = guild.get_channel(self.ids['SQUAD_COFFEE_CHANNEL'])
         #tea_channel = guild.get_channel(self.ids['WORKSHOP_CHANNEL'])
