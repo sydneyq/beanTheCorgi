@@ -115,7 +115,7 @@ class Store(commands.Cog):
             return
         #item
         elif type.lower() == 'item' or type.lower() == 'i' or type.lower() == 'items':
-            storeHelp = """You can buy these items with Coins. Items will immediately be used upon purchase."""
+            storeHelp = """You can buy these items with Coins. Some items will immediately be used upon purchase."""
             embed.add_field(name='Store Help', value=storeHelp, inline=False)
             storeDesc = ''
             prevCost = 0

@@ -44,7 +44,7 @@ class Battle(commands.Cog):
             boost += '(+15% Absorb Chance)'
         elif aff == 'Water':
             desc += '(+20% Heal Chance)'
-            boost += '(+10% Double Attack Chance)'
+            boost += '(+15% Double Attack Chance)'
         elif aff == 'Air':
             desc += '(+20% Avoid Chance)'
             boost += '(+20% Reflect Chance)'
@@ -63,10 +63,6 @@ class Battle(commands.Cog):
 
         hp = stats['hp']
         embed.add_field(name="Health (HP)", value='`' + str(hp) + '`', inline=True)
-
-        double = stats['double_chance']
-        if double != 0:
-            embed.add_field(name="Double Attack", value='`' + str(int(double * 100)) + '%`', inline=True)
 
         critical = stats['critical_chance']
         if critical != 0:
@@ -89,6 +85,10 @@ class Battle(commands.Cog):
             embed.add_field(name="Heal Chance", value='`' + str(int(heal_chance * 100)) + '%`', inline=True)
             #heal = stats['heal']
             #embed.add_field(name="Heal", value='`' + str(heal) + '`', inline=True)
+
+        double = stats['double_chance']
+        if double != 0:
+            embed.add_field(name="Double Attack", value='`' + str(int(double * 100)) + '%`', inline=True)
 
         embed.set_thumbnail(url = pic)
         await ctx.send(embed = embed)
@@ -119,7 +119,7 @@ class Battle(commands.Cog):
 
         if p_user['booster']:
             if aff == 'Water':
-                double_chance += .1
+                double_chance += .15
             elif aff == 'Earth':
                 absorb_chance += .15
             elif aff == 'Air':
@@ -249,8 +249,9 @@ class Battle(commands.Cog):
                 p2_st['hp'] += int(dmg)
                 battle_desc += '\n**' + player2.name + '** absorbed **' + player1.name + '**\'s attack of `' + str(dmg) + '` as health!'
             elif random.random() < p1_st['critical_chance']:
-                p2_st['hp'] -= (p1_st['atk'] + 5)
-                battle_desc += '\nCritical Hit! **' + player1.name + '** did `' + str(dmg) + '` damage to **' + player2.name + '**!'
+                crit_dmg = (int(p1_st['atk']) + 5)
+                p2_st['hp'] -= crit_dmg
+                battle_desc += '\nCritical Hit! **' + player1.name + '** did `' + str(crit_dmg) + '` damage to **' + player2.name + '**!'
             else:
                 p2_st['hp'] -= dmg
                 battle_desc += '\n**' + player1.name + '** did `' + str(dmg) + '` damage to **' + player2.name + '**!'

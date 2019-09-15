@@ -47,36 +47,36 @@ class TempEvent(commands.Cog):
         #tea_words = ['leaf', 'teapot']
         #coffee_words = ['latte', 'creamer']
 
-        tea_words = ['stripe', #1
-        'calm', #2
-        'engine', #3
-        'line', #4
-        'feather', #5
-        'trust', #6
-        'smith', #7
-        'west', #8
-        'ripe', #9
-        'frame', #10
-        'town', #11
-        'prime', #12
-        'parachute', #13
-        'charge', #14
-        'dry']
+        tea_words = ['bear', #1
+        'snow', #2
+        'finally', #3
+        'disney', #4
+        'world', #5
+        'yesterday', #6
+        'under', #7
+        'realize', #8
+        'eyes', #9
+        'design', #10
+        'talk', #11
+        'thor', #12
+        'hire', #13
+        'mind', #14
+        'prince']
         coffee_words = ['drop', #1
         'hero', #2
-        'invent', #3
-        'hint', #4
-        'mime', #5
-        'film', #6
-        'blink', #7
-        'phil', #8
-        'bury', #9
-        'wheat', #10
-        'catch', #11
-        'against', #12
-        'plate', #13
-        'slide', #14
-        'easter']
+        'march', #3
+        'dino', #4
+        'fix', #5
+        'valentine', #6
+        'time', #7
+        'netflix', #8
+        'salad', #9
+        'along', #10
+        'invent', #11
+        'watch', #12
+        'forget', #13
+        'pikachu', #14
+        'website']
 
         guild = ctx.guild
         tea_index = 0

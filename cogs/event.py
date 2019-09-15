@@ -52,7 +52,7 @@ class Event(commands.Cog):
         'does the sun shine for man to tell it where to cast its rays',
         'the wilderness must be explored',
         'no one deserves to fade away',
-        'a wilderness explorer is a friend to all be it plants or fish or tiny mole rawr caw caw']
+        'a wilderness explorer is a friend to all be it plants or fish or tiny mole caw caw rawr']
 
         dirname = os.path.dirname(__file__)
         filename2 = os.path.join(dirname, 'docs/emojis.json')
