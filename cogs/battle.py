@@ -66,7 +66,7 @@ class Battle(commands.Cog):
 
         critical = stats['critical_chance']
         if critical != 0:
-            embed.add_field(name="Criticial", value='`' + str(int(critical * 100)) + '%`', inline=True)
+            embed.add_field(name="Critical", value='`' + str(int(critical * 100)) + '%`', inline=True)
 
         absorb = stats['absorb_chance']
         if absorb != 0:

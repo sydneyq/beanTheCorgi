@@ -90,21 +90,38 @@ class Help(commands.Cog):
         return
 
     @commands.command(aliases=['badgelist', 'badge'])
-    async def badges(self, ctx):
+    async def badges(self, ctx, *, type = ''):
         embed = discord.Embed(
             title = 'Badge List',
-            description = 'These fun things can be found on your profile!',
+            description = 'Use `+badges positions` to see Staff and position badges and `+badges` to see all other badges.',
             color = discord.Color.teal()
         )
         embed.set_thumbnail(url = 'https://cdn.discordapp.com/attachments/591611902459641856/593267453363224588/Bean_Icon.png')
 
         emojis = self.emojis
-        position_badges = emojis['Administrator'] + ' Administrator\n' + emojis['BotDeveloper'] + ' Bot Developer\n' + emojis['Moderator'] + ' Moderator\n' + emojis['MarketingOfficer'] + ' Marketing Officer\n' + emojis['EventCoordinator'] + ' Event Coordinator\n' + emojis['CertifyingTeam'] + ' Certifying Team\n' + emojis['Certified'] + ' Certified in Active Listening\n' + emojis['Listener'] + ' Listener\n' +emojis['CorgiCallResponder'] + ' Corgi Call Responders\n'
-        embed.add_field(name = 'Position Badges', value = position_badges)
+        type = type.lower()
+        if type == 'position' or type == 'p' or type == 'positions':
+            position_badges = emojis['Administrator'] + ' - Administrator\n'
+            position_badges += emojis['BotDeveloper'] + ' - Bot Developer\n'
+            position_badges += emojis['Moderator'] + ' - Moderator\n'
+            position_badges += emojis['MarketingOfficer'] + ' - Marketing Officer\n'
+            position_badges += emojis['EventCoordinator'] + ' - Event Coordinator\n'
+            position_badges += emojis['CertifyingTeam'] + ' - Certifying Team\n'
+            position_badges += emojis['Certified'] + ' - Certified in Active Listening\n'
+            position_badges += emojis['Listener'] + ' - Listener\n'
+            position_badges += emojis['CorgiCallResponder'] + ' - Corgi Call Responders\n'
+            embed.add_field(name = 'Position Badges', value = position_badges)
+        else:
+            badges = self.dbConnection.findBadge({'id':'CaughtDitto'})['literal'] + ' - Caught the rare Ditto!\n'
+            badges += self.dbConnection.findBadge({'id':'GiftedByBean'})['literal'] + ' - Gifted Bean and got a rare badge back!\n'
+            badges += self.dbConnection.findBadge({'id':'2019'})['literal'] + ' - Was here in 2019 and used the 2019 badge command!\n'
+            badges += self.dbConnection.findBadge({'id':'HeckinRich'})['literal'] + ' - Bought the HeckinRich badge from the Item Store!\n'
+            badges += emojis['HelpPts10'] + ' - Has at least 10 Help points!\n'
+            badges += emojis['Recruited10'] + ' - Has recruited at least 10 people to the server!\n'
+            badges += emojis['Earth'] + emojis['Air'] + emojis['Fire'] + emojis['Water'] + ' - Affinities!\n'
+            badges += self.dbConnection.findBadge({'id':'Avatar'})['literal'] + ' - Has spent time as all Affinities!\n'
 
-        other_badges = self.dbConnection.findBadge({'id':'CaughtDitto'})['literal'] + ' - Caught the rare Ditto!\n' + self.dbConnection.findBadge({'id':'GiftedByBean'})['literal'] + ' - Gifted Bean and got a rare badge back!\n' + self.dbConnection.findBadge({'id':'2019'})['literal'] + ' - Was here in 2019 and used the 2019 badge command!\n' + self.dbConnection.findBadge({'id':'HeckinRich'})['literal'] + ' - Bought the HeckinRich badge from the Item Store!\n' + emojis['HelpPts10'] + ' - Has at least 10 Help points!\n' + emojis['Recruited10'] + ' - Has recruited at least 10 people to the server!\n' + self.dbConnection.findBadge({'id':'Avatar'})['literal'] + ' - Has spent time as all Affinities!\n'
-
-        embed.add_field(name = 'Other Badges', value = other_badges)
+            embed.add_field(name = 'Badges', value = badges)
 
         await ctx.send(embed = embed)
         return
