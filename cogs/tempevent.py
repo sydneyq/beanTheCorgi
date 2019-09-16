@@ -50,7 +50,7 @@ class TempEvent(commands.Cog):
         tea_words = ['bear', #1
         'snow', #2
         'finally', #3
-        'disney', #4
+        'glee', #4
         'world', #5
         'yesterday', #6
         'under', #7

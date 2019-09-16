@@ -120,6 +120,7 @@ class Help(commands.Cog):
             badges += emojis['Recruited10'] + ' - Has recruited at least 10 people to the server!\n'
             badges += emojis['Earth'] + emojis['Air'] + emojis['Fire'] + emojis['Water'] + ' - Affinities!\n'
             badges += self.dbConnection.findBadge({'id':'Avatar'})['literal'] + ' - Has spent time as all Affinities!\n'
+            badges += self.dbConnection.findBadge({'id':'BestedBean'})['literal'] + ' - Defeat Bean in battle!\n'
 
             embed.add_field(name = 'Badges', value = badges)
 

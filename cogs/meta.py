@@ -34,6 +34,16 @@ class Meta:
             return True
         return False
 
+    def isBean(self, member: discord.Member):
+        if member.id == secret.BEAN_ID:
+            return True
+        return False
+
+    def isBeanOrJarvis(self, member: discord.Member):
+        if member.id == secret.BEAN_ID or member.id == secret.JARVIS_ID:
+            return True
+        return False
+
     #isAdmin
     def isAdmin(self, member: discord.Member):
         if self.isBotOwner(member):
@@ -139,6 +149,13 @@ class Meta:
         else:
             return True
 
+    def getBadge(self, badge):
+        b = self.dbConnection.findBadge({"id":badge})['literal']
+
+        if b is None:
+            b = self.emojis[badge]
+        return b
+
     def hasBadge(self, member: discord.Member, badge):
         user = self.getProfile(member)
         badges = user['badges']
@@ -148,6 +165,8 @@ class Meta:
             return False
 
     def addBadgeToProfile(self, member: discord.Member, badge):
+        if self.hasBadge(member, badge):
+            return
         user = self.getProfile(member)
         badges = user['badges']
         badges.append(badge)

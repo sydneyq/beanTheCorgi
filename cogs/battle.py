@@ -48,6 +48,9 @@ class Battle(commands.Cog):
         elif aff == 'Air':
             desc += '(+20% Avoid Chance)'
             boost += '(+20% Reflect Chance)'
+        elif aff == 'Avatar':
+            desc = 'It\'s the Avatar!'
+            boost += 'All'
 
         if user['booster']:
             desc += boost
@@ -126,6 +129,11 @@ class Battle(commands.Cog):
                 reflect_chance += .2
             elif aff == 'Fire':
                 critical_chance += .2
+            elif aff == 'Avatar':
+                double_chance += .3
+                absorb_chance += .3
+                reflect_chance += .3
+                critical_chance += .3
 
         stats = {
             "heal_chance":heal_chance,
@@ -142,13 +150,25 @@ class Battle(commands.Cog):
 
     @commands.command(aliases=['challenge'])
     async def battle(self, ctx, member: discord.Member, bet: int = 0):
+        isBeanChallenge = False
         if member.bot:
-            embed = discord.Embed(
-                title = 'You can\'t challenge a bot!',
-                color = discord.Color.teal()
-            )
-            await ctx.send(embed = embed)
-            return
+            if member.id == secret.BEAN_ID or member.id == secret.JARVIS_ID:
+                if bet != 25:
+                    embed = discord.Embed(
+                        title = 'You have to bet 25 coins to challenge me!',
+                        color = discord.Color.teal()
+                    )
+                    await ctx.send(embed = embed)
+                    return
+                else:
+                    isBeanChallenge = True
+            else:
+                embed = discord.Embed(
+                    title = 'You can\'t challenge a bot that\'s not me!',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+                return
 
         if member == ctx.author:
             embed = discord.Embed(
@@ -191,41 +211,43 @@ class Battle(commands.Cog):
             await ctx.send(embed = embed)
             return
 
-        #accept challenge?
-        embed_req = discord.Embed(
-            title = p2.name + ', ' + p1.name + ' challenges you to a battle for ` ' + str(bet) + ' ` coins! Accept?',
-            description = 'React to this message with a ✅ for yes, ⛔ for no.\nYou have 60 seconds to decide!',
-            color = discord.Color.teal()
-        )
-        #embed_req.set_thumbnail(url = 'https://icon-library.net/images/alert-icon/alert-icon-8.jpg')
-        await ctx.send(embed = embed_req)
-        msg = ctx.channel.last_message
-        await msg.add_reaction('✅')
-        await msg.add_reaction('⛔')
-        emoji = ''
-        def check(reaction, user):
-            nonlocal emoji
-            emoji = str(reaction.emoji)
-            return user == p2 and (str(reaction.emoji) == '✅' or str(reaction.emoji) == '⛔')
-        try:
-            reaction, user = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
-        except asyncio.TimeoutError:
-            await ctx.send('Timed out.')
-            return
-        else:
-            if emoji == '⛔':
-                embed_d = discord.Embed(
-                    title = 'Battle request denied.',
-                    color = discord.Color.teal()
-                )
-                await ctx.send(embed = embed_d)
+        if not isBeanChallenge:
+            #accept challenge?
+            embed_req = discord.Embed(
+                title = p2.name + ', ' + p1.name + ' challenges you to a battle for ` ' + str(bet) + ' ` coins! Accept?',
+                description = 'React to this message with a ✅ for yes, ⛔ for no.\nYou have 60 seconds to decide!',
+                color = discord.Color.teal()
+            )
+            #embed_req.set_thumbnail(url = 'https://icon-library.net/images/alert-icon/alert-icon-8.jpg')
+            await ctx.send(embed = embed_req)
+            msg = ctx.channel.last_message
+            await msg.add_reaction('✅')
+            await msg.add_reaction('⛔')
+            emoji = ''
+            def check(reaction, user):
+                nonlocal emoji
+                emoji = str(reaction.emoji)
+                return (user == p2 and (str(reaction.emoji) == '✅' or str(reaction.emoji) == '⛔'))
+
+            try:
+                reaction, user = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
+            except asyncio.TimeoutError:
+                await ctx.send('Timed out.')
                 return
             else:
-                embed_a = discord.Embed(
-                    title = 'Challenge accepted!',
-                    color = discord.Color.teal()
-                )
-                await ctx.send(embed = embed_a, delete_after=2)
+                if emoji == '⛔':
+                    embed_d = discord.Embed(
+                        title = 'Battle request denied.',
+                        color = discord.Color.teal()
+                    )
+                    await ctx.send(embed = embed_d)
+                    return
+                else:
+                    embed_a = discord.Embed(
+                        title = 'Challenge accepted!',
+                        color = discord.Color.teal()
+                    )
+                    await ctx.send(embed = embed_a, delete_after=2)
 
         def battle_turn(player1, p1_st, player2, p2_st):
             nonlocal reflect
@@ -297,6 +319,7 @@ class Battle(commands.Cog):
 
         def battle_win(p1, p1_user, p2, p2_user):
             nonlocal bet
+            nonlocal isBeanChallenge
 
             p1_og_coins = self.meta.getProfile(p1)['coins']
             p2_og_coins = self.meta.getProfile(p2)['coins']
@@ -312,8 +335,12 @@ class Battle(commands.Cog):
             p1_coins = p1_og_coins + bet
             p2_coins = p2_og_coins - bet
 
-            desc = '**' + p1.name + '\'s coins:** `' + str(p1_og_coins) + '` -> `' + str(p1_coins) + '`\n'
-            desc += '**' + p2.name + '\'s coins:** `' + str(p2_og_coins) + '` -> `' + str(p2_coins) + '`'
+            desc = ''
+
+            if not self.meta.isBean(p1):
+                desc += '**' + p1.name + '\'s coins:** `' + str(p1_og_coins) + '` -> `' + str(p1_coins) + '`\n'
+            if not self.meta.isBean(p2):
+                desc += '**' + p2.name + '\'s coins:** `' + str(p2_og_coins) + '` -> `' + str(p2_coins) + '`'
 
             embed = discord.Embed(
                 title = p1.name + ' won!',
@@ -322,9 +349,19 @@ class Battle(commands.Cog):
             )
 
             embed.set_thumbnail(url = p1.avatar_url)
+            if not self.meta.isBean(p1):
+                self.dbConnection.updateProfile({"id": p1.id}, {"$set": {"coins": p1_coins}})
+            if not self.meta.isBean(p2):
+                self.dbConnection.updateProfile({"id": p2.id}, {"$set": {"coins": p2_coins}})
 
-            self.dbConnection.updateProfile({"id": p1.id}, {"$set": {"coins": p1_coins}})
-            self.dbConnection.updateProfile({"id": p2.id}, {"$set": {"coins": p2_coins}})
+            if isBeanChallenge and p1.id != secret.BEAN_ID:
+                embed = discord.Embed(
+                    title = 'Wow, you\'re strong! Here, take this: ' + self.meta.getBadge('BestedBean'),
+                    description = desc,
+                    color = discord.Color.teal()
+                )
+                self.meta.addBadgeToProfile(p1, 'BestedBean')
+
             return embed
 
         async with ctx.channel.typing():
