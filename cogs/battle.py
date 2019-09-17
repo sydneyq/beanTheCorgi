@@ -35,6 +35,9 @@ class Battle(commands.Cog):
 
         boost = '\nBooster detected!: '
 
+        if aff == '':
+            aff = 'N/A'
+
         desc = 'Affinity: `' + aff + '` '
         if aff == 'Fire':
             desc += '(+7 ATK)'
@@ -130,10 +133,10 @@ class Battle(commands.Cog):
             elif aff == 'Fire':
                 critical_chance += .2
             elif aff == 'Avatar':
-                double_chance += .3
-                absorb_chance += .3
-                reflect_chance += .3
-                critical_chance += .3
+                double_chance += .25
+                absorb_chance += .25
+                reflect_chance += .25
+                critical_chance += .25
 
         stats = {
             "heal_chance":heal_chance,
@@ -178,8 +181,14 @@ class Battle(commands.Cog):
             await ctx.send(embed = embed)
             return
 
-        p1 = ctx.author
-        p2 = member
+        first = random.choice([True, False])
+        if first:
+            p1 = ctx.author
+            p2 = member
+        else:
+            p1 = member
+            p2 = ctx.author
+
         p1_user = self.meta.getProfile(p1)
         p2_user = self.meta.getProfile(p2)
         reflect = False
@@ -214,7 +223,7 @@ class Battle(commands.Cog):
         if not isBeanChallenge:
             #accept challenge?
             embed_req = discord.Embed(
-                title = p2.name + ', ' + p1.name + ' challenges you to a battle for ` ' + str(bet) + ' ` coins! Accept?',
+                title = member.name + ', ' + ctx.author.name + ' challenges you to a battle for ` ' + str(bet) + ' ` coins! Accept?',
                 description = 'React to this message with a ✅ for yes, ⛔ for no.\nYou have 60 seconds to decide!',
                 color = discord.Color.teal()
             )
@@ -227,7 +236,7 @@ class Battle(commands.Cog):
             def check(reaction, user):
                 nonlocal emoji
                 emoji = str(reaction.emoji)
-                return (user == p2 and (str(reaction.emoji) == '✅' or str(reaction.emoji) == '⛔'))
+                return (user == member and (str(reaction.emoji) == '✅' or str(reaction.emoji) == '⛔'))
 
             try:
                 reaction, user = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
@@ -271,13 +280,14 @@ class Battle(commands.Cog):
                 p2_st['hp'] += int(dmg)
                 battle_desc += '\n**' + player2.name + '** absorbed **' + player1.name + '**\'s attack of `' + str(dmg) + '` as health!'
             elif random.random() < p1_st['critical_chance']:
-                crit_dmg = (int(p1_st['atk']) + 5)
+                crit_dmg = (int(p1_st['atk']) + 10)
                 p2_st['hp'] -= crit_dmg
                 battle_desc += '\nCritical Hit! **' + player1.name + '** did `' + str(crit_dmg) + '` damage to **' + player2.name + '**!'
             else:
                 p2_st['hp'] -= dmg
                 battle_desc += '\n**' + player1.name + '** did `' + str(dmg) + '` damage to **' + player2.name + '**!'
             if random.random() < p1_st['double_chance']:
+                dmg = random.randint(p1_st['atk'] - 10, p1_st['atk'])
                 p2_st['hp'] -= dmg
                 battle_desc += '\nDouble Attack! **' + player1.name + '** did `' + str(dmg) + '` damage to **' + player2.name + '**!'
 
