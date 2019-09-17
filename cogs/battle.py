@@ -365,6 +365,14 @@ class Battle(commands.Cog):
                 self.dbConnection.updateProfile({"id": p2.id}, {"$set": {"coins": p2_coins}})
 
             if isBeanChallenge and p1.id != secret.BEAN_ID:
+                if self.meta.hasBadge(p1, 'BestedBean'):
+                    embed2 = discord.Embed(
+                        title = 'Wow, you\'re strong! Looks like you already have my Battle badge!',
+                        description = desc,
+                        color = discord.Color.teal()
+                    )
+                    return embed2
+
                 embed = discord.Embed(
                     title = 'Wow, you\'re strong! Here, take this: ' + self.meta.getBadge('BestedBean'),
                     description = desc,
