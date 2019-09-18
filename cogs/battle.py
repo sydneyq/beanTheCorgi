@@ -241,7 +241,11 @@ class Battle(commands.Cog):
             try:
                 reaction, user = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
             except asyncio.TimeoutError:
-                await ctx.send('Timed out.')
+                embed_t = discord.Embed(
+                    title = 'Timed out.',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed_t)
                 return
             else:
                 if emoji == '⛔':

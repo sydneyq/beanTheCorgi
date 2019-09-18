@@ -40,7 +40,7 @@ class Store(commands.Cog):
 
         embed = discord.Embed(
             title = 'Store',
-            description = 'You have:\t`' + str(helped) + '` Helped ' + self.emojis['Helped'] + '\t`' + str(coins) + '` Coins ' + self.emojis['Coin'],
+            description = 'You have:\t`' + str(helped) + '` Helped ' + self.emojis['HelpPoint'] + '\t`' + str(coins) + '` Coins ' + self.emojis['Coin'],
             color = discord.Color.teal()
         )
 
@@ -108,7 +108,7 @@ class Store(commands.Cog):
                     storeDesc += '\n`' + str(item['price']) + ' helped:` ' + item['name']
                     prevCost = item['price']
 
-            embed.add_field(name=self.emojis['Helped'] + ' Helped Companions', value=storeDesc, inline=False)
+            embed.add_field(name=self.emojis['HelpPoint'] + ' Helped Companions', value=storeDesc, inline=False)
             #embed.set_thumbnail(url = 'https://img.pngio.com/mario-bros-star-png-png-image-mario-bros-star-png-240_215.png')
             embed.set_footer(text = 'Earn Help Points by supporting others! Read #about-profiles for more information. Access this store using "+store h".')
             await ctx.send(embed = embed)

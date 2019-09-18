@@ -15,11 +15,8 @@ class Event(commands.Cog):
         self.client = client
         self.dbConnection = database
         self.meta = meta
-        #self.queue = list()
-        #self.tea_score = 0
-        #self.coffee_score = 0
 
-        self.strings = ['the quick brown fox jumps over the lazy dog', #1
+        self.typeracer_strings = ['the quick brown fox jumps over the lazy dog', #1
         'bean the corgi is the goodest boy', #2
         'tea and coffee make the world go round', #3
         'with great power comes great responsibility', #4
@@ -76,22 +73,7 @@ class Event(commands.Cog):
         else:
             await ctx.send(embed = self.meta.embedOops())
             return
-    '''
-    @commands.command(aliases=['pts'])
-    async def points(self, ctx):
-        embed2 = discord.Embed(
-            title = 'Squad Points',
-            description = self.emojis['Tea'] + ' **Tea Squad:** `' + str(self.tea_score) + '`\n' + self.emojis['Coffee'] + ' **Coffee Squad:** `' + str(self.coffee_score) + '`',
-            color = discord.Color.teal()
-        )
 
-        if self.tea_score > self.coffee_score:
-            embed2.set_thumbnail(url = 'https://cdn.discordapp.com/attachments/591611902459641856/613918428293627914/teamteaBean.png')
-        elif self.coffee_score > self.tea_score:
-            embed2.set_thumbnail(url = 'https://cdn.discordapp.com/attachments/591611902459641856/613918442034298890/teamcoffeeBean.png')
-
-        await ctx.send(embed = embed2)
-        '''
     @commands.command(aliases=['typerace', 'squadrace', 'squadracer', 'race'])
     async def typeracer(self, ctx, channel: discord.TextChannel = None):#rounds: int = 1, channel: discord.TextChannel = None):
         message = ctx.message
@@ -168,11 +150,63 @@ class Event(commands.Cog):
     async def on_message(self, message):
         if message.author.bot:
             return
+
+        #auto-highfive
+        if random.random() < .05:
+            past_timestamp = self.dbConnection.findMeta({'id':'server'})['highfive']
+            if past_timestamp == '' or self.meta.hasBeenMinutes(10, past_timestamp, self.meta.getDateTime()):
+                self.dbConnection.updateMeta({'id':'server'}, {'$set': {'highfive': self.meta.getDateTime()}})
+                #casual = 593153723610693632 #cmd
+                casual = 257751892241809408
+                channels = [casual]
+                channel = random.choice(channels)
+                channel = message.guild.get_channel(channel)
+
+                amt = 25
+
+                embed = discord.Embed(
+                    title = 'Game On: Highfive! | Win ' + str(amt) + ' Coins!',
+                    color = discord.Color.teal()
+                )
+
+                embed.add_field(name=self.dbConnection.findBadge({"id":'GiftedByBean'})['literal'] + ': o/',
+                value='Bean would like a highfive! Be the first to say `\o` to highfive him back!')
+                embed.set_footer(text='This expires in 7 seconds, don\'t leave him hanging!')
+                await channel.send(embed = embed, delete_after=7)
+
+                def check(m):
+                    return '\o' in m.content.lower() and m.channel == channel
+
+                try:
+                    msg = await self.client.wait_for('message', timeout=7.0, check=check)
+                except asyncio.TimeoutError:
+                    embed_d = discord.Embed(
+                        title = 'Bean received no highfive. :(',
+                        color = discord.Color.teal()
+                    )
+                    await ctx.send(embed = embed_d, delete_after=3)
+                    return
+                else:
+                    user = self.meta.getProfile(msg.author)
+
+                    coins = user['coins'] + amt
+                    self.dbConnection.updateProfile({"id": msg.author.id}, {"$set": {"coins": coins}})
+
+                    embed2 = discord.Embed(
+                        title = msg.author.name + ', you\'ve just earned `' + str(amt) + '` coins!',
+                        description = 'Your total: `' + str(coins) + '` coins',
+                        color = discord.Color.teal()
+                    )
+
+                    await channel.send(embed = embed2)
+                return
+
+        #auto-typeracer
         if random.random() < .1:
             #check timestamp
-            past_timestamp = self.dbConnection.findMeta({'id':'server'})['typerace']
-            if past_timestamp == '' or self.meta.hasBeen10Minutes(past_timestamp, self.meta.getDateTime()):
-                self.dbConnection.updateMeta({'id':'server'}, {'$set': {'typerace': self.meta.getDateTime()}})
+            past_timestamp = self.dbConnection.findMeta({'id':'server'})['typeracer']
+            if past_timestamp == '' or self.meta.hasBeenMinutes(30, past_timestamp, self.meta.getDateTime()):
+                self.dbConnection.updateMeta({'id':'server'}, {'$set': {'typeracer': self.meta.getDateTime()}})
                 casual = 257751892241809408
                 casual2 = 599757443362193408
                 #casual = 593153723610693632 #cmd
@@ -182,7 +216,7 @@ class Event(commands.Cog):
                 channel = random.choice(channels)
                 channel = message.guild.get_channel(channel)
 
-                string = random.choice(self.strings)
+                string = random.choice(self.typeracer_strings)
                 amt = 50
                 altered = ''
 
@@ -193,7 +227,7 @@ class Event(commands.Cog):
                 altered = altered[:-1]
 
                 embed = discord.Embed(
-                    title = 'Game On: Win ' + str(amt) + ' Coins!',
+                    title = 'Game On: Typeracer! | Win ' + str(amt) + ' Coins!',
                     #title = 'Game On: Squad Racers!',
                     color = discord.Color.teal()
                 )
@@ -213,7 +247,7 @@ class Event(commands.Cog):
                 self.dbConnection.updateProfile({"id": msg.author.id}, {"$set": {"coins": coins}})
 
                 embed2 = discord.Embed(
-                    title = msg.author.name + ', you\'ve just earned ' + str(amt) + ' coins!',
+                    title = msg.author.name + ', you\'ve just earned `' + str(amt) + '` coins!',
                     description = 'Your total: `' + str(coins) + '` coins',
                     color = discord.Color.teal()
                 )
