@@ -154,7 +154,7 @@ class Event(commands.Cog):
         #auto-highfive
         if random.random() < .05:
             past_timestamp = self.dbConnection.findMeta({'id':'server'})['highfive']
-            if past_timestamp == '' or self.meta.hasBeenMinutes(10, past_timestamp, self.meta.getDateTime()):
+            if past_timestamp == '' or self.meta.hasBeenMinutes(20, past_timestamp, self.meta.getDateTime()):
                 self.dbConnection.updateMeta({'id':'server'}, {'$set': {'highfive': self.meta.getDateTime()}})
                 #casual = 593153723610693632 #cmd
                 casual = 257751892241809408
@@ -184,7 +184,7 @@ class Event(commands.Cog):
                         title = 'Bean received no highfive. :(',
                         color = discord.Color.teal()
                     )
-                    await ctx.send(embed = embed_d, delete_after=3)
+                    await channel.send(embed = embed_d, delete_after=3)
                     return
                 else:
                     user = self.meta.getProfile(msg.author)

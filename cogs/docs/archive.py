@@ -1,4 +1,4 @@
-    '''
+
     @commands.command(aliases=['influence', 'justsayit', 'repeatafterme'])
     async def influencer(self, ctx):
         if not self.meta.isAdmin(ctx.author):
@@ -170,7 +170,7 @@
                 continue
             else:
                 continue
-    '''
+    
     '''
     @commands.command()
     async def avatar(self, ctx, channel: discord.TextChannel = None):
