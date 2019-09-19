@@ -1,16 +1,61 @@
 import discord
 from discord.ext import commands
+from database import Database
+from .meta import Meta
 
 class ModMail(commands.Cog):
 
-    def __init__(self, client):
+    def __init__(self, client, database, meta):
         self.client = client
+        self.dbConnection = database
+        self.meta = meta
+
+    @commands.command(aliases=['mm', 'mmreply', 'reply', 'modmail'])
+    async def replymm(self, ctx):
+        if not self.meta.isMod(ctx.author):
+            return
+        if not self.meta.isModMailChannel(ctx.channel):
+            return
+
+        user_id = self.meta.getChannelOwnerID(ctx.channel)
+        user = discord.utils.get(self.client.get_all_members(), id=user_id)
+
+        content = ctx.message.clean_content
+        #if content.startswith('+'):
+        content = content[content.find(' ') + 1:]
+        content = content.replace('+mm', '')
+        content = content.replace('=mm', '')
+        attachments = ctx.message.attachments
+        #links = ''
+        #for attachment in attachments:
+        #    links += '\n' + attachment.url
+        link = ''
+        if not (attachments is None or len(attachments) <= 0):
+            link = attachments[0].url
+        else:
+            if content == '' or content == ' ':
+                return
+
+        embed = discord.Embed(
+            title = 'A Mind Café Staff Member says:',
+            description = content,
+            color = discord.Color.teal()
+        )
+        if link != '':
+            embed.set_image(url = link)
+
+        await user.send(embed = embed)
+
+        embed.set_footer(text=ctx.author.name, icon_url = ctx.author.avatar_url)
+
+        await ctx.message.delete()
+        await ctx.send(embed = embed)
 
     #modmail DM listener
     @commands.Cog.listener()
     async def on_message(self, message):
         #the bot itself
-        if (message.author.id == 592436047175221259 or message.author.id == 432038389663924225):
+        if self.meta.isBeanOrJarvis(message.author):
             return
 
         if isinstance(message.channel, discord.DMChannel):
@@ -27,14 +72,23 @@ class ModMail(commands.Cog):
                 return
 
             channels = category.text_channels
-
             userChannel = 0
+
+            attachments = message.attachments
+            link = ''
+            if not (attachments is None or len(attachments) <= 0):
+                link = attachments[0].url
 
             embed = discord.Embed(
                 title = message.author.name + ' says:',
                 description = message.content,
                 color = discord.Color.teal()
             )
+
+            if link != '':
+                embed.set_image(url = link)
+
+            embed.set_footer(text=message.author.name, icon_url = message.author.avatar_url)
 
             for channel in channels:
                 if channel.name.endswith(str(message.author.id)):
@@ -51,31 +105,9 @@ class ModMail(commands.Cog):
                 #await message.author.dm_channel.send('I\'m creating a new channel.')
                 newChannel = await guild.create_text_channel('MM-' + message.author.name + '-' + str(message.author.id), category = category)
                 await newChannel.send('__New ModMail ticket created by **' + message.author.name + '**.__ <@&592070664169455616>')
-
                 await newChannel.send(embed = embed)
-        elif not(message.content.startswith('+')) and not(message.content.startswith('=')) and (message.channel.name.startswith('mm-') and ('Angels' in [role.name for role in message.author.roles] or 'mechanic' in [role.name for role in message.author.roles])):
-            channel = message.channel
-            userID = int(channel.name[channel.name.rfind('-')+1:])
-
-            #user = self.client.get_user(userID)
-            #user = discord.Client.get_user(userID, userID)
-            user = discord.utils.get(self.client.get_all_members(), id=userID)
-
-            embed = discord.Embed(
-                title = 'A Mind Café Staff Member says:',
-                description = message.content,
-                color = discord.Color.teal()
-            )
-            #if (user == None):
-            #    await message.author.dm_channel.send('No user found: ' + str(userID))
-            #else:
-            #    await self.send_message(user, "A message for you")
-            #await client.send_message(some_user, "content")
-
-            await user.send(embed = embed)
-            #await message.author.dm_channel.send('userID: ' + str(userID))
-
-
 
 def setup(client):
-    client.add_cog(ModMail(client))
+    database_connection = Database()
+    meta_class = Meta(database_connection)
+    client.add_cog(ModMail(client, database_connection, meta_class))

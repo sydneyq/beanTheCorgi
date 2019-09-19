@@ -150,6 +150,8 @@ class Event(commands.Cog):
     async def on_message(self, message):
         if message.author.bot:
             return
+        if isinstance(message.channel, discord.DMChannel):
+            return
 
         #auto-highfive
         if random.random() < .05:
