@@ -331,21 +331,33 @@ class Battle(commands.Cog):
 
             #ctx.send(embed, delete_after=5)
 
-        def battle_win(p1, p1_user, p2, p2_user):
+        def check_coins():
+            nonlocal p1
+            nonlocal p2
             nonlocal bet
-            nonlocal isBeanChallenge
-
             p1_og_coins = self.meta.getProfile(p1)['coins']
             p2_og_coins = self.meta.getProfile(p2)['coins']
 
             if not (p1_og_coins >= bet and p2_og_coins >= bet):
-                embed = discord.Embed(
-                    title = p1.name + ' won!',
-                    description = 'Oops, I couldn\'t change your coins! Does someone have less than the bet amount?',
-                    color = discord.Color.teal()
-                )
-                return
+                return False
+            return True
 
+        def embedOops():
+            embed = discord.Embed(
+                title = 'Oops! Does someone have less than the bet amount?',
+                color = discord.Color.teal()
+            )
+            return embed
+
+        def battle_win(p1, p1_user, p2, p2_user):
+            nonlocal bet
+            nonlocal isBeanChallenge
+
+            if not check_coins():
+                return embedOops()
+
+            p1_og_coins = self.meta.getProfile(p1)['coins']
+            p2_og_coins = self.meta.getProfile(p2)['coins']
             p1_coins = p1_og_coins + bet
             p2_coins = p2_og_coins - bet
 
@@ -396,6 +408,9 @@ class Battle(commands.Cog):
             p2_stats = self.get_battle_stats(p2_user, p2_user['affinity'])
 
             while (p1_stats['hp'] > 0 and p2_stats['hp'] > 0):
+                if not check_coins():
+                    await ctx.send(embed = embedOops())
+                    return
                 embed = discord.Embed(
                     title = 'Battle!: **' + p1.name + '** vs **' + p2.name + '**',
                     color = discord.Color.teal()
@@ -412,6 +427,9 @@ class Battle(commands.Cog):
 
             #await asyncio.sleep(10)
             #await ctx.send(embed = embed)
+        if not check_coins():
+            await ctx.send(embed = embedOops())
+            return
         #p2 wins
         if p1_stats['hp'] <= 0:
             await ctx.send(embed = battle_win(p2, p2_user, p1, p1_user))

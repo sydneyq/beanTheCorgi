@@ -86,7 +86,7 @@ class Event(commands.Cog):
         await ctx.message.delete()
 
         #for round in range(0, rounds):
-        string = random.choice(self.strings)
+        string = random.choice(self.typeracer_strings)
         amt = 25
         altered = ''
 
@@ -97,7 +97,7 @@ class Event(commands.Cog):
         altered = altered[:-1]
 
         embed = discord.Embed(
-            title = 'Game On: Win ' + str(amt) + ' Coins!',
+            title = 'Game On: Typeracer! | Win ' + str(amt) + ' Coins!',
             #title = 'Game On: Squad Racers!',
             color = discord.Color.teal()
         )
