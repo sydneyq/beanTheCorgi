@@ -116,7 +116,7 @@ class Help(commands.Cog):
             badges += self.dbConnection.findBadge({'id':'GiftedByBean'})['literal'] + ' - Gifted Bean and got a rare badge back!\n'
             badges += self.dbConnection.findBadge({'id':'2019'})['literal'] + ' - Was here in 2019 and used the 2019 badge command!\n'
             badges += self.dbConnection.findBadge({'id':'HeckinRich'})['literal'] + ' - Bought the HeckinRich badge from the Item Store!\n'
-            badges += emojis['HelpPts10'] + ' - Has at least 10 Help points!\n'
+            badges += emojis['HelpPts10'] + emojis['HelpPts20'] + emojis['HelpPts30'] + ' - Has at least 10, 20, 30 Help points (respectively)!\n'
             badges += emojis['Recruited10'] + ' - Has recruited at least 10 people to the server!\n'
             badges += emojis['Earth'] + emojis['Air'] + emojis['Fire'] + emojis['Water'] + ' - Affinities!\n'
             badges += self.dbConnection.findBadge({'id':'Avatar'})['literal'] + ' - Has spent time as all Affinities!\n'

@@ -89,12 +89,12 @@ class Store(commands.Cog):
 
             embed.add_field(name=self.emojis['Special'] + ' Evolvable Companions', value=storeDesc_special, inline=False)
 
-            embed.set_footer(text = 'Earn coins by participating in server events! Read #about-profiles for more information. Access this store using "+store c".')
+            embed.set_footer(text = 'Earn coins by participating in server events! Use the "+help" command for more Bean commands.')
             await ctx.send(embed = embed)
             return
         #helped
         elif type.lower() == 'helped' or type.lower() == 'h':
-            storeHelp = """You can unlock these Companions with Help Points and using `+set companionName`. After reaching the minimum amount Helped, you're able to keep these Companions!"""
+            storeHelp = """You can unlock these Companions with Help Points and using `+set companionName`. After reaching the minimum amount of Help Points, you're able to keep these Companions!"""
             embed.add_field(name='Store Help', value=storeHelp, inline=False)
             storeDesc = ''
             prevCost = 0
@@ -110,12 +110,12 @@ class Store(commands.Cog):
 
             embed.add_field(name=self.emojis['HelpPoint'] + ' Helped Companions', value=storeDesc, inline=False)
             #embed.set_thumbnail(url = 'https://img.pngio.com/mario-bros-star-png-png-image-mario-bros-star-png-240_215.png')
-            embed.set_footer(text = 'Earn Help Points by supporting others! Read #about-profiles for more information. Access this store using "+store h".')
+            embed.set_footer(text = 'Earn Help Points by supporting others!  Use the "+help" command for more Bean commands.')
             await ctx.send(embed = embed)
             return
         #item
         elif type.lower() == 'item' or type.lower() == 'i' or type.lower() == 'items':
-            storeHelp = """You can buy these items with Coins. Some items will immediately be used upon purchase."""
+            storeHelp = """You can buy these items with Coins. Some items will immediately be used upon purchase. Buy items using `+buy itemName`."""
             embed.add_field(name='Store Help', value=storeHelp, inline=False)
             storeDesc = ''
             prevCost = 0
@@ -131,7 +131,7 @@ class Store(commands.Cog):
 
             embed.add_field(name=self.emojis['Coin'] + ' Items', value=storeDesc, inline=False)
             #embed.set_thumbnail(url = 'https://vignette.wikia.nocookie.net/mariokart/images/a/aa/Golden_Mushroom_-_Mario_Kart_Wii.png/revision/latest?cb=20180115185605')
-            embed.set_footer(text = 'Earn coins by participating in server events! Read #about-profiles for more information. Access this store using "+store i".')
+            embed.set_footer(text = 'Earn coins by participating in server events!  Use the "+help" command for more Bean commands.')
             await ctx.send(embed = embed)
             return
         #special
@@ -161,7 +161,7 @@ class Store(commands.Cog):
 
             embed.add_field(name=self.emojis['Special'] + ' Evolved Companions', value=storeDesc_special, inline=False)
 
-            embed.set_footer(text = 'Earn coins by participating in server events! Read #about-profiles for more information. Access this store using "+store s".')
+            embed.set_footer(text = 'Earn coins by participating in server events!  Use the "+help" command for more Bean commands.')
             await ctx.send(embed = embed)
             return
         #unknown type
