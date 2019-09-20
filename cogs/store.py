@@ -40,7 +40,7 @@ class Store(commands.Cog):
 
         embed = discord.Embed(
             title = 'Store',
-            description = 'You have:\t`' + str(helped) + '` Helped ' + self.emojis['HelpPoint'] + '\t`' + str(coins) + '` Coins ' + self.emojis['Coin'],
+            description = 'You have:\t`' + str(helped) + '` Help Points ' + self.emojis['HelpPoint'] + '\t`' + str(coins) + '` Coins ' + self.emojis['Coin'],
             color = discord.Color.teal()
         )
 
@@ -469,6 +469,7 @@ class Store(commands.Cog):
                         if not self.meta.changeCoins(ctx.author, price):
                             embed = discord.Embed(
                                 title = 'You can\'t seem to afford that item.',
+                                description = 'You have:\t`' + str(helped) + '` Help Points ' + self.emojis['HelpPoint'] + '\t`' + str(original_coins) + '` Coins ' + self.emojis['Coin'],
                                 color = discord.Color.teal()
                             )
                             await ctx.send(embed = embed)
@@ -486,6 +487,7 @@ class Store(commands.Cog):
                 else:
                     embed = discord.Embed(
                         title = 'You can\'t seem to afford that item.',
+                        description = 'You have:\t`' + str(helped) + '` Help Points ' + self.emojis['HelpPoint'] + '\t`' + str(original_coins) + '` Coins ' + self.emojis['Coin'],
                         color = discord.Color.teal()
                     )
                     await ctx.send(embed = embed)

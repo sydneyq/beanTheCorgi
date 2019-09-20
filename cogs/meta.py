@@ -13,8 +13,12 @@ class Meta:
         self.dbConnection = database
 
         dirname = os.path.dirname(__file__)
+        filename = os.path.join(dirname, 'docs/store.json')
         filename2 = os.path.join(dirname, 'docs/emojis.json')
         filename3 = os.path.join(dirname, 'docs/ids.json')
+
+        with open(filename) as json_file:
+            self.store = json.load(json_file)
 
         with open(filename2) as json_file:
             self.emojis = json.load(json_file)
@@ -180,6 +184,35 @@ class Meta:
             self.addBadgeToProfile(member, 'Avatar')
 
         self.dbConnection.updateProfile({"id": member.id}, {"$set": {"affinity": affinity, "booster":False}})
+
+    #is directly buyable from store.json
+    def isBuyable(self, item):
+        if self.getStoreItem(item) == '':
+            return False
+
+        unbuyable_stores = ['Evolved Companions']
+
+        for s in unbuyable_stores:
+            for i in self.store[s]:
+                if i['name'].lower() == item:
+                    return False
+        return True
+
+    #returns the JSON data of the item in store.json
+    def getStoreItem(self, item):
+        item = item.lower()
+
+        stores = ['Coin Companions',
+        'Helped Companions',
+        'Evolvable Companions',
+        'Items']
+
+        for s in stores:
+            for i in self.store[s]:
+                if i['name'].lower() == item:
+                    return i
+
+        return ''
 
     def getDateTime(self):
         x = datetime.datetime.now()

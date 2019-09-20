@@ -32,7 +32,7 @@ class Help(commands.Cog):
         )
         embed.set_thumbnail(url = 'https://cdn.discordapp.com/attachments/591611902459641856/593267453363224588/Bean_Icon.png')
         embed.add_field(name = 'Help Commands',
-        value = '`+funcmds` - Fun Commands List\n`+supportcmds` - Support Commands List\n`+badges` - Badges List', inline=True)
+        value = '`+funcmds` - Fun Commands List\n`+supportcmds` - Support Commands List\n`+badges` - Badges List\n`+misccmds` - Miscellaneous Commands List', inline=True)
 
         await ctx.send(embed = embed)
 
@@ -85,6 +85,25 @@ class Help(commands.Cog):
         `remove <@user>` - Remove a specific user's ability to be able to speak in the Ticket.
         `reset` - Reset everyone's permissions for the Ticket."""
         embed.add_field(name = 'Support Commands', value = support_commands)
+
+        await ctx.send(embed = embed)
+        return
+
+    @commands.command(aliases=['mcmd', 'mcmds'])
+    async def misccmds(self, ctx):
+        embed = discord.Embed(
+            title = 'Bean\'s Miscellaneous Commands',
+            description = '`<>` is required, `[]` is optional.\nCommands are for Ticket Owners and Moderators+ unless specified otherwise.',
+            color = discord.Color.teal()
+        )
+        embed.set_thumbnail(url = 'https://cdn.discordapp.com/attachments/591611902459641856/593267453363224588/Bean_Icon.png')
+
+        misc_commands = """`hug [@user]` - Hug someone!
+        `punch [@user]` - Punch someone!
+        `high5 [@user]` - AKA `highfive`, `hi5`. Highfive someone!
+        `boop [@user]` - Boop someone!
+        `blep` - Blep!"""
+        embed.add_field(name = 'Miscellaneous Commands', value = misc_commands)
 
         await ctx.send(embed = embed)
         return
