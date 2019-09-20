@@ -235,7 +235,7 @@ class Store(commands.Cog):
                     value = ''
 
                     if companion_name in dittos:
-                        if random.random() < .1:
+                        if random.random() < .05:
                             companion_name = 'Ditto'
                             title = 'Consider it — Oh? **Ditto** was caught! 🌟'
                             self.meta.addBadgeToProfile(ctx.author, 'CaughtDitto')
