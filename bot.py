@@ -16,7 +16,7 @@ client = commands.Bot(commands.when_mentioned_or('+'), case_insensitive=True)
 @client.event
 async def on_ready():
     print('Bean is online!\n---')
-    await client.change_presence(status=discord.Status.online, activity=discord.Game('DM me for help/feedback!'))
+    await client.change_presence(status=discord.Status.online, activity=discord.Game('DM me for ModMail!'))
 
 @client.command()
 async def reload(ctx, extension):

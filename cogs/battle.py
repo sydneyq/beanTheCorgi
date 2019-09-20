@@ -51,11 +51,10 @@ class Battle(commands.Cog):
         elif aff == 'Air':
             desc += '(+20% Avoid Chance)'
             boost += '(+20% Reflect Chance)'
-        elif aff == 'Avatar':
-            desc = 'It\'s the Avatar!'
+        elif self.meta.isBeanOrJarvis(member):
             boost += 'All'
 
-        if user['booster']:
+        if user['booster'] or self.meta.isBeanOrJarvis(member):
             desc += boost
 
         embed = discord.Embed(
@@ -132,11 +131,11 @@ class Battle(commands.Cog):
                 reflect_chance += .2
             elif aff == 'Fire':
                 critical_chance += .2
-            elif aff == 'Avatar':
-                double_chance += .25
-                absorb_chance += .25
-                reflect_chance += .25
-                critical_chance += .25
+        if p_user['id'] == secret.BEAN_ID or p_user['id'] == secret.JARVIS_ID:
+            double_chance += .25
+            absorb_chance += .25
+            reflect_chance += .25
+            critical_chance += .25
 
         stats = {
             "heal_chance":heal_chance,

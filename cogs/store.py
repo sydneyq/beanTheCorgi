@@ -192,20 +192,6 @@ class Store(commands.Cog):
                         color = discord.Color.teal()
                     )
 
-                    #ditto event
-                    dittos = ['Squirtle', 'Charmander', 'Bulbasaur']
-                    companion_name = c['name']
-                    title = 'Consider it done! ✅'
-                    value = ''
-
-                    if companion_name in dittos:
-                        if random.random() < .1:
-                            companion_name = 'Ditto'
-                            title = 'Consider it — Oh? **Ditto** was caught! 🌟'
-                            badges = user['badges']
-                            badges.append('CaughtDitto')
-                            self.dbConnection.updateProfile({"id": id}, {"$set": {"badges": badges}})
-
                     self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "companion": companion_name}})
                     embed = discord.Embed(
                         title = title,
@@ -241,9 +227,22 @@ class Store(commands.Cog):
             if c['name'].lower() == input.lower():
                 if coins >= c['price']:
                     coins -= c['price']
-                    self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "companion": c['name']}})
+
+                    #ditto event
+                    dittos = ['Squirtle', 'Charmander', 'Bulbasaur']
+                    companion_name = c['name']
+                    title = 'Consider it done! ✅'
+                    value = ''
+
+                    if companion_name in dittos:
+                        if random.random() < .1:
+                            companion_name = 'Ditto'
+                            title = 'Consider it — Oh? **Ditto** was caught! 🌟'
+                            self.meta.addBadgeToProfile(ctx.author, 'CaughtDitto')
+
+                    self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "companion": companion_name}})
                     embed = discord.Embed(
-                        title = 'Consider it done! ✅',
+                        title = title,
                         color = discord.Color.teal()
                     )
                     await ctx.send(embed = embed)
@@ -386,7 +385,7 @@ class Store(commands.Cog):
                         elif companion == 'Bulbasaur':
                             choices = ['Ivysaur']
                         elif companion == 'Ivysaur':
-                            choices = ['Venosaur']
+                            choices = ['Venusaur']
                         #Charmander Line
                         elif companion == 'Charmander':
                             choices = ['Charmeleon']
