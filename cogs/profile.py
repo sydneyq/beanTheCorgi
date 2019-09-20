@@ -116,6 +116,10 @@ class Profile(commands.Cog):
 
         if user['helped'] >= 10:
             str = str + self.emojis['HelpPts10'] + ' '
+            if user['helped'] >= 20:
+                str = str + self.emojis['HelpPts20'] + ' '
+                if user['helped'] >= 30:
+                    str = str + self.emojis['HelpPts30'] + ' '
 
         if self.meta.hasRole(member, '○° bubble tea °○'):
             str = str + self.emojis['Recruited10'] + ' '
