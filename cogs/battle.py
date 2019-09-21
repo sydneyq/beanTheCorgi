@@ -227,8 +227,7 @@ class Battle(commands.Cog):
                 color = discord.Color.teal()
             )
             #embed_req.set_thumbnail(url = 'https://icon-library.net/images/alert-icon/alert-icon-8.jpg')
-            await ctx.send(embed = embed_req)
-            msg = ctx.channel.last_message
+            msg = await ctx.send(embed = embed_req)
             await msg.add_reaction('✅')
             await msg.add_reaction('⛔')
             emoji = ''
@@ -241,7 +240,7 @@ class Battle(commands.Cog):
                 reaction, user = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
             except asyncio.TimeoutError:
                 embed_t = discord.Embed(
-                    title = 'Timed out.',
+                    title = 'Battle request timed out.',
                     color = discord.Color.teal()
                 )
                 await ctx.send(embed = embed_t)
@@ -254,12 +253,12 @@ class Battle(commands.Cog):
                     )
                     await ctx.send(embed = embed_d)
                     return
-                else:
-                    embed_a = discord.Embed(
-                        title = 'Challenge accepted!',
-                        color = discord.Color.teal()
-                    )
-                    await ctx.send(embed = embed_a, delete_after=2)
+
+        embed_a = discord.Embed(
+            title = 'Challenge accepted!',
+            color = discord.Color.teal()
+        )
+        msg_edit = await ctx.send(embed = embed_a)
 
         def battle_turn(player1, p1_st, player2, p2_st):
             nonlocal reflect
@@ -398,17 +397,13 @@ class Battle(commands.Cog):
             return embed
 
         async with ctx.channel.typing():
-            #embed = discord.Embed(
-            #    title = 'Battle!: **' + p1.name + '** vs **' + p2.name + '**',
-            #    color = discord.Color.teal()
-            #)
-
             p1_stats = self.get_battle_stats(p1_user, p1_user['affinity'])
             p2_stats = self.get_battle_stats(p2_user, p2_user['affinity'])
 
             while (p1_stats['hp'] > 0 and p2_stats['hp'] > 0):
+                await asyncio.sleep(5)
                 if not check_coins():
-                    await ctx.send(embed = embedOops())
+                    await msg_edit.edit(embed = embedOops())
                     return
                 embed = discord.Embed(
                     title = 'Battle!: **' + p1.name + '** vs **' + p2.name + '**',
@@ -421,21 +416,19 @@ class Battle(commands.Cog):
                     break
                 battle_turn(p1, p1_stats, p2, p2_stats)
 
-                await ctx.send(embed = embed, delete_after=5)
-                await asyncio.sleep(6)
+                await msg_edit.edit(embed = embed)
 
-            #await asyncio.sleep(10)
-            #await ctx.send(embed = embed)
+        await asyncio.sleep(5)
         if not check_coins():
-            await ctx.send(embed = embedOops())
+            await msg_edit.edit(embed = embedOops())
             return
         #p2 wins
         if p1_stats['hp'] <= 0:
-            await ctx.send(embed = battle_win(p2, p2_user, p1, p1_user))
+            await msg_edit.edit(embed = battle_win(p2, p2_user, p1, p1_user))
             return
         #p1 wins
         elif p2_stats['hp'] <= 0:
-            await ctx.send(embed = battle_win(p1, p1_user, p2, p2_user))
+            await msg_edit.edit(embed = battle_win(p1, p1_user, p2, p2_user))
             return
         return
 

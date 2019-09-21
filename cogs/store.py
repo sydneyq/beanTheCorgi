@@ -178,327 +178,183 @@ class Store(commands.Cog):
         user = self.meta.getProfile(ctx.author)
         id = ctx.author.id
 
-        original_coins = user['coins']
-        coins = original_coins
+        coins = user['coins']
         helped = user['helped']
-        c = 0
+        getStoreItem = self.meta.getStoreItem(input)
+        json = getStoreItem['JSON']
+        category = getStoreItem['type']
 
-        for c in self.store['Coin Companions']:
-            if c['name'].lower() == input.lower():
-                if coins >= c['price']:
-                    coins -= c['price']
+        def embedAfford():
+            nonlocal helped
+            nonlocal coins
+            embed = discord.Embed(
+                title = 'You can\'t seem to afford that.',
+                description = 'You have:\t`' + str(helped) + '` Help Points ' + self.emojis['HelpPoint'] + '\t`' + str(coins) + '` Coins ' + self.emojis['Coin'],
+                color = discord.Color.teal()
+            )
+            return embed
 
-                    embed = discord.Embed(
-                        color = discord.Color.teal()
-                    )
+        if getStoreItem == '' or category == 'Evolved Companions':
+            await ctx.send(embed = self.meta.embedOops())
+            return
+        else:
+            #coin-based items
+            if category == 'Coin Companions' or category == 'Items' or category == 'Evolvable Companions':
+                #cannot afford
+                if coins < json['price']:
+                    await ctx.send(embed = embedAfford())
+                    return
+                #subtract coins
+                coins -= json['price']
+            elif category == 'Helped Companions':
+                #not enough help points
+                if helped < json['price']:
+                    await ctx.send(embed = embedAfford())
+                    return
 
-                    self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "companion": companion_name}})
-                    embed = discord.Embed(
-                        title = title,
-                        color = discord.Color.teal()
-                    )
-                    await ctx.send(embed = embed)
+            title = 'Consider it done! ✅'
+
+            #all companions
+            if 'Companions' in category:
+                companion = json['name']
+
+                if category == 'Helped Companions':
+                    self.dbConnection.updateProfile({"id": id}, {"$set": {"companion": companion}})
+                    return
                 else:
-                    embed = discord.Embed(
-                        title = 'You can\'t seem to afford that companion.',
-                        color = discord.Color.teal()
-                    )
-                    await ctx.send(embed = embed)
-                return
-
-        for c in self.store['Helped Companions']:
-            if c['name'].lower() == input.lower():
-                if helped >= c['price']:
-                    self.dbConnection.updateProfile({"id": id}, {"$set": {"companion": c['name']}})
-                    embed = discord.Embed(
-                        title = 'Consider it done! ✅',
-                        color = discord.Color.teal()
-                    )
-                    await ctx.send(embed = embed)
-                else:
-                    embed = discord.Embed(
-                        title = 'You can\'t seem to afford that companion.',
-                        color = discord.Color.teal()
-                    )
-                    await ctx.send(embed = embed)
-                return
-
-        for c in self.store['Evolvable Companions']:
-            if c['name'].lower() == input.lower():
-                if coins >= c['price']:
-                    coins -= c['price']
-
-                    #ditto event
+                    #case: ditto
                     dittos = ['Squirtle', 'Charmander', 'Bulbasaur']
-                    companion_name = c['name']
-                    title = 'Consider it done! ✅'
-                    value = ''
-
-                    if companion_name in dittos:
+                    if companion in dittos:
                         if random.random() < .05:
                             companion_name = 'Ditto'
                             title = 'Consider it — Oh? **Ditto** was caught! 🌟'
                             self.meta.addBadgeToProfile(ctx.author, 'CaughtDitto')
 
-                    self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "companion": companion_name}})
-                    embed = discord.Embed(
-                        title = title,
-                        color = discord.Color.teal()
-                    )
-                    await ctx.send(embed = embed)
-                else:
-                    embed = discord.Embed(
-                        title = 'You can\'t seem to afford that companion.',
-                        color = discord.Color.teal()
-                    )
-                    await ctx.send(embed = embed)
-                return
-
-        for i in self.store['Items']:
-            if input.lower() == i['name'].lower():
-                if coins >= i['price']:
-                    coins -= i['price']
-
-                    #buying a squad swap
-                    if i['name'].lower() == 'squad swap':
-                        guild = ctx.guild
-                        teaRole = ctx.guild.get_role(612788003542401035)
-                        coffeeRole = role = ctx.guild.get_role(612788004926521365)
-                        if user['squad'] == 'Coffee':
-                            self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "squad": 'Tea'}})
-                            await ctx.author.add_roles(teaRole)
-                            await ctx.author.remove_roles(coffeeRole)
-                            await guild.get_channel(self.ids['SQUAD_TEA_CHANNEL']).send(self.meta.msgWelcomeSquad(ctx.author))
-                        else:
-                            self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "squad": 'Coffee'}})
-                            await ctx.author.add_roles(coffeeRole)
-                            await ctx.author.remove_roles(teaRole)
-                            await guild.get_channel(self.emojis['SQUAD_COFFEE_CHANNEL']).send(self.meta.msgWelcomeSquad(ctx.author))
-                        await ctx.send(embed = self.meta.embedDone())
+                    self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "companion": companion}})
+            #items
+            elif category == 'Items':
+                item = json['name']
+                #affinity booster
+                if item == 'Affinity Booster':
+                    if not user['booster']:
+                        self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "booster": True}})
+                        user = self.meta.getProfile(ctx.author)
+                    else:
+                        await ctx.send(embed = self.meta.embedOops())
                         return
-                    elif i['name'].lower() == 'affinity booster':
-                        if not user['booster']:
-                            self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "booster": True}})
-                            user = self.meta.getProfile(ctx.author)
-                            if user['coins'] == original_coins - i['price']:
-                                await ctx.send(embed = self.meta.embedDone())
-                            else:
-                                self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": (original_coins - i['price'])}})
-                                await ctx.send('Error 417. <@' + str(secret.BOT_OWNER_ID) + '>')
-                            return
-                        else:
-                            await ctx.send(embed = self.meta.embedOops())
-                            return
-                        return
-                    elif i['name'].lower() == 'heckinrich badge':
-                        badges = user['badges']
-                        if 'HeckinRich' not in badges:
-                            badges.append('HeckinRich')
-                            self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "badges": badges}})
-                            await ctx.send(embed = self.meta.embedDone())
-                            return
-                        else:
-                            await ctx.send(embed = self.meta.embedOops())
-                            return
-                        return
-                    #buying an evolution
-                    elif i['name'].lower() == 'affinity swap':
-                        if user['affinity'] == '':
-                            embed_oops = discord.Embed(
-                                title = 'Sorry, you haven\'t set an affinity yet! You can do that by using `+affinity fire/water/air/earth`.',
-                                color = discord.Color.teal()
-                            )
-                            await channel.send(embed = embed_oops)
-                            return
-
-                        embed = discord.Embed(
-                            title = 'Swap to which affinity?',
-                            description = '🌱 - Earth\n🎐 - Air\n🔥 - Fire\n💧 - Water\n⛔ - Cancel',
+                #affinity swap
+                elif item == 'Affinity Swap':
+                    if user['affinity'] == '':
+                        embed_oops = discord.Embed(
+                            title = 'Sorry, you haven\'t set an affinity yet! You can do that by using `+affinity fire/water/air/earth`.',
                             color = discord.Color.teal()
                         )
-                        embed.set_footer(text='You\'ll lose your booster if you have one by changing affinities.')
-                        await ctx.send(embed = embed)
+                        await channel.send(embed = embed_oops)
+                        return
 
-                        msg = ctx.channel.last_message
-                        await msg.add_reaction('🌱')
-                        await msg.add_reaction('🎐')
-                        await msg.add_reaction('🔥')
-                        await msg.add_reaction('💧')
-                        await msg.add_reaction('⛔')
+                    embed = discord.Embed(
+                        title = 'Swap to which affinity?',
+                        description = '🌱 - Earth\n🎐 - Air\n🔥 - Fire\n💧 - Water\n⛔ - Cancel',
+                        color = discord.Color.teal()
+                    )
+                    embed.set_footer(text='You\'ll lose your booster if you have one by changing affinities.')
+                    msg = await ctx.send(embed = embed)
+                    await msg.add_reaction('🌱')
+                    await msg.add_reaction('🎐')
+                    await msg.add_reaction('🔥')
+                    await msg.add_reaction('💧')
+                    await msg.add_reaction('⛔')
 
-                        emoji = ''
+                    emoji = ''
 
-                        def check(reaction, user):
-                            nonlocal emoji
-                            emoji = str(reaction.emoji)
-                            return user == ctx.author and (str(reaction.emoji) == '🌱' or str(reaction.emoji) == '🎐' or str(reaction.emoji) == '🔥' or str(reaction.emoji) == '💧' or str(reaction.emoji) == '⛔')
+                    def check(reaction, user):
+                        nonlocal emoji
+                        emoji = str(reaction.emoji)
+                        return user == ctx.author and (str(reaction.emoji) == '🌱' or str(reaction.emoji) == '🎐' or str(reaction.emoji) == '🔥' or str(reaction.emoji) == '💧' or str(reaction.emoji) == '⛔')
 
-                        try:
-                            reaction, user = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
-                        except asyncio.TimeoutError:
-                            await channel.send('Timed out.')
-                        else:
-                            if emoji == '⛔':
-                                embed = discord.Embed(
-                                    title = 'Swap canceled.',
-                                    color = discord.Color.teal()
-                                )
-                                await ctx.send(embed = embed)
-                                return
-
-                            aff = ''
-                            if emoji == '🌱':
-                                aff = 'Earth'
-                            elif emoji == '🎐':
-                                aff = 'Air'
-                            elif emoji == '🔥':
-                                aff = 'Fire'
-                            elif emoji == '💧':
-                                aff = 'Water'
-
-                            self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins}})
-                            self.meta.changeAffinity(ctx.author, aff)
-
+                    try:
+                        reaction, user = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
+                    except asyncio.TimeoutError:
+                        await channel.send('Affinity Swap timed out.')
+                    else:
+                        if emoji == '⛔':
                             embed = discord.Embed(
-                                title = 'Consider it done! ✅\nYour affinity is now `' + aff + '`.',
-                                color = discord.Color.teal()
-                            )
-                            await ctx.send(embed = embed)
-                            return
-                    elif i['name'].lower() == 'evolution stone':
-                        companion = user['companion']
-                        if companion == 'Eevee':
-                            choices = ['Flareon',
-                                'Jolteon',
-                                'Glaceon',
-                                'Umbreon',
-                                'Leafeon',
-                                'Espeon',
-                                'Vaporeon',
-                                'Sylveon']
-                        elif companion == 'Cosmog':
-                            choices = ['Solgaleo',
-                                'Lunala']
-                        elif companion == 'Yamper':
-                            choices = ['Dancing Yamper']
-                        #Bulbasaur Line
-                        elif companion == 'Bulbasaur':
-                            choices = ['Ivysaur']
-                        elif companion == 'Ivysaur':
-                            choices = ['Venusaur']
-                        #Charmander Line
-                        elif companion == 'Charmander':
-                            choices = ['Charmeleon']
-                        elif companion == 'Charmeleon':
-                            choices = ['Charizard']
-                        elif companion == 'Charizard':
-                            choices = ['Mega Charizard X', 'Mega Charizard Y']
-                        #Squirtle Line
-                        elif companion == 'Squirtle':
-                            choices = ['Wartortle']
-                        elif companion == 'Wartortle':
-                            choices = ['Blastoise']
-                        #Shaymin
-                        elif companion == 'Shaymin':
-                            choices = ['Shaymin Sky']
-                        #Psyduck
-                        elif companion == 'Psyduck':
-                            choices = ['Golduck']
-                        #Pikachu
-                        elif companion == 'Pichu':
-                            choices = ['Pikachu']
-                        elif companion == 'Pikachu':
-                            choices = ['Raichu']
-                        #Oshawott Line
-                        elif companion == 'Oshawott':
-                            choices = ['Dewott']
-                        elif companion == 'Dewott':
-                            choices = ['Samurott']
-                        #Mudkip Line
-                        elif companion == 'Mudkip':
-                            choices = ['Marshtomp']
-                        elif companion == 'Marshtomp':
-                            choices = ['Swampert']
-                        elif companion == 'Swampert':
-                            choices = ['Mega Swampert']
-                        #Dratini Line
-                        elif companion == 'Dratini':
-                            choices = ['Dragonair']
-                        elif companion == 'Dragonair':
-                            choices = ['Dragonite']
-                        #Wooper
-                        elif companion == 'Wooper':
-                            choices = ['Quagsire']
-                        #Riolu Line
-                        elif companion == 'Riolu':
-                            choices = ['Lucario']
-                        elif companion == 'Lucario':
-                            choices = ['Mega Lucario']
-                        #Riolu Line
-                        elif companion == 'Lotad':
-                            choices = ['Lombre']
-                        elif companion == 'Lombre':
-                            choices = ['Ludicolo']
-                        #Froakie Line
-                        elif companion == 'Froakie':
-                            choices = ['Frogadier']
-                        elif companion == 'Frogadier':
-                            choices = ['Greninja']
-                        else:
-                            embed = discord.Embed(
-                                title = 'You need an evolvable Companion to evolve!',
+                                title = 'Affinity Swap canceled.',
                                 color = discord.Color.teal()
                             )
                             await ctx.send(embed = embed)
                             return
 
-                        result = random.choice(choices)
+                        aff = ''
+                        if emoji == '🌱':
+                            aff = 'Earth'
+                        elif emoji == '🎐':
+                            aff = 'Air'
+                        elif emoji == '🔥':
+                            aff = 'Fire'
+                        elif emoji == '💧':
+                            aff = 'Water'
 
+                        self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins}})
+                        self.meta.changeAffinity(ctx.author, aff)
+
+                        title += '\nYour affinity is now `' + aff + '`.'
+                #evolution stone
+                elif item == 'Evolution Stone':
+                    companion = user['companion']
+                    companion_getStoreItem = self.meta.getStoreItem(companion)
+                    companion_json = companion_getStoreItem['JSON']
+                    companion_category = companion_getStoreItem['type']
+                    evolve = companion_json['evolve']
+                    #no evolution form
+                    if len(evolve) == 0:
+                        await ctx.send(embed = self.meta.embedOops())
+                        return
+                    else:
+                        result = random.choice(evolve)
                         self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "companion": result}})
-
-                        embed = discord.Embed(
-                            title = 'Consider it done! ✅\nYour companion is now a ' + result + '!',
-                            color = discord.Color.teal()
-                        )
-                        await ctx.send(embed = embed)
+                        title += '\nYour companion is now a `' + result + '`!'
+                #coin gift
+                elif item == 'Coin Gift':
+                    gifts = user['gifts']
+                    gifts += 1
+                    self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "gifts": gifts}})
+                #heckinrich badge
+                elif item == 'HeckinRich Badge':
+                    if self.meta.hasBadge(ctx.author, 'HeckinRich'):
+                        await ctx.send(embed = self.meta.embedOops())
                         return
-                    elif i['name'].lower() == 'coin gift' or i['name'].lower() == 'gift' or i['name'].lower() == 'coins':
-                        gifts = user['gifts']
-
-                        price = i['price'] * -1
-                        if not self.meta.changeCoins(ctx.author, price):
-                            embed = discord.Embed(
-                                title = 'You can\'t seem to afford that item.',
-                                description = 'You have:\t`' + str(helped) + '` Help Points ' + self.emojis['HelpPoint'] + '\t`' + str(original_coins) + '` Coins ' + self.emojis['Coin'],
-                                color = discord.Color.teal()
-                            )
-                            await ctx.send(embed = embed)
-                            return
-
-                        if gifts is None:
-                            gifts = 0
-
-                        gifts += 1
-
-                        self.dbConnection.updateProfile({"id": id}, {"$set": {"gifts": gifts}})
-
-                        await ctx.send(embed = self.meta.embedDone())
-                        return
+                    else:
+                        self.meta.addBadgeToProfile(ctx.author, 'HeckinRich')
+                        self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins}})
+                #squad swap
+                elif item == 'Squad Swap':
+                    guild = ctx.guild
+                    tea_role = ctx.guild.get_role(self.ids['SQUAD_TEA_ROLE'])
+                    coffee_role = role = ctx.guild.get_role(self.ids['SQUAD_COFFEE_ROLE'])
+                    if user['squad'] == 'Coffee':
+                        self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "squad": 'Tea'}})
+                        await ctx.author.add_roles(tea_role)
+                        await ctx.author.remove_roles(coffee_role)
+                        await guild.get_channel(self.ids['SQUAD_TEA_CHANNEL']).send(self.meta.msgWelcomeSquad(ctx.author))
+                    else:
+                        self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "squad": 'Coffee'}})
+                        await ctx.author.add_roles(coffee_role)
+                        await ctx.author.remove_roles(tea_role)
+                        await guild.get_channel(self.emojis['SQUAD_COFFEE_CHANNEL']).send(self.meta.msgWelcomeSquad(ctx.author))
                 else:
-                    embed = discord.Embed(
-                        title = 'You can\'t seem to afford that item.',
-                        description = 'You have:\t`' + str(helped) + '` Help Points ' + self.emojis['HelpPoint'] + '\t`' + str(original_coins) + '` Coins ' + self.emojis['Coin'],
-                        color = discord.Color.teal()
-                    )
-                    await ctx.send(embed = embed)
+                    await ctx.send(embed = self.meta.embedOops())
                     return
-
-        embed = discord.Embed(
-            title = 'I couldn\'t seem to find that companion or item.',
-            color = discord.Color.teal()
-        )
-        await ctx.send(embed = embed)
-        return
+            else:
+                await ctx.send(embed = self.meta.embedOops())
+                return
+            #send embed
+            embed = discord.Embed(
+                title = title,
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
 
     #members can gift coin companions or lotto tickets
     @commands.command(aliases=['donate', 'give'])

@@ -205,12 +205,16 @@ class Meta:
         stores = ['Coin Companions',
         'Helped Companions',
         'Evolvable Companions',
-        'Items']
+        'Items',
+        'Evolved Companions']
 
         for s in stores:
             for i in self.store[s]:
                 if i['name'].lower() == item:
-                    return i
+                    return {
+                    "JSON": i,
+                    "type": s
+                    }
 
         return ''
 
