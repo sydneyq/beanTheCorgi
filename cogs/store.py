@@ -226,7 +226,7 @@ class Store(commands.Cog):
                     dittos = ['Squirtle', 'Charmander', 'Bulbasaur']
                     if companion in dittos:
                         if random.random() < .05:
-                            companion_name = 'Ditto'
+                            companion = 'Ditto'
                             title = 'Consider it — Oh? **Ditto** was caught! 🌟'
                             self.meta.addBadgeToProfile(ctx.author, 'CaughtDitto')
 
@@ -237,7 +237,7 @@ class Store(commands.Cog):
                 #affinity booster
                 if item == 'Affinity Booster':
                     if not user['booster']:
-                        self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "booster": True}})
+                        self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "booster": 1}})
                         user = self.meta.getProfile(ctx.author)
                     else:
                         await ctx.send(embed = self.meta.embedOops())

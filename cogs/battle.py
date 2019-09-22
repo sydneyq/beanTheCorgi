@@ -54,8 +54,8 @@ class Battle(commands.Cog):
         elif self.meta.isBeanOrJarvis(member):
             boost += 'All'
 
-        if user['booster'] or self.meta.isBeanOrJarvis(member):
-            desc += boost
+        if user['booster'] > 0 or self.meta.isBeanOrJarvis(member):
+            desc += '`Lv`' + str(user['booster']) + ' ' + boost
 
         embed = discord.Embed(
             title = name + '\'s Battle Card',
@@ -122,7 +122,7 @@ class Battle(commands.Cog):
         #fire buff: chance of 10 dmg more than cap
         critical_chance = 0
 
-        if p_user['booster']:
+        if p_user['booster'] == 1:
             if aff == 'Water':
                 double_chance += .15
             elif aff == 'Earth':

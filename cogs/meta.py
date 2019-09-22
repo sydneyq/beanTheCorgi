@@ -141,7 +141,7 @@ class Meta:
 
         profile = self.dbConnection.findProfile({"id": id})
         if profile is None:
-            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'spouse': 0, 'gifts': 0, 'affinity':'', 'daily': '', 'badges':[], 'booster': False})
+            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'spouse': 0, 'gifts': 0, 'affinity':'', 'daily': '', 'badges':[], 'booster': 0})
             profile = self.dbConnection.findProfile({"id": id})
 
         return profile
@@ -358,14 +358,12 @@ class Global(commands.Cog):
         if self.meta.isBotOwner(ctx.author):
             guild = ctx.guild
             #self.dbConnection.renameColumn("given", "gifted")
-            self.dbConnection.makeColumn("booster", False)
+            #self.dbConnection.makeColumn("booster", False)
             #self.dbConnection.removeColumn("badges")
 
             profiles = self.dbConnection.findProfiles({})
             for profile in profiles:
-                if profile['affinity'] != '':
-                    user = guild.get_member(profile['id'])
-                    self.meta.addBadgeToProfile(user, profile['affinity'])
+                self.dbConnection.updateProfile({"id": profile['id']}, {"$set": {"booster": 0}})
 
             print("Done!")
 
