@@ -33,35 +33,41 @@ class Battle(commands.Cog):
 
         pic = member.avatar_url
 
-        boost = '\nBooster detected!: '
 
         if aff == '':
             aff = 'N/A'
 
-        desc = 'Affinity: `' + aff + '` '
+        booster_level = user['booster']
+
+        boost = '\n`Lv' + str(booster_level) + '` Booster: (+'
+
+        boost += str(booster_level * 10)
+
+        desc = '`' + aff + '` Affinity:'
         if aff == 'Fire':
             desc += '(+7 ATK)'
-            boost += '(+20% Critical Chance)'
+            boost +=  '% Critical Chance)'
         elif aff == 'Earth':
             desc += '(+40 HP)'
-            boost += '(+15% Absorb Chance)'
+            boost += '% Absorb Chance)'
         elif aff == 'Water':
             desc += '(+20% Heal Chance)'
-            boost += '(+15% Double Attack Chance)'
+            boost += '% Double Attack Chance)'
         elif aff == 'Air':
             desc += '(+20% Avoid Chance)'
-            boost += '(+20% Reflect Chance)'
+            boost += '% Reflect Chance)'
         elif self.meta.isBeanOrJarvis(member):
-            boost += 'All'
-
-        if user['booster'] > 0 or self.meta.isBeanOrJarvis(member):
-            desc += '`Lv`' + str(user['booster']) + ' ' + boost
+            desc = 'Almighty'
+            boost = 'All Boosters'
 
         embed = discord.Embed(
             title = name + '\'s Battle Card',
-            description = desc,
+            description = desc + boost,
             color = discord.Color.teal()
         )
+
+        booster = user['booster']
+        embed.add_field(name="Booster Level", value='`' + str(booster) + '`', inline=True)
 
         atk = stats['atk']
         embed.add_field(name="Attack Power (ATK)", value='`' + str(atk) + '`', inline=True)
@@ -104,38 +110,44 @@ class Battle(commands.Cog):
         #earth -> higher hp
         #fire -> higher atk
 
-        #water
-        heal_chance = .2 if aff == 'Water' else 0
+        booster_level = p_user['booster']
+
+        hp = 120
+        atk = 20
+        heal_chance = 0
         heal = 20
-        #water buff: double attack chance
         double_chance = 0
-        #earth
-        hp = 160 if aff == 'Earth' else 120
-        #earth buff: change dmg to hp
         absorb_chance = 0
-        #air
-        avoid_chance = .2 if aff == 'Air' else 0
-        #air buff: reflect chance
+        avoid_chance = 0
         reflect_chance = 0
-        #fire
-        atk = 27 if aff == 'Fire' else 20
-        #fire buff: chance of 10 dmg more than cap
         critical_chance = 0
 
-        if p_user['booster'] == 1:
-            if aff == 'Water':
-                double_chance += .15
-            elif aff == 'Earth':
-                absorb_chance += .15
-            elif aff == 'Air':
-                reflect_chance += .2
-            elif aff == 'Fire':
-                critical_chance += .2
+        #water
+        #water buff: double attack chance
+        if aff == 'Water':
+            heal_chance = .2
+            double_chance = booster_level * .1
+        #earth
+        #earth buff: change dmg to hp
+        elif aff == 'Earth':
+            hp = 160
+            absorb_chance = booster_level * .1
+        #air
+        #air buff: reflect chance
+        elif aff == 'Air':
+            avoid_chance = .2 if aff == 'Air' else 0
+            reflect_chance = booster_level * .1
+        #fire
+        #fire buff: chance of 10 dmg more than cap
+        elif aff == 'Fire':
+            atk = 27
+            critical_chance = booster_level * .1
+
         if p_user['id'] == secret.BEAN_ID or p_user['id'] == secret.JARVIS_ID:
-            double_chance += .25
-            absorb_chance += .25
-            reflect_chance += .25
-            critical_chance += .25
+            double_chance += .3
+            absorb_chance += .3
+            reflect_chance += .3
+            critical_chance += .3
 
         stats = {
             "heal_chance":heal_chance,

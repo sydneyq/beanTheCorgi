@@ -236,8 +236,10 @@ class Store(commands.Cog):
                 item = json['name']
                 #affinity booster
                 if item == 'Affinity Booster':
-                    if not user['booster']:
-                        self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "booster": 1}})
+                    booster = user['booster']
+                    if booster < 3:
+                        booster += 1
+                        self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "booster": booster}})
                         user = self.meta.getProfile(ctx.author)
                     else:
                         await ctx.send(embed = self.meta.embedOops())
