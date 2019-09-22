@@ -361,10 +361,11 @@ class Global(commands.Cog):
             #self.dbConnection.makeColumn("booster", False)
             #self.dbConnection.removeColumn("badges")
 
-            profiles = self.dbConnection.findProfiles({})
-            for profile in profiles:
-                self.dbConnection.updateProfile({"id": profile['id']}, {"$set": {"booster": 0}})
+            #profiles = self.dbConnection.findProfiles({})
+            #for profile in profiles:
+            #    self.dbConnection.updateProfile({"id": profile['id']}, {"$set": {"booster": 0}})
 
+            await ctx.send(embed = self.meta.embedDone())
             print("Done!")
 
     @commands.command()

@@ -241,6 +241,7 @@ class Store(commands.Cog):
                         booster += 1
                         self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "booster": booster}})
                         user = self.meta.getProfile(ctx.author)
+                        title += '\nBooster Level: `' + str(booster-1) + '->' + str(booster) + '`'
                     else:
                         await ctx.send(embed = self.meta.embedOops())
                         return

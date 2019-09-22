@@ -57,7 +57,7 @@ class Battle(commands.Cog):
             desc += '(+20% Avoid Chance)'
             boost += '% Reflect Chance)'
         elif self.meta.isBeanOrJarvis(member):
-            desc = 'Almighty'
+            desc = '`Almighty` - '
             boost = 'All Boosters'
 
         embed = discord.Embed(
@@ -66,8 +66,9 @@ class Battle(commands.Cog):
             color = discord.Color.teal()
         )
 
-        booster = user['booster']
-        embed.add_field(name="Booster Level", value='`' + str(booster) + '`', inline=True)
+        if not self.meta.isBeanOrJarvis(member):
+            booster = user['booster']
+            embed.add_field(name="Booster Level", value='`' + str(booster) + '`', inline=True)
 
         atk = stats['atk']
         embed.add_field(name="Attack Power (ATK)", value='`' + str(atk) + '`', inline=True)
@@ -144,10 +145,10 @@ class Battle(commands.Cog):
             critical_chance = booster_level * .1
 
         if p_user['id'] == secret.BEAN_ID or p_user['id'] == secret.JARVIS_ID:
-            double_chance += .3
-            absorb_chance += .3
-            reflect_chance += .3
-            critical_chance += .3
+            double_chance += .35
+            absorb_chance += .35
+            reflect_chance += .35
+            critical_chance += .35
 
         stats = {
             "heal_chance":heal_chance,
@@ -443,6 +444,16 @@ class Battle(commands.Cog):
             await msg_edit.edit(embed = battle_win(p1, p1_user, p2, p2_user))
             return
         return
+
+    @commands.command(aliases=['aboost'])
+    async def abooster(self, ctx, member: discord.Member, level: int = 0):
+        if not self.meta.isBotOwner(ctx.author):
+            return
+        else:
+            if level == 0:
+                level = int(self.meta.getProfile(member)['booster']) + 1
+            self.dbConnection.updateProfile({"id": member.id}, {"$set": {"booster": level}})
+            await ctx.send(embed = self.meta.embedDone())
 
 def setup(client):
     database_connection = Database()
