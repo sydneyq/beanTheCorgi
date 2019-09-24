@@ -181,6 +181,11 @@ class Store(commands.Cog):
         coins = user['coins']
         helped = user['helped']
         getStoreItem = self.meta.getStoreItem(input)
+
+        if getStoreItem == '':
+            await ctx.send(embed = self.meta.embedOops())
+            return
+
         json = getStoreItem['JSON']
         category = getStoreItem['type']
 
@@ -220,7 +225,6 @@ class Store(commands.Cog):
 
                 if category == 'Helped Companions':
                     self.dbConnection.updateProfile({"id": id}, {"$set": {"companion": companion}})
-                    return
                 else:
                     #case: ditto
                     dittos = ['Squirtle', 'Charmander', 'Bulbasaur']

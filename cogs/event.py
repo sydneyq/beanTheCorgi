@@ -173,14 +173,14 @@ class Event(commands.Cog):
 
                 embed.add_field(name=self.dbConnection.findBadge({"id":'GiftedByBean'})['literal'] + ': o/',
                 value='Bean would like a highfive! Be the first to say `\o` to highfive him back!')
-                embed.set_footer(text='This expires in 7 seconds, don\'t leave him hanging!')
-                await channel.send(embed = embed, delete_after=7)
+                embed.set_footer(text='This expires in 10 seconds, don\'t leave him hanging!')
+                await channel.send(embed = embed, delete_after=10)
 
                 def check(m):
                     return '\o' in m.content.lower() and m.channel == channel
 
                 try:
-                    msg = await self.client.wait_for('message', timeout=7.0, check=check)
+                    msg = await self.client.wait_for('message', timeout=10.0, check=check)
                 except asyncio.TimeoutError:
                     embed_d = discord.Embed(
                         title = 'Bean received no highfive. :(',

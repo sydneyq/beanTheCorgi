@@ -183,7 +183,7 @@ class Meta:
         if self.hasBadge(member, 'Fire') and self.hasBadge(member, 'Water') and self.hasBadge(member, 'Earth') and self.hasBadge(member, 'Air'):
             self.addBadgeToProfile(member, 'Avatar')
 
-        self.dbConnection.updateProfile({"id": member.id}, {"$set": {"affinity": affinity, "booster":False}})
+        self.dbConnection.updateProfile({"id": member.id}, {"$set": {"affinity": affinity, "booster":0}})
 
     #is directly buyable from store.json
     def isBuyable(self, item):

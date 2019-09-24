@@ -43,7 +43,7 @@ class Battle(commands.Cog):
 
         boost += str(booster_level * 10)
 
-        desc = '`' + aff + '` Affinity:'
+        desc = '`' + aff + '` Affinity: '
         if aff == 'Fire':
             desc += '(+7 ATK)'
             boost +=  '% Critical Chance)'
@@ -145,10 +145,10 @@ class Battle(commands.Cog):
             critical_chance = booster_level * .1
 
         if p_user['id'] == secret.BEAN_ID or p_user['id'] == secret.JARVIS_ID:
-            double_chance += .35
-            absorb_chance += .35
-            reflect_chance += .35
-            critical_chance += .35
+            double_chance += .3
+            absorb_chance += .3
+            reflect_chance += .3
+            critical_chance += .3
 
         stats = {
             "heal_chance":heal_chance,
