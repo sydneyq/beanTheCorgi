@@ -170,11 +170,29 @@ class Meta:
 
     def addBadgeToProfile(self, member: discord.Member, badge):
         if self.hasBadge(member, badge):
-            return
+            return False
         user = self.getProfile(member)
         badges = user['badges']
         badges.append(badge)
         self.dbConnection.updateProfile({"id": member.id}, {"$set": {"badges": badges}})
+        return True
+
+    def hasCompanion(self, member: discord.Member, companion):
+        user = self.getProfile(member)
+        companions = user['companions']
+        if companion in companions:
+            return True
+        else:
+            return False
+
+    def addCompanionToProfile(self, member: discord.Member, companion):
+        if self.hasCompanion(member, companion):
+            return False
+        user = self.getProfile(member)
+        companions = user['companioons']
+        companions.append(companion)
+        self.dbConnection.updateProfile({"id": member.id}, {"$set": {"companions": companions}})
+        return True
 
     def changeAffinity(self, member: discord.Member, affinity):
         if not (affinity in self.getProfile(member)['badges']):
@@ -325,10 +343,19 @@ class Meta:
     def getChannelOwnerID(self, channel: discord.TextChannel):
         if not '-' in channel.name:
             return -1
-        return int(channel.name[channel.name.rfind('-')+1:])
+        channel_owner_id = channel.name[channel.name.rfind('-')+1:]
+        try:
+            channel_owner_id = int(channel_owner_id)
+        except:
+            return -1
+        else:
+            return channel_owner_id
 
     def isChannelOwner(self, member: discord.Member, channel: discord.TextChannel):
-        return member.id == self.getChannelOwnerID(channel)
+        channel_owner_id = self.getChannelOwnerID(channel)
+        if type(channel_owner_id) is not int or channel_owner_id == -1:
+            return -1
+        return member.id == channel_owner_id
 
     def isSupportChannel(self, channel: discord.TextChannel):
         return channel.name.lower().startswith('s-')
@@ -358,7 +385,7 @@ class Global(commands.Cog):
         if self.meta.isBotOwner(ctx.author):
             guild = ctx.guild
             #self.dbConnection.renameColumn("given", "gifted")
-            #self.dbConnection.makeColumn("booster", False)
+            self.dbConnection.makeColumn("companions", [])
             #self.dbConnection.removeColumn("badges")
 
             #profiles = self.dbConnection.findProfiles({})
@@ -422,7 +449,7 @@ class Global(commands.Cog):
             casual = guild.get_channel(self.ids['GENERAL_CHANNEL'])
             msg = '**__🎉 Let\'s all welcome <@' + str(member.id) + '> to Mind Cafe! 🎉__**'
             msg += '\n> **Need Support?** Take a look at <#601444570600964097> and get started in <#597026335835291659>.'
-            msg += '\n> **Want to join a Squad?** Go to <#431191485933813765> and say `+profile` to get started.'
+            msg += '\n> **Want to join a Squad?** Go to <#621499838856560642> and say `+profile` to get started.'
             await casual.send(msg)
             #delete command
             await ctx.message.delete()
@@ -558,8 +585,6 @@ class Global(commands.Cog):
                 await ctx.send(embed = self.meta.embedNoAccess())
                 return
 
-            user = self.client.get_user(self.meta.getChannelOwnerID(channel))
-
             embed = discord.Embed(
                 title = 'Thanks for talking with us!',
                 description = 'If you felt a Listener was supportive, you can use the command `+helpedby @user` in #botspam to show them how much you appreciated their help!',
@@ -567,10 +592,13 @@ class Global(commands.Cog):
             )
             embed.set_thumbnail(url = 'https://cdn.discordapp.com/emojis/602887275289772052.png?v=1')
 
-            try:
-                await user.send(embed = embed)
-            except:
-                print('Could not send private message.')
+            channel_owner_id = self.meta.getChannelOwnerID(channel)
+            if channel_owner_id != -1:
+                user = self.client.get_user(channel_owner_id)
+                try:
+                    await user.send(embed = embed)
+                except:
+                    print('Could not send private message.')
 
             await log.send('Support Ticket [**' + channel.name + '**] has been archived.')
         elif self.meta.isModMailChannel(channel):

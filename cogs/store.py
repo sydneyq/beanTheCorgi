@@ -37,6 +37,7 @@ class Store(commands.Cog):
 
         helped = user['helped']
         coins = user['coins']
+        companions = user['companions']
 
         embed = discord.Embed(
             title = 'Store',

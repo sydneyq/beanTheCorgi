@@ -33,25 +33,6 @@ class Database:
     def countProfiles(self, findCriteria):
         return self.db.profile.count(findCriteria)
 
-    #companion
-    def insertCompanionProfile(self, toInsert):
-        self.db.companion.insert(toInsert)
-
-    def findCompanionProfile(self, findCriteria):
-        return self.db.companion.find_one(findCriteria)
-
-    def findCompanionProfiles(self, findCriteria):
-        return self.db.companion.find(findCriteria)
-
-    def updateCompanionProfile(self, updateCritera, change):
-        self.db.companion.update(updateCritera, change)
-
-    def removeCompanionProfile(self, toRemove):
-        self.db.companion.remove(toRemove)
-
-    def countCompanionProfiles(self, findCriteria):
-        return self.db.companion.count(findCriteria)
-
     #quote
     def insertQuote(self, toInsert):
         self.db.quote.insert(toInsert)
