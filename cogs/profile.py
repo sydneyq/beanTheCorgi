@@ -69,15 +69,7 @@ class Profile(commands.Cog):
                 teaTopHelped = doc['helped']
             elif doc['helped'] == teaTopHelped:
                 teaTop += '\n<@' + str(doc['id']) + '> (`' + str(doc['helped']) + '` Helped)'
-            '''
-            #given
-            teaGifted += doc['gifted']
-            if doc['gifted'] > teaTopGifted:
-                teaTopGifter = '<@' + str(doc['id']) + '> (`' + str(doc['gifted']) + '` Gifts Given)'
-                teaTopGifted = doc['gifted']
-            elif doc['gifted'] == teaTopGifted:
-                teaTopGifter += '\n<@' + str(doc['id']) + '> (`' + str(doc['gifted']) + '` Gifts Given)'
-            '''
+
         #tea_affinities = '`' + str(tea_earth) + '` Earth | `' + str(tea_air) + '` Air | `' + str(tea_fire) + '` Fire | `' + str(tea_water) + '` Water'
         teaStr = '`' + str(teaMembers) + '` Members | `' + str(teaHelped) + '` Helped\n**Most Helpful Member(s):**\n' + teaTop
         #teaStr = '`' + str(teaMembers) + '` Members | `' + str(teaHelped) + '` Helped | `' + str(teaGifted) + '` Gifts Given\n**Most Helpful Member(s):**\n' + teaTop + '\n**Most Generous Member(s):**\n' + teaTopGifter
@@ -411,6 +403,32 @@ class Profile(commands.Cog):
         embed.set_thumbnail(url = pic)
         await ctx.send(embed=embed)
 
+    @commands.command(alises=['spouses', 'spouse', 'soulmate', 'marriages'])
+    async def soulmates(self, ctx, member: discord.Member = None):
+        if member is None:
+            member = ctx.author
+
+        user = self.meta.getProfile(member)
+        soulmates = user['soulmates']
+
+        num = self.meta.getNumSoulmates(member)
+        soulmate_spots = self.meta.getSoulmateSpots(member)
+        desc = ''
+        for soulmate in soulmates:
+            desc += '<@' + str(soulmate) + '>\n'
+
+        if desc == '':
+            desc = 'N/A'
+
+        embed = discord.Embed(
+            title = member.name + '\'s Marriages `[' + str(num) + '/' + str(soulmate_spots)  + ']`',
+            description = desc,
+            color = discord.Color.teal()
+        )
+        embed.set_footer(text = 'For every 10 Help Points, you gain a soulmate spot!')
+        await ctx.send(embed = embed)
+        return
+
     @commands.command(alias=['propose'])
     async def marry(self, ctx, member: discord.Member = None):
         if member is None:
@@ -428,11 +446,29 @@ class Profile(commands.Cog):
             )
             await ctx.send(embed = embed)
             return
+        if member == ctx.author:
+            embed = discord.Embed(
+                title = 'You can\'t marry yourself!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
 
         id = ctx.author.id
 
         user = self.meta.getProfile(ctx.author)
         memberProfile = self.meta.getProfile(member)
+
+        if not self.meta.canAddSoulmate(ctx.author) or not self.meta.canAddSoulmate(member):
+            embed = discord.Embed(
+                title = 'One of you doesn\'t have enough soulmate spots!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
+        '''
+        user_spots = int(user['helped']) / 10
+        memberProfile
 
         if user['spouse'] != 0 or memberProfile['spouse'] != 0:
             embed = discord.Embed(
@@ -441,14 +477,7 @@ class Profile(commands.Cog):
             )
             await ctx.send(embed = embed)
             return
-
-        if member == ctx.author:
-            embed = discord.Embed(
-                title = 'You can\'t marry yourself!',
-                color = discord.Color.teal()
-            )
-            await ctx.send(embed = embed)
-            return
+        '''
 
         embed = discord.Embed(
             title = ctx.author.name + ' proposed to ' + member.name + '!',
@@ -482,8 +511,10 @@ class Profile(commands.Cog):
                 await ctx.send(embed = embed)
                 return
 
-            self.dbConnection.updateProfile({"id": ctx.author.id}, {"$set": {"spouse": member.id}})
-            self.dbConnection.updateProfile({"id": member.id}, {"$set": {"spouse": ctx.author.id}})
+            confirmed = self.meta.addSoulmate(ctx.author, member)
+            if not (confirmed):
+                await ctx.send(embed = self.meta.embedOops())
+                return
 
             choices = ['https://i.gifer.com/S3lf.gif',
                 'https://66.media.tumblr.com/ed485a688fc03e4e8f5cdb3f4d01678b/tumblr_oyfmbl9N5W1rl58vno1_500.gif',
@@ -501,25 +532,30 @@ class Profile(commands.Cog):
             await ctx.send(embed = embed)
 
     @commands.command()
-    async def divorce(self, ctx):
+    async def divorce(self, ctx, member: discord.Member = None):
         id = ctx.author.id
         user = self.meta.getProfile(ctx.author)
 
-        spouse = user['spouse']
+        soulmates = user['soulmates']
 
-        if spouse == 0:
-            embed = discord.Embed(
-                title = 'You don\'t have a spouse to divorce.',
-                color = discord.Color.teal()
-            )
-            await ctx.send(embed = embed)
+        if len(soulmates) == 0:
+            await ctx.send(embed = self.meta.embedOops())
             return
+
+        if member is None:
+            member = soulmates[0]
+        else:
+            if member.id not in soulmates:
+                await ctx.send(embed = self.meta.embedOops())
+                return
+            else:
+                member = member.id
 
         spouse_name = 'spouse'
         spouseExists = False
         if self.meta.profileDoesExist(spouse):
             spouseExists = True
-            spouse_name = self.client.get_user(spouse).name
+            spouse_name = self.client.get_user(member).name
 
         embed = discord.Embed(
             title = 'Divorce ' + spouse_name + '?',
@@ -552,10 +588,17 @@ class Profile(commands.Cog):
                 await ctx.send(embed = embed)
                 return
 
-            self.dbConnection.updateProfile({"id": ctx.author.id}, {"$set": {"spouse": 0}})
+            self.meta.removeSoulmate(ctx.author, member)
+            '''
+            soulmates.remove(member)
+            self.dbConnection.updateProfile({"id": ctx.author.id}, {"$set": {"soulmates": soulmates}})
 
             if spouseExists:
-                self.dbConnection.updateProfile({"id": spouse}, {"$set": {"spouse": 0}})
+                memberProfile = self.meta.getProfile(member)
+                member_soulmates = memberProfile['soulmates']
+                member_soulmates.remove(ctx.author.id)
+                self.dbConnection.updateProfile({"id": spouse}, {"$set": {"soulmates": member_soulmates}})
+            '''
 
             embed = discord.Embed(
                 title = 'Divorced ' + spouse_name + '.',

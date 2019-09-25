@@ -340,6 +340,46 @@ class Meta:
 
         return False
 
+    def getSoulmateSpots(self, member: discord.Member):
+        user = self.getProfile(member)
+        spots = 1 + int(int(user['helped'])/10)
+        return spots
+
+    def getNumSoulmates(self, member: discord.Member):
+        user = self.getProfile(member)
+        num = len(user['soulmates'])
+        return num
+
+    def canAddSoulmate(self, member: discord.Member):
+        if self.getSoulmateSpots(member) > self.getNumSoulmates(member):
+            return True
+        return False
+
+    def addSoulmate(self, member: discord.Member, member2: discord.Member):
+        user = self.getProfile(member)
+        user2 = self.getProfile(member2)
+        soulmates = user['soulmates']
+        soulmates2 = user2['soulmates']
+
+        if (not self.meta.canAddSoulmate(member)) or (not self.meta.canAddSoulmate(member2)) :
+            return False
+
+        soulmates.append(member2.id)
+        self.dbConnection.updateProfile({"id": member.id}, {"$set": {"soulmates": soulmates}})
+        soulmates2.append(member.id)
+        self.dbConnection.updateProfile({"id": member2.id}, {"$set": {"soulmates": soulmates2}})
+        return True
+
+    def removeSoulmate(self, member: discord.Member, member2: discord.Member):
+        user = self.getProfile(member)
+        user2 = self.getProfile(member2)
+        soulmates = user['soulmates']
+        soulmates2 = user2['soulmates']
+        soulmates = soulmates.remove(member2.id)
+        soulmates2 = soulmates2.remove(member.id)
+        self.dbConnection.updateProfile({"id": member.id}, {"$set": {"soulmates": soulmates}})
+        self.dbConnection.updateProfile({"id": member2.id}, {"$set": {"soulmates": soulmates2}})
+
     def getChannelOwnerID(self, channel: discord.TextChannel):
         if not '-' in channel.name:
             return -1
@@ -385,12 +425,15 @@ class Global(commands.Cog):
         if self.meta.isBotOwner(ctx.author):
             guild = ctx.guild
             #self.dbConnection.renameColumn("given", "gifted")
-            self.dbConnection.makeColumn("companions", [])
-            #self.dbConnection.removeColumn("badges")
+            #self.dbConnection.makeColumn("companions", [])
+            #self.dbConnection.removeColumn("spouse")
 
             #profiles = self.dbConnection.findProfiles({})
             #for profile in profiles:
-            #    self.dbConnection.updateProfile({"id": profile['id']}, {"$set": {"booster": 0}})
+            #    if profile['spouse'] != 0:
+            #        soulmates = []
+            #        soulmates.append(profile['spouse'])
+            #        self.dbConnection.updateProfile({"id": profile['id']}, {"$set": {"soulmates": soulmates}})
 
             await ctx.send(embed = self.meta.embedDone())
             print("Done!")
