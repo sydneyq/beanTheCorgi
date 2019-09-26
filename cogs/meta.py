@@ -361,7 +361,7 @@ class Meta:
         soulmates = user['soulmates']
         soulmates2 = user2['soulmates']
 
-        if (not self.meta.canAddSoulmate(member)) or (not self.meta.canAddSoulmate(member2)) :
+        if (not self.canAddSoulmate(member)) or (not self.canAddSoulmate(member2)) :
             return False
 
         soulmates.append(member2.id)
@@ -426,7 +426,7 @@ class Global(commands.Cog):
             guild = ctx.guild
             #self.dbConnection.renameColumn("given", "gifted")
             #self.dbConnection.makeColumn("companions", [])
-            #self.dbConnection.removeColumn("spouse")
+            self.dbConnection.removeColumn("spouse")
 
             #profiles = self.dbConnection.findProfiles({})
             #for profile in profiles:

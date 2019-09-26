@@ -339,7 +339,7 @@ class Store(commands.Cog):
                 elif item == 'Squad Swap':
                     guild = ctx.guild
                     tea_role = ctx.guild.get_role(self.ids['SQUAD_TEA_ROLE'])
-                    coffee_role = role = ctx.guild.get_role(self.ids['SQUAD_COFFEE_ROLE'])
+                    coffee_role = ctx.guild.get_role(self.ids['SQUAD_COFFEE_ROLE'])
                     if user['squad'] == 'Coffee':
                         self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "squad": 'Tea'}})
                         await ctx.author.add_roles(tea_role)
