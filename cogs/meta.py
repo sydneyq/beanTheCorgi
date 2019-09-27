@@ -189,9 +189,19 @@ class Meta:
         if self.hasCompanion(member, companion):
             return False
         user = self.getProfile(member)
-        companions = user['companioons']
+        companions = user['companions']
         companions.append(companion)
         self.dbConnection.updateProfile({"id": member.id}, {"$set": {"companions": companions}})
+        return True
+
+    def hasAllEvolutionsOf(self, member: discord.Member, companion):
+        user = self.getProfile(member)
+        companions = user['companions']
+        evolve = self.getStoreItem(companion)
+        evolve = evolve['JSON']['evolve']
+        for e in evolve:
+            if not (e in companions):
+                return False
         return True
 
     def changeAffinity(self, member: discord.Member, affinity):
@@ -403,6 +413,23 @@ class Meta:
     def isModMailChannel(self, channel: discord.TextChannel):
         return channel.name.lower().startswith('mm-')
 
+    def isEeveelution(self, companion):
+        eeveelutions = self.getEeveelutions()
+        if companion in eeveelutions:
+            return True
+        return False
+
+    def getEeveelutions(self):
+        eeveelutions = ['Espeon',
+        'Flareon',
+        'Glaceon',
+        'Jolteon',
+        'Leafeon',
+        'Sylveon',
+        'Umbreon',
+        'Vaporeon']
+        return eeveelutions
+
 class Global(commands.Cog):
 
     def __init__(self, client, database, meta):
@@ -428,12 +455,12 @@ class Global(commands.Cog):
             #self.dbConnection.makeColumn("companions", [])
             self.dbConnection.removeColumn("spouse")
 
-            #profiles = self.dbConnection.findProfiles({})
-            #for profile in profiles:
-            #    if profile['spouse'] != 0:
-            #        soulmates = []
-            #        soulmates.append(profile['spouse'])
-            #        self.dbConnection.updateProfile({"id": profile['id']}, {"$set": {"soulmates": soulmates}})
+            profiles = self.dbConnection.findProfiles({})
+            for profile in profiles:
+                if profile['companion'] == 'Ditto' or self.meta.isEeveelution(profile['companion']):
+                    companions = []
+                    companions.append(profile['companion'])
+                    self.dbConnection.updateProfile({"id": profile['id']}, {"$set": {"companions": companions}})
 
             await ctx.send(embed = self.meta.embedDone())
             print("Done!")

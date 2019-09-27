@@ -65,6 +65,43 @@ class Currency(commands.Cog):
         embed.set_thumbnail(url = pic)
         await ctx.send(embed = embed)
 
+    @commands.command(aliases=['pokedex', 'd'])
+    async def dex(self, ctx, other: discord.Member = None):
+        if other == None:
+            member = ctx.author
+            id = ctx.author.id
+        else:
+            member = other
+            id = other.id
+
+        user = self.meta.getProfile(member)
+
+        embed = discord.Embed(
+            title = member.name + '\'s Dex',
+            color = discord.Color.teal()
+        )
+
+        companions = user['companions']
+        eeveelutions = self.meta.getEeveelutions()
+        val = ''
+        for e in eeveelutions:
+            if e in companions:
+                val += self.emojis['Check']
+            else:
+                val += self.emojis['Cancel']
+            val += ' ' + e + '\n'
+        embed.add_field(name="Eeveelutions", value=val, inline=True)
+
+        val2 = ''
+        if 'Ditto' in companions:
+            val2 += self.emojis['Check']
+        else:
+            val2 += self.emojis['Cancel']
+        val2 += ' Ditto\n'
+        embed.add_field(name = 'In The Wild', value=val2, inline=True)
+        embed.set_thumbnail(url = member.avatar_url)
+        await ctx.send(embed = embed)
+
     @commands.command()
     async def setCompanion(self, ctx, member: discord.Member, *, companion):
         if ctx.author.id != secret.BOT_OWNER_ID:

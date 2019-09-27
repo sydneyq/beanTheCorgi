@@ -11,6 +11,7 @@ class Help(commands.Cog):
     def __init__(self, client, database, meta):
         self.client = client
         self.dbConnection = database
+        self.meta = meta
         client.remove_command('help')
 
         dirname = os.path.dirname(__file__)
@@ -46,10 +47,12 @@ class Help(commands.Cog):
         embed.set_thumbnail(url = 'https://cdn.discordapp.com/attachments/591611902459641856/593267453363224588/Bean_Icon.png')
 
         profile_commands = """`profile [@user]` - AKA `p`. Display a person's profile.
-        `inventory [@user]` - AKA `i`. Display a person's inventory.
+        `inventory [@user]` - AKA `i`. Display a person's Inventory.
+        `dex [@user]` - AKA `d`, `pokedex`. Display someone's Dex.
         `squads` - AKA `s`. Display the Squad leaderboard.
         `marry <@user>` - Propose to someone.
-        `divorce` - Divorce your current soulmate.
+        `divorce [@user]` - Divorce a soulmate.
+        `soulmates [@user]` - AKA `sm`. See all soulmates and soulmate spots.
         `squad <squadName>` - Join a Squad.
         `affinity <affinityType>` - Declare your affinity."""
         embed.add_field(name = 'Profile Commands', value = profile_commands)
@@ -141,6 +144,7 @@ class Help(commands.Cog):
             badges += self.dbConnection.findBadge({'id':'Avatar'})['literal'] + ' - Has spent time as all Affinities!\n'
             badges += self.dbConnection.findBadge({'id':'BestedBean'})['literal'] + ' - Defeat Bean in battle!\n'
             badges += self.dbConnection.findBadge({'id':'ArtCompetitionWinner'})['literal'] + self.dbConnection.findBadge({'id':'ArtCompetition'})['literal'] + ' - Win and submit art to a server Art Competition, respectively!\n'
+            badges += self.meta.getBadge('EeveeLover') + ' - Got all Eeveelutions!\n'
 
             embed.add_field(name = 'Badges', value = badges)
 

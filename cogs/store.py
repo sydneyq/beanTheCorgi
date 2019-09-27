@@ -234,6 +234,7 @@ class Store(commands.Cog):
                             companion = 'Ditto'
                             title = 'Consider it — Oh? **Ditto** was caught! 🌟'
                             self.meta.addBadgeToProfile(ctx.author, 'CaughtDitto')
+                            self.meta.addCompanionToProfile(ctx.author, companion)
 
                     self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "companion": companion}})
             #items
@@ -320,8 +321,13 @@ class Store(commands.Cog):
                         return
                     else:
                         result = random.choice(evolve)
+                        self.meta.addCompanionToProfile(ctx.author, result)
                         self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "companion": result}})
                         title += '\nYour companion is now a `' + result + '`!'
+                        if companion == 'Eevee':
+                            if self.meta.hasAllEvolutionsOf(ctx.author, 'Eevee'):
+                                title += '\nAnd with this, you got all Eeveelutions! Here, take this badge: ' + self.meta.getBadge('EeveeLover')
+
                 #coin gift
                 elif item == 'Coin Gift':
                     gifts = user['gifts']

@@ -190,7 +190,7 @@ class Announce(commands.Cog):
             value = 'Drama and insults is to be kept outside of the server. We also won\'t stand for any discrimination or \"jokes\" against others about their race, religion, sexuality, gender, political views, and more.')
 
             embed.add_field(name = '5) You do NOT talk about Fight Club',
-            value = 'Anything posted in this server should not be shared outside of it, and we ask that our listeners follow the same rule with support DMs.')
+            value = 'For non-moderators+, anything posted in support channels should not be posted outside of them, and we ask that listeners also not share specific details from support DMs.')
 
             embed.add_field(name = '6) No advertising',
             value = 'This includes posting or promoting other server invites, publicly or in DMs, and personal social media if done too often.')
