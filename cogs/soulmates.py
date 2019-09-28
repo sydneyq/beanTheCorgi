@@ -40,9 +40,9 @@ class Soulmates(commands.Cog):
         num = self.meta.getNumSoulmates(member)
         soulmate_spots = self.meta.getSoulmateSpots(member)
         desc = ''
+
         for soulmate in soulmates:
             desc += '<@' + str(soulmate) + '>\n'
-
         if desc == '':
             desc = 'N/A'
 
@@ -92,18 +92,6 @@ class Soulmates(commands.Cog):
             )
             await ctx.send(embed = embed)
             return
-        '''
-        user_spots = int(user['helped']) / 10
-        memberProfile
-
-        if user['spouse'] != 0 or memberProfile['spouse'] != 0:
-            embed = discord.Embed(
-                title = 'One of you is already married!',
-                color = discord.Color.teal()
-            )
-            await ctx.send(embed = embed)
-            return
-        '''
 
         embed = discord.Embed(
             title = ctx.author.name + ' proposed to ' + member.name + '!',
@@ -118,15 +106,15 @@ class Soulmates(commands.Cog):
 
         emoji = ''
 
-        def check(reaction, user):
+        def check(reaction, user2):
             nonlocal emoji
             emoji = str(reaction.emoji)
-            return user == member and (str(reaction.emoji) == '❤' or str(reaction.emoji) == '💔')
+            return user2 == member and (str(reaction.emoji) == '❤' or str(reaction.emoji) == '💔')
 
         try:
-            reaction, user = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
+            reaction, user2 = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
         except asyncio.TimeoutError:
-            await channel.send('Timed out.')
+            await ctx.channel.send('Timed out.')
         else:
             if emoji == '💔':
                 embed = discord.Embed(
@@ -170,18 +158,17 @@ class Soulmates(commands.Cog):
 
         if member is None:
             member = soulmates[0]
+            member = self.client.get_user(member)
         else:
             if member.id not in soulmates:
                 await ctx.send(embed = self.meta.embedOops())
                 return
-            else:
-                member = member.id
 
-        spouse_name = 'spouse'
+        spouse_name = 'soulmate'
         spouseExists = False
-        if self.meta.profileDoesExist(spouse):
+        if self.meta.profileDoesExist(member.id):
             spouseExists = True
-            spouse_name = self.client.get_user(member).name
+            spouse_name = self.client.get_user(member.id).name
 
         embed = discord.Embed(
             title = 'Divorce ' + spouse_name + '?',
@@ -215,16 +202,6 @@ class Soulmates(commands.Cog):
                 return
 
             self.meta.removeSoulmate(ctx.author, member)
-            '''
-            soulmates.remove(member)
-            self.dbConnection.updateProfile({"id": ctx.author.id}, {"$set": {"soulmates": soulmates}})
-
-            if spouseExists:
-                memberProfile = self.meta.getProfile(member)
-                member_soulmates = memberProfile['soulmates']
-                member_soulmates.remove(ctx.author.id)
-                self.dbConnection.updateProfile({"id": spouse}, {"$set": {"soulmates": member_soulmates}})
-            '''
 
             embed = discord.Embed(
                 title = 'Divorced ' + spouse_name + '.',
@@ -232,7 +209,7 @@ class Soulmates(commands.Cog):
             )
             await ctx.send(embed = embed)
             return
-            
+
 def setup(client):
     database_connection = Database()
     meta_class = Meta(database_connection)

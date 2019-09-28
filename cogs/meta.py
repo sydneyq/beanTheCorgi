@@ -141,7 +141,7 @@ class Meta:
 
         profile = self.dbConnection.findProfile({"id": id})
         if profile is None:
-            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'spouse': 0, 'gifts': 0, 'affinity':'', 'daily': '', 'badges':[], 'booster': 0})
+            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'gifts': 0, 'affinity':'', 'daily': '', 'badges':[], 'booster': 0,'companions' : [], 'soulmates' : []})
             profile = self.dbConnection.findProfile({"id": id})
 
         return profile
@@ -357,7 +357,11 @@ class Meta:
 
     def getNumSoulmates(self, member: discord.Member):
         user = self.getProfile(member)
-        num = len(user['soulmates'])
+        soulmates = user['soulmates']
+        if soulmates is None:
+            num = 0
+        else:
+            num = len(soulmates)
         return num
 
     def canAddSoulmate(self, member: discord.Member):
@@ -382,12 +386,13 @@ class Meta:
 
     def removeSoulmate(self, member: discord.Member, member2: discord.Member):
         user = self.getProfile(member)
-        user2 = self.getProfile(member2)
         soulmates = user['soulmates']
-        soulmates2 = user2['soulmates']
         soulmates = soulmates.remove(member2.id)
-        soulmates2 = soulmates2.remove(member.id)
         self.dbConnection.updateProfile({"id": member.id}, {"$set": {"soulmates": soulmates}})
+
+        user2 = self.getProfile(member2)
+        soulmates2 = user2['soulmates']
+        soulmates2 = soulmates2.remove(member.id)
         self.dbConnection.updateProfile({"id": member2.id}, {"$set": {"soulmates": soulmates2}})
 
     def getChannelOwnerID(self, channel: discord.TextChannel):
@@ -452,15 +457,13 @@ class Global(commands.Cog):
         if self.meta.isBotOwner(ctx.author):
             guild = ctx.guild
             #self.dbConnection.renameColumn("given", "gifted")
-            #self.dbConnection.makeColumn("companions", [])
-            self.dbConnection.removeColumn("spouse")
+            #self.dbConnection.makeColumn("soulmates", [])
+            #self.dbConnection.removeColumn("spouse")
 
             profiles = self.dbConnection.findProfiles({})
             for profile in profiles:
-                if profile['companion'] == 'Ditto' or self.meta.isEeveelution(profile['companion']):
-                    companions = []
-                    companions.append(profile['companion'])
-                    self.dbConnection.updateProfile({"id": profile['id']}, {"$set": {"companions": companions}})
+                if profile['soulmates'] is None:
+                    self.dbConnection.updateProfile({"id": profile['id']}, {"$set": {"soulmates": []}})
 
             await ctx.send(embed = self.meta.embedDone())
             print("Done!")
@@ -567,21 +570,22 @@ class Global(commands.Cog):
     #clear archive
     @commands.command(aliases=['clearA'])
     async def clearArchive(self, ctx):
-        guild = self.client.get_guild(257751892241809408)
-        author = ctx.message.author
-        archive = 0
+        async with ctx.channel.typing():
+            guild = self.client.get_guild(257751892241809408)
+            author = ctx.message.author
+            archive = 0
 
-        if (self.meta.isAdmin(author)):
-            for ch in guild.categories:
-                if ch.name.lower() == 'archive':
-                    archive = ch
-                    break
-        else:
-            await ctx.send(embed = self.meta.noAccessEmbed())
-            return
+            if (self.meta.isAdmin(author)):
+                for ch in guild.categories:
+                    if ch.name.lower() == 'archive':
+                        archive = ch
+                        break
+            else:
+                await ctx.send(embed = self.meta.noAccessEmbed())
+                return
 
-        for ch in archive.channels:
-            await ch.delete(reason='Archive clear')
+            for ch in archive.channels:
+                await ch.delete(reason='Archive clear')
 
         embed = discord.Embed(
             title = 'Archive cleared! ✅',
@@ -682,7 +686,26 @@ class Global(commands.Cog):
                 return
 
         await ctx.message.channel.edit(name = 'archived-'+ channel.name)
-        await ctx.message.channel.edit(category = category, sync_permissions = True)
+        try:
+            await ctx.message.channel.edit(category = category, sync_permissions = True)
+        except:
+            async with ctx.channel.typing():
+                embed = discord.Embed(
+                    title = 'Archive full. Clearing archive...',
+                    color = discord.Color.teal()
+                )
+                await ctx.send(embed = embed)
+
+                for ch in category.channels:
+                    await ch.delete(reason='Archive clear')
+
+                embed = discord.Embed(
+                    title = 'Archive auto-cleared! ✅',
+                    color = discord.Color.teal()
+                )
+                await log.send(embed = embed)
+                await ctx.send(embed = embed)
+            await ctx.message.channel.edit(category = category, sync_permissions = True)
 
     #close/delete
     @commands.command(aliases=['delete'])

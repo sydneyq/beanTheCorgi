@@ -411,9 +411,10 @@ class Profile(commands.Cog):
         user = self.meta.getProfile(member)
 
         soulmates = user['soulmates']
-        for soulmate in soulmates:
-            s = guild.get_user(soulmate)
-            self.meta.removeSoulmate(s, member)
+        if not (soulmates is None):
+            for soulmate in soulmates:
+                s = guild.get_user(soulmate)
+                self.meta.removeSoulmate(s, member)
 
         self.dbConnection.removeProfile({"id": id})
 

@@ -343,19 +343,55 @@ class Store(commands.Cog):
                         self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins}})
                 #squad swap
                 elif item == 'Squad Swap':
-                    guild = ctx.guild
-                    tea_role = ctx.guild.get_role(self.ids['SQUAD_TEA_ROLE'])
-                    coffee_role = ctx.guild.get_role(self.ids['SQUAD_COFFEE_ROLE'])
-                    if user['squad'] == 'Coffee':
-                        self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "squad": 'Tea'}})
-                        await ctx.author.add_roles(tea_role)
-                        await ctx.author.remove_roles(coffee_role)
-                        await guild.get_channel(self.ids['SQUAD_TEA_CHANNEL']).send(self.meta.msgWelcomeSquad(ctx.author))
+                    embed = discord.Embed(
+                        title = 'Swap to where?',
+                        description = '🔰 - Swap to other Squad\n⚠ - Leave Squad\n⛔ - Cancel',
+                        color = discord.Color.teal()
+                    )
+                    msg = await ctx.send(embed = embed)
+                    await msg.add_reaction('🔰')
+                    await msg.add_reaction('⚠')
+                    await msg.add_reaction('⛔')
+
+                    emoji = ''
+
+                    def check(reaction, user2):
+                        nonlocal emoji
+                        emoji = str(reaction.emoji)
+                        return user2 == ctx.author and (str(reaction.emoji) == '🔰' or str(reaction.emoji) == '⚠' or str(reaction.emoji) == '⛔')
+
+                    try:
+                        reaction, user2 = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
+                    except asyncio.TimeoutError:
+                        await channel.send('Squad Swap timed out.')
                     else:
-                        self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "squad": 'Coffee'}})
-                        await ctx.author.add_roles(coffee_role)
-                        await ctx.author.remove_roles(tea_role)
-                        await guild.get_channel(self.emojis['SQUAD_COFFEE_CHANNEL']).send(self.meta.msgWelcomeSquad(ctx.author))
+                        if emoji == '⛔':
+                            embed = discord.Embed(
+                                title = 'Squad Swap canceled.',
+                                color = discord.Color.teal()
+                            )
+                            await ctx.send(embed = embed)
+                            return
+
+                        guild = ctx.guild
+                        tea_role = guild.get_role(self.ids['SQUAD_TEA_ROLE'])
+                        coffee_role = guild.get_role(self.ids['SQUAD_COFFEE_ROLE'])
+
+                        if emoji == '⚠':
+                            self.dbConnection.updateProfile({"id": id}, {"$set": {"squad": ''}})
+                            await ctx.author.remove_roles(coffee_role, tea_role)
+                            title += '\nYou\'ve left your Squad.'
+                        elif emoji == '🔰':
+                            if user['squad'] == 'Coffee':
+                                self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "squad": 'Tea'}})
+                                await ctx.author.add_roles(tea_role)
+                                await ctx.author.remove_roles(coffee_role)
+                                await guild.get_channel(self.ids['SQUAD_TEA_CHANNEL']).send(self.meta.msgWelcomeSquad(ctx.author))
+                            else:
+                                self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "squad": 'Coffee'}})
+                                await ctx.author.add_roles(coffee_role)
+                                await ctx.author.remove_roles(tea_role)
+                                await guild.get_channel(self.ids['SQUAD_COFFEE_CHANNEL']).send(self.meta.msgWelcomeSquad(ctx.author))
                 else:
                     await ctx.send(embed = self.meta.embedOops())
                     return
