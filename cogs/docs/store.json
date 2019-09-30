@@ -173,6 +173,12 @@
             "evolve":["Lombre"]
         },
         {
+            "name":"Gastly",
+            "price":100,
+            "src":"https://media3.giphy.com/media/U4lft0NffeOCA/giphy.gif",
+            "evolve":["Haunter"]
+        },
+        {
             "name":"Shaymin",
             "price":300,
             "src":"http://45.media.tumblr.com/c3c6b13035a5392183a6676673ecab0c/tumblr_np1gr1IlFv1tdtetdo1_500.gif",
@@ -422,6 +428,16 @@
         {
             "name":"Greninja",
             "src":"https://projectpokemon.org/home/uploads/monthly_2018_05/large.5aeb1c9c5b87b_greninjawatershurikenmoveGif.gif.cf9b20fded49483b3f154b0ad9277403.gif",
+            "evolve":[]
+        },
+        {
+            "name":"Haunter",
+            "src":"https://media.giphy.com/media/CgO40fUMVTKow/giphy.gif",
+            "evolve":["Gengar"]
+        },
+        {
+            "name":"Gengar",
+            "src":"https://media1.giphy.com/media/VTtTC0C7Hp9ug/source.gif",
             "evolve":[]
         }
     ],

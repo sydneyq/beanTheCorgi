@@ -388,11 +388,15 @@ class Meta:
         user = self.getProfile(member)
         soulmates = user['soulmates']
         soulmates = soulmates.remove(member2.id)
+        if soulmates is None:
+            soulmates = []
         self.dbConnection.updateProfile({"id": member.id}, {"$set": {"soulmates": soulmates}})
 
         user2 = self.getProfile(member2)
         soulmates2 = user2['soulmates']
         soulmates2 = soulmates2.remove(member.id)
+        if soulmates2 is None:
+            soulmates2 = []
         self.dbConnection.updateProfile({"id": member2.id}, {"$set": {"soulmates": soulmates2}})
 
     def getChannelOwnerID(self, channel: discord.TextChannel):
