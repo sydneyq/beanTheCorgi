@@ -37,7 +37,7 @@ class Pics(commands.Cog):
         await ctx.message.channel.send(data['message'])
 
     @commands.command(pass_context=True)
-    async def corgi(self, ctx):
+    async def corgipic(self, ctx):
         response = requests.get('https://dog.ceo/api/breed/corgi/images/random')
         data = response.json()
         await ctx.message.channel.send(data['message'])
