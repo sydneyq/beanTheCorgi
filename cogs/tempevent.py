@@ -27,7 +27,7 @@ class TempEvent(commands.Cog):
 
         with open(filename3) as json_file:
             self.ids = json.load(json_file)
-    '''
+
     @commands.command(aliases=['changepts', 'changept', 'chpts', 'chpt'])
     async def changePoints(self, ctx, squad, pts:int):
         if not self.meta.isBotOwner(ctx.author):
@@ -53,58 +53,7 @@ class TempEvent(commands.Cog):
             embed2.set_thumbnail(url = 'https://cdn.discordapp.com/attachments/591611902459641856/613918442034298890/teamcoffeeBean.png')
 
         await ctx.send(embed = embed2)
-    '''
-    @commands.command(aliases=['pts', 'points'])
-    async def listeners(self, ctx):
-        tea_num = 0
-        tea_names = ''
-        coffee_num = 0
-        coffee_names = ''
-
-        tea = self.getNum(ctx, 'Tea')
-        tea_num = tea['num']
-        tea_names = tea['names']
-
-        coffee = self.getNum(ctx, 'Coffee')
-        coffee_num = coffee['num']
-        coffee_names = coffee['names']
-
-        embed2 = discord.Embed(
-            title = 'Squad Listeners',
-            color = discord.Color.teal()
-        )
-
-        embed2.add_field(name=self.emojis['Tea'] + ' Tea Squad `('+str(tea_num)+')`',value=tea_names)
-        embed2.add_field(name=self.emojis['Coffee'] + ' Coffee Squad `('+str(coffee_num)+'`)',value=coffee_names)
-
-        if tea_num > coffee_num:
-            embed2.set_thumbnail(url = 'https://cdn.discordapp.com/attachments/591611902459641856/613918428293627914/teamteaBean.png')
-        elif coffee_num > tea_num:
-            embed2.set_thumbnail(url = 'https://cdn.discordapp.com/attachments/591611902459641856/613918442034298890/teamcoffeeBean.png')
-
-        await ctx.send(embed = embed2)
-
-    def getNum(self, ctx, squad):
-        num = 0
-        names = ''
-        profiles = self.dbConnection.findProfiles({'squad' : squad})
-        for doc in profiles:
-            id = doc['id']
-            user = ctx.guild.get_member(id)
-            if user is None:
-                self.dbConnection.removeProfile({"id": id})
-                return
-            if 'Listeners' in [role.name for role in user.roles]:
-                num += 1
-                names += '<@' + str(user.id) + '>, '
-
-        names = names[:len(names) - 2]
-        stats = {
-            "num":num,
-            "names":names
-        }
-        return stats
-
+    
 
 def setup(client):
     database_connection = Database()

@@ -115,7 +115,7 @@ class Help(commands.Cog):
     async def badges(self, ctx, *, type = ''):
         embed = discord.Embed(
             title = 'Badge List',
-            description = 'Use `+badges positions` to see Staff and position badges and `+badges` to see all other badges.',
+            description = 'Use `+badges positions` to see Staff and position badges and `+badges [pageNum]` to see all other badges.',
             color = discord.Color.teal()
         )
         embed.set_thumbnail(url = 'https://cdn.discordapp.com/attachments/591611902459641856/593267453363224588/Bean_Icon.png')
@@ -134,17 +134,21 @@ class Help(commands.Cog):
             position_badges += emojis['CorgiCallResponder'] + ' - Corgi Call Responders\n'
             embed.add_field(name = 'Position Badges', value = position_badges)
         else:
-            badges = self.dbConnection.findBadge({'id':'CaughtDitto'})['literal'] + ' - Caught the rare Ditto!\n'
-            badges += self.dbConnection.findBadge({'id':'GiftedByBean'})['literal'] + ' - Gifted Bean and got a rare badge back!\n'
-            badges += self.dbConnection.findBadge({'id':'2019'})['literal'] + ' - Was here in 2019 and used the 2019 badge command!\n'
-            badges += self.dbConnection.findBadge({'id':'HeckinRich'})['literal'] + ' - Bought the HeckinRich badge from the Item Store!\n'
-            badges += emojis['HelpPts10'] + emojis['HelpPts20'] + emojis['HelpPts30'] + ' - Has at least 10, 20, 30 Help points, respectively!\n'
-            badges += emojis['Recruited10'] + ' - Has recruited at least 10 people to the server!\n'
-            badges += emojis['Earth'] + emojis['Air'] + emojis['Fire'] + emojis['Water'] + ' - Affinities!\n'
-            badges += self.dbConnection.findBadge({'id':'Avatar'})['literal'] + ' - Has spent time as all Affinities!\n'
-            badges += self.dbConnection.findBadge({'id':'BestedBean'})['literal'] + ' - Defeat Bean in battle!\n'
-            badges += self.dbConnection.findBadge({'id':'ArtCompetitionWinner'})['literal'] + self.dbConnection.findBadge({'id':'ArtCompetition'})['literal'] + ' - Win and submit art to a server Art Competition, respectively!\n'
-            badges += self.meta.getBadge('EeveeLover') + ' - Got all Eeveelutions!\n'
+            if type == '' or type == '1':
+                badges = self.meta.getBadge('CaughtDitto') + ' - Caught the rare Ditto!\n'
+                badges += self.meta.getBadge('GiftedByBean') + ' - Gifted Bean and got a rare badge back!\n'
+                badges += self.meta.getBadge('2019') + ' - Was here in 2019 and used the 2019 badge command!\n'
+                badges += self.meta.getBadge('HeckinRich') + ' - Bought the HeckinRich badge from the Item Store!\n'
+                badges += emojis['HelpPts10'] + emojis['HelpPts20'] + emojis['HelpPts30'] + ' - Has at least 10, 20, 30 Help points, respectively!\n'
+                badges += emojis['Recruited10'] + ' - Has recruited at least 10 people to the server!\n'
+                badges += emojis['Earth'] + emojis['Air'] + emojis['Fire'] + emojis['Water'] + ' - Affinities!\n'
+                badges += self.meta.getBadge('Avatar') + ' - Has spent time as all Affinities!\n'
+                badges += self.meta.getBadge('BestedBean') + ' - Defeat Bean in battle!\n'
+                badges += self.meta.getBadge('ArtCompetitionWinner') + self.meta.getBadge('ArtCompetition') + ' - Win and submit art to a server Art Competition, respectively!\n'
+                badges += self.meta.getBadge('EeveeLover') + ' - Got all Eeveelutions!\n'
+            else:
+                badges = self.meta.getBadge('First1kMembers') + ' - One of the first 1k members in the server!\n'
+                badges += self.meta.getBadge('LGBTQAI+') + ' - Participated in LGBTQAI+ Awareness Month!\n'
 
             embed.add_field(name = 'Badges', value = badges)
 

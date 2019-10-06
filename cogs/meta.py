@@ -463,12 +463,12 @@ class Global(commands.Cog):
             #self.dbConnection.renameColumn("given", "gifted")
             #self.dbConnection.makeColumn("soulmates", [])
             #self.dbConnection.removeColumn("spouse")
-
+            '''
             profiles = self.dbConnection.findProfiles({})
             for profile in profiles:
                 if profile['soulmates'] is None:
                     self.dbConnection.updateProfile({"id": profile['id']}, {"$set": {"soulmates": []}})
-
+            '''
             await ctx.send(embed = self.meta.embedDone())
             print("Done!")
 
