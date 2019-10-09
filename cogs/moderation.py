@@ -5,6 +5,8 @@ from .meta import Meta
 import random
 import pymongo
 from bson import objectid
+import os
+import json
 
 class Moderation(commands.Cog):
 
@@ -29,9 +31,6 @@ class Moderation(commands.Cog):
 
     def getModLogs(self, member: discord.Member):
         return self.dbConnection.findModLogs({'id' : member.id})
-
-    def getModProfile(self, member: discord.Member):
-        return self.dbConnection.findModProfile({'id' : member.id})
 
     def modProfileExists(self, id):
         profile = self.dbConnection.findModProfile({"id": id})
@@ -93,7 +92,7 @@ class Moderation(commands.Cog):
     def embedBlindfolded(self):
         embed = discord.Embed(
             title = 'You have been blindfolded',
-            description = 'You no longer have access to casual channels and may only receive support through requesting support DMs'
+            description = 'You no longer have access to casual channels and may only receive support through requesting support DMs',
             color = discord.Color.red()
         )
         return embed
@@ -116,7 +115,8 @@ class Moderation(commands.Cog):
         await ban(user)
         try:
             await member.send(embed = self.embedBanned())
-        return
+        except:
+            return
 
     async def unban(self, user: discord.User):
         await unban(user)
@@ -127,28 +127,32 @@ class Moderation(commands.Cog):
         await member.add_roles(muted)
         try:
             await member.send(embed = self.embedMuted(hrs))
-        return
+        except:
+            return
 
     async def unmute(self, member: discord.Member):
         muted = guild.get_role(445398365606248448)
         await member.remove_roles(muted)
         try:
             await member.send(embed = self.embedUnmuted())
-        return
+        except:
+            return
 
     async def blindfold(self, member: discord.Member):
         role = guild.get_role(self.ids['BLINDFOLDED_ROLE'])
         await member.add_roles(role)
         try:
             await member.send(embed = self.embedBlindfolded())
-        return
+        except:
+            return
 
     async def unblindfold(self, member: discord.Member):
         role = guild.get_role(self.ids['BLINDFOLDED_ROLE'])
         await member.remove_roles(role)
         try:
             await member.send(embed = self.embedUnblindfolded())
-        return
+        except:
+            return
 
     def changeStrikes(self, member:discord.Member, strikes:int):
         if not self.modProfileExists(member.id):
@@ -156,7 +160,7 @@ class Moderation(commands.Cog):
         self.dbConnection.updateProfile({"id": member.id}, {"$set": {"strikes": strikes}})
         return True
 
-    def getRuleJSON(rule: int):
+    def getRuleJSON(self, rule: int):
         rule_json = self.rules[rule]
         return rule_json
 
@@ -167,22 +171,25 @@ class Moderation(commands.Cog):
     @commands.command(aliases=['warn', 'sanction'])
     async def strike(self, ctx, member: discord.Member, rule:int, *, reason = None):
         if not self.meta.isMod(ctx.author):
-            await ctx.send(embed = self.meta.embedOops()
+            await ctx.send(embed = self.meta.embedOops())
             return
         elif member.bot: #or self.isAdmin(member):
-            await ctx.send(embed = self.meta.embedOops()
+            await ctx.send(embed = self.meta.embedOops())
             return
         if rule < 0 or rule > 14:
-            await ctx.send(embed = self.meta.embedOops()
+            await ctx.send(embed = self.meta.embedOops())
             return
 
-        if reason is None:
+        await ctx.message.delete()
+
+        if reason is None or reason == None:
             reason = 'No reason provided'
 
         profile = self.getModProfile(member)
         before_strikes = profile['strikes']
         after_strikes = profile['strikes'] + self.getAmtStrikesFromRule(rule)
         self.dbConnection.insertModLog({'id': member.id, 'rule': rule, 'reason': reason, 'staff': ctx.author.id, 'date': self.meta.getFullDateTime()})
+        self.changeStrikes(member, after_strikes)
 
         try:
             embed = discord.Embed(
@@ -190,7 +197,7 @@ class Moderation(commands.Cog):
                 color = discord.Color.red()
             )
             n = 'You\'ve been striked for: Rule `'+str(rule)+'`'
-            v = 'Strikes: `'+str(before_strikes)+'->'+str(after_strikes)+'`
+            v = 'Strikes: `'+str(before_strikes)+'->'+str(after_strikes)+'`'
             embed.add_field(name=n, value=v)
             n = 'Rule `'+str(rule)+'` description'
             v = self.getRuleJSON['DESC']
@@ -199,6 +206,8 @@ class Moderation(commands.Cog):
             v = reason
             embed.add_field(name=n, value=v)
             await member.send(embed = embed)
+        except:
+            ctx.send('Could not send them Strike message.')
 
         action = 'No further action was taken.'
         if not (before_strikes == after_strikes):
@@ -243,7 +252,7 @@ class Moderation(commands.Cog):
 
         embed = discord.Embed(
             title = 'Consider it done! ✅',
-            description = member.name '\'s Strikes: `'+str(before_strikes)+'->'+str(after_strikes)+'`',
+            description = member.name + '\'s Strikes: `'+str(before_strikes)+'->'+str(after_strikes)+'`',
             color = discord.Color.red()
         )
         await ctx.send(embed = embed)
@@ -284,9 +293,8 @@ class Moderation(commands.Cog):
         profile = self.getModProfile(member)
 
         title = member.name + '\'s Log'
-        desc += 'Total Strikes: `' + str(profile['strikes']) + '`'
+        desc = 'Total Strikes: `' + str(profile['strikes']) + '`'
         desc += '\nNumber of Logs: `' + str(numLogs) + '`'
-        embed.add_field(name=title,value=desc)
 
         embed = discord.Embed(
             title = title,
@@ -295,8 +303,8 @@ class Moderation(commands.Cog):
         )
 
         for doc in logs:
-            n = 'Rule `' +doc['rule']+ '` by <@' + str(doc['staff']) + '>'
-            v = '`'+str(doc['date'])+'`: ' + doc['_id']
+            n = 'Rule `' + str(doc['rule']) + '`  @ ' + self.meta.formatDateTimeString(doc['date'])
+            v = '<@' + str(doc['staff']) + '>: ' + str(doc['_id'])
             embed.add_field(name=n, value=v)
 
         pic = member.avatar_url
@@ -312,7 +320,7 @@ class Moderation(commands.Cog):
     async def strikesystem(self, ctx):
         embed = discord.Embed(
             title = 'Moderation Strike System',
-            description = 'See the spreadsheet here: (https://docs.google.com/spreadsheets/d/1t3ppHecBITclZdoQ7t-VQMdBHsQ_-5tepOvdw3qLQlU)[https://docs.google.com/spreadsheets/d/1t3ppHecBITclZdoQ7t-VQMdBHsQ_-5tepOvdw3qLQlU]',
+            description = 'See the spreadsheet here: https://docs.google.com/spreadsheets/d/1t3ppHecBITclZdoQ7t-VQMdBHsQ_-5tepOvdw3qLQlU',
             color = discord.Color.red()
         )
         await ctx.send(embed = embed)

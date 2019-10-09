@@ -249,6 +249,19 @@ class Meta:
     def getFullDateTime(self):
         return datetime.datetime.now()
 
+    def formatDateTime(self, datetime):
+        x = datetime
+        data = {
+            "month": x.strftime("%B"),
+            "day": int(x.strftime("%d")),
+            "hour": int(x.strftime("%H"))
+        }
+        return data
+
+    def formatDateTimeString(self, datetime):
+        data = self.formatDateTime(datetime)
+        return str(data['hour']) + 'h, ' + str(data['day']) + ' ' + data['month']
+
     def getDateTime(self):
         x = datetime.datetime.now()
         data = {

@@ -5,10 +5,11 @@ import secret
 import json
 import os
 from database import Database
+from .meta import Meta
 
 class Triggers(commands.Cog):
 
-    def __init__(self, client, database):
+    def __init__(self, client, database, meta):
         self.client = client
         self.dbConnection = database
 
@@ -101,12 +102,12 @@ class Triggers(commands.Cog):
             await heaven.send(e)
             await mods.send(e)
         #PM added
-        elif roleWasAdded(self.ids['MARKETING_OFFICER']):
+        elif roleWasAdded(self.ids['MARKETINGOFFICER_ROLE']):
             e = embedRoleAdded('Partnership Managers')
             await heaven.send(e)
             await marketing.send(e)
         #PM removed
-        elif roleWasRemoved(self.ids['MARKETING_OFFICER']):
+        elif roleWasRemoved(self.ids['MARKETINGOFFICER_ROLE']):
             e = embedRoleRemoved('Partnership Managers')
             await heaven.send(e)
             await marketing.send(e)

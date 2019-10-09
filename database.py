@@ -70,7 +70,7 @@ class Database:
         self.db.modprofile.insert(toInsert)
 
     def findModProfile(self, findCriteria):
-        return self.db.modprofile.find(findCriteria)
+        return self.db.modprofile.find_one(findCriteria)
 
     def removeModProfile(self, toRemove):
         self.db.modprofile.remove(toRemove)
