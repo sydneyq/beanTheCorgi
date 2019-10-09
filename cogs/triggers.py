@@ -1,10 +1,30 @@
 import discord
 from discord.ext import commands
+from discord.utils import get
+import secret
+import json
+import os
+from database import Database
 
 class Triggers(commands.Cog):
 
-    def __init__(self, client):
+    def __init__(self, client, database):
         self.client = client
+        self.dbConnection = database
+
+        dirname = os.path.dirname(__file__)
+        filename = os.path.join(dirname, 'docs/store.json')
+        filename2 = os.path.join(dirname, 'docs/emojis.json')
+        filename3 = os.path.join(dirname, 'docs/ids.json')
+
+        with open(filename) as json_file:
+            self.store = json.load(json_file)
+
+        with open(filename2) as json_file:
+            self.emojis = json.load(json_file)
+
+        with open(filename3) as json_file:
+            self.ids = json.load(json_file)
 
     @commands.command()
     async def hotlines(self, ctx):
@@ -15,94 +35,96 @@ class Triggers(commands.Cog):
         )
         await ctx.send(embed = embed)
 
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        return
+    #@commands.Cog.listener()
+    #async def on_message(self, message):
+    #    return
 
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
         guild = self.client.get_guild(257751892241809408)
         casual = guild.get_channel(257751892241809408)
         heaven = guild.get_channel(594657206251814963)
-
         events = guild.get_channel(594641130545741834)
         mods = guild.get_channel(592030367796690975)
         marketing = guild.get_channel(594641226330800153)
 
-        #angel added
-        if (257755582662967305 in [role.id for role in after.roles]) and (257755582662967305 not in [role.id for role in before.roles]):
+        def embedRoleAdded(role):
             embed = discord.Embed(
-                title = after.name + ' has been given the Angel role!',
-                description = '<@' + str(after.id) + '>, when you\'re able, please take a moment to check the pins of this channel and your respective team\'s channels.',
+                title = after.name + ' has been given the ' + role + ' role!',
                 color = discord.Color.gold()
             )
-
-            embed.set_author(name = 'Mind Café', icon_url = 'https://cdn.discordapp.com/emojis/593214693573787654.png')
+            embed.set_author(name = 'Mind Café', icon_url = 'https://media.discordapp.net/attachments/591611902459641856/595372970843701258/Mind_Cafe_Icon.png')
             embed.set_footer(text = 'Congratulations! 🎉')
-            await heaven.send(embed = embed)
-        #angel removed
-        if (257755582662967305 in [role.id for role in before.roles]) and (257755582662967305 not in [role.id for role in after.roles]):
+            return embed
+
+        def embedRoleRemoved(role):
             embed = discord.Embed(
-                title = after.name + ' has been removed from the Angel role.',
+                title = after.name + ' has been removed from the ' + role + ' role.',
                 color = discord.Color.gold()
             )
+            return embed
 
-            await heaven.send(embed = embed)
-        #mod
-        if (592070664169455616 in [role.id for role in after.roles]) and (592070664169455616 not in [role.id for role in before.roles]):
-            embed = discord.Embed(
-                title = after.name + ' has been given the Mod role!',
-                description = '<@' + str(after.id) + '>, when you\'re able, please take a moment to check the pins of this channel. Ask your teammates if you have any questions.',
-                color = discord.Color.blue()
-            )
+        def roleWasAdded(id):
+            nonlocal before
+            nonlocal after
+            if (id in [role.id for role in after.roles]) and (id not in [role.id for role in before.roles]):
+                return True
+            return False
 
-            embed.set_author(name = 'Mind Café', icon_url = 'https://cdn.discordapp.com/emojis/593214693573787654.png')
-            embed.set_footer(text = 'Congratulations! 🎉')
-            await mods.send(embed = embed)
-        #event-coord
-        if (594642605862682672 in [role.id for role in after.roles]) and (594642605862682672 not in [role.id for role in before.roles]):
-            embed = discord.Embed(
-                title = after.name + ' has been given the Events Coordinator role!',
-                description = '<@' + str(after.id) + '>, when you\'re able, please take a moment to check the pins of this channel. Ask your teammates if you have any questions.',
-                color = discord.Color.red()
-            )
+        def roleWasRemoved(id):
+            nonlocal before
+            nonlocal after
+            if (id in [role.id for role in before.roles]) and (id not in [role.id for role in after.roles]):
+                return True
+            return False
 
-            embed.set_author(name = 'Mind Café', icon_url = 'https://cdn.discordapp.com/emojis/593214693573787654.png')
-            embed.set_footer(text = 'Congratulations! 🎉')
-            await events.send(embed = embed)
-        #marketing
-        if (594642783160107186 in [role.id for role in after.roles]) and (594642783160107186 not in [role.id for role in before.roles]):
-            embed = discord.Embed(
-                title = after.name + ' has been given the Marketing Officer role!',
-                description = '<@' + str(after.id) + '>, when you\'re able, please take a moment to check the pins of this channel. Ask your teammates if you have any questions.',
-                color = discord.Color.green()
-            )
-
-            embed.set_author(name = 'Mind Café', icon_url = 'https://cdn.discordapp.com/emojis/593214693573787654.png')
-            embed.set_footer(text = 'Congratulations! 🎉')
-            await marketing.send(embed = embed)
-
-        #certified-listener
-        if (597781064718745660 in [role.id for role in after.roles]) and (597781064718745660 not in [role.id for role in before.roles]):
-            embed = discord.Embed(
-                title = after.name + ' is now Certified in Active Listening!',
-                color = discord.Color.gold()
-            )
-
-            embed.set_author(name = 'Mind Café', icon_url = 'https://cdn.discordapp.com/emojis/594982856162541573.png')
-            embed.set_footer(text = 'Congratulations! 🎉')
-            await casual.send(embed = embed)
-        #certification-team
-        if 597801322716332044 in [role.id for role in after.roles] and 597801322716332044 not in [role.id for role in before.roles]:
-            embed = discord.Embed(
-                title = after.name + ' is now on the Certifying Team!',
-                description = 'Thanks for helping us improve our listening quality.',
-                color = discord.Color.gold()
-            )
-
-            embed.set_author(name = 'Mind Café', icon_url = 'https://cdn.discordapp.com/emojis/592850494767104011.png')
-            embed.set_footer(text = 'Congratulations! 🎉')
-            await casual.send(embed = embed)
+        #in-trial angel added
+        if roleWasAdded(self.ids['TRIAL_ROLE']):
+            await heaven.send(embedRoleAdded('In-Trial Angels'))
+        #in-trial angel removed
+        elif roleWasRemoved(self.ids['TRIAL_ROLE']):
+            await heaven.send(embedRoleRemoved('In-Trial Angels'))
+        #staff added
+        elif roleWasAdded(self.ids['STAFF_ROLE']):
+            await heaven.send(embedRoleAdded('Angels'))
+        #staff removed
+        elif roleWasRemoved(self.ids['STAFF_ROLE']):
+            await heaven.send(embedRoleRemoved('Angels'))
+        #mod added
+        elif roleWasAdded(self.ids['MOD_ROLE']):
+            e = embedRoleAdded('Mods')
+            await heaven.send(e)
+            await mods.send(e)
+        #mod removed
+        elif roleWasRemoved(self.ids['MOD_ROLE']):
+            e = embedRoleRemoved('Mods')
+            await heaven.send(e)
+            await mods.send(e)
+        #PM added
+        elif roleWasAdded(self.ids['MARKETING_OFFICER']):
+            e = embedRoleAdded('Partnership Managers')
+            await heaven.send(e)
+            await marketing.send(e)
+        #PM removed
+        elif roleWasRemoved(self.ids['MARKETING_OFFICER']):
+            e = embedRoleRemoved('Partnership Managers')
+            await heaven.send(e)
+            await marketing.send(e)
+        #EC added
+        elif roleWasAdded(self.ids['EVENTCOORDINATOR_ROLE']):
+            embedRoleAdded('Event Coordinators')
+            await heaven.send(e)
+            await events.send(e)
+        #EC removed
+        elif roleWasRemoved(self.ids['EVENTCOORDINATOR_ROLE']):
+            e = embedRoleRemoved('Event Coordinators')
+            await heaven.send(e)
+            await events.send(e)
+        #EC added
+        elif roleWasAdded(self.ids['CERTIFIED_ROLE']):
+            await casual.send(embedRoleAdded('Certified in Active Listening'))
 
 def setup(client):
-    client.add_cog(Triggers(client))
+    database_connection = Database()
+    meta_class = Meta(database_connection)
+    client.add_cog(Triggers(client, database_connection, meta_class))

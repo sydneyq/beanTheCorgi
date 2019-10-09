@@ -49,6 +49,32 @@ class Database:
     def countQuotes(self, findCriteria):
         return self.db.quote.count(findCriteria)
 
+    #modlog
+    def insertModLog(self, toInsert):
+        self.db.modlog.insert(toInsert)
+
+    def findModLogs(self, findCriteria):
+        return self.db.modlog.find(findCriteria)
+
+    def findModLog(self, findCriteria):
+        return self.db.modlog.find_one(findCriteria)
+
+    def removeModLog(self, toRemove):
+        self.db.modlog.remove(toRemove)
+
+    def countModLogs(self, findCriteria):
+        return self.db.modlog.count(findCriteria)
+
+    #modprofile
+    def insertModProfile(self, toInsert):
+        self.db.modprofile.insert(toInsert)
+
+    def findModProfile(self, findCriteria):
+        return self.db.modprofile.find(findCriteria)
+
+    def removeModProfile(self, toRemove):
+        self.db.modprofile.remove(toRemove)
+
     #badges
     def findBadge(self, findCriteria):
         return self.db.badge.find_one(findCriteria)

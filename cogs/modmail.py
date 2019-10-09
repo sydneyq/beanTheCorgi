@@ -39,7 +39,7 @@ class ModMail(commands.Cog):
         embed = discord.Embed(
             title = 'A Mind Café Staff Member says:',
             description = content,
-            color = discord.Color.teal()
+            color = discord.Color.red()
         )
         if link != '':
             embed.set_image(url = link)

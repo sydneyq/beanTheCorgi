@@ -115,7 +115,7 @@ class Help(commands.Cog):
     async def badges(self, ctx, *, type = ''):
         embed = discord.Embed(
             title = 'Badge List',
-            description = 'Use `+badges positions` to see Staff and position badges and `+badges [pageNum]` to see all other badges.',
+            description = 'Use `+badges p` to see Staff/position badges and `+badges [pageNum]` to see all other badges.',
             color = discord.Color.teal()
         )
         embed.set_thumbnail(url = 'https://cdn.discordapp.com/attachments/591611902459641856/593267453363224588/Bean_Icon.png')
@@ -128,7 +128,6 @@ class Help(commands.Cog):
             position_badges += emojis['Moderator'] + ' - Moderator\n'
             position_badges += emojis['MarketingOfficer'] + ' - Marketing Officer\n'
             position_badges += emojis['EventCoordinator'] + ' - Event Coordinator\n'
-            position_badges += emojis['CertifyingTeam'] + ' - Certifying Team\n'
             position_badges += emojis['Certified'] + ' - Certified in Active Listening\n'
             position_badges += emojis['Listener'] + ' - Listener\n'
             position_badges += emojis['CorgiCallResponder'] + ' - Corgi Call Responders\n'
@@ -144,11 +143,11 @@ class Help(commands.Cog):
                 badges += emojis['Earth'] + emojis['Air'] + emojis['Fire'] + emojis['Water'] + ' - Affinities!\n'
                 badges += self.meta.getBadge('Avatar') + ' - Has spent time as all Affinities!\n'
                 badges += self.meta.getBadge('BestedBean') + ' - Defeat Bean in battle!\n'
-                badges += self.meta.getBadge('ArtCompetitionWinner') + self.meta.getBadge('ArtCompetition') + ' - Win and submit art to a server Art Competition, respectively!\n'
+                badges += self.meta.getBadge('ArtCompetitionWinner') + self.meta.getBadge('ArtCompetition') + ' - Win/submit art to an Art Competition, respectively!\n'
                 badges += self.meta.getBadge('EeveeLover') + ' - Got all Eeveelutions!\n'
             else:
                 badges = self.meta.getBadge('First1kMembers') + ' - One of the first 1k members in the server!\n'
-                badges += self.meta.getBadge('LGBTQAI+') + ' - Participated in LGBTQAI+ Awareness Month!\n'
+                badges += self.meta.getBadge('LGBTQIA+') + ' - Participated in LGBTQIA+ Awareness 2019!\n'
 
             embed.add_field(name = 'Badges', value = badges)
 

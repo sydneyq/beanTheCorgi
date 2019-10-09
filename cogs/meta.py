@@ -246,6 +246,9 @@ class Meta:
 
         return ''
 
+    def getFullDateTime(self):
+        return datetime.datetime.now()
+
     def getDateTime(self):
         x = datetime.datetime.now()
         data = {
@@ -375,7 +378,11 @@ class Meta:
         soulmates = user['soulmates']
         soulmates2 = user2['soulmates']
 
+        #don't have spots
         if (not self.canAddSoulmate(member)) or (not self.canAddSoulmate(member2)) :
+            return False
+        #already soulmates
+        if (member2.id in soulmates or member.id in soulmates2):
             return False
 
         soulmates.append(member2.id)
@@ -386,14 +393,14 @@ class Meta:
 
     def removeSoulmate(self, member: discord.Member, member2: discord.Member):
         user = self.getProfile(member)
-        soulmates = user['soulmates']
+        soulmates = list(user['soulmates'])
         soulmates = soulmates.remove(member2.id)
         if soulmates is None:
             soulmates = []
         self.dbConnection.updateProfile({"id": member.id}, {"$set": {"soulmates": soulmates}})
 
         user2 = self.getProfile(member2)
-        soulmates2 = user2['soulmates']
+        soulmates2 = list(user2['soulmates'])
         soulmates2 = soulmates2.remove(member.id)
         if soulmates2 is None:
             soulmates2 = []
