@@ -26,6 +26,10 @@ class Meta:
         with open(filename3) as json_file:
             self.ids = json.load(json_file)
 
+    async def sendEmbedToLog(self, ctx, embed):
+        log = ctx.guild.get_channel(self.ids['LOG_CHANNEL'])
+        await log.send(embed = embed)
+
     def hasRole(self, member:discord.Member, rolename):
         rolename = rolename.lower()
         if rolename in [role.name.lower() for role in member.roles]:
@@ -458,6 +462,15 @@ class Meta:
         'Umbreon',
         'Vaporeon']
         return eeveelutions
+
+    def getMention(self, id:int):
+        return '<@' + str(id) + '>'
+
+    def getUserByID(self, client, id:int):
+        return client.get_user(id)
+
+    def getMemberByID(self, ctx, id:int):
+        return ctx.guild.get_member(id)
 
 class Global(commands.Cog):
 

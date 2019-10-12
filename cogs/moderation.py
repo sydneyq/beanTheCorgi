@@ -52,30 +52,30 @@ class Moderation(commands.Cog):
 
         return profile
 
-    def checkStrikes(self, member: discord.Member):
+    async def checkStrikes(self, ctx, member: discord.Member):
         profile = self.getModProfile(member)
         strikes = profile['strikes']
 
         if strikes >= 10:
-            self.ban(member)
+            await self.ban_func(ctx, member)
             return 'The member was permabanned.'
         elif strikes >= 9:
-            self.blindfold(member)
+            await self.blindfold_func(ctx, member)
             return 'The member was Blindfolded.'
         elif strikes >= 7:
-            self.mute(member, 72)
+            await self.mute_func(ctx, member, 72)
             return 'The member was muted for 72h.'
         elif strikes >= 5:
-            self.mute(member, 24)
+            await self.mute_func(ctx, member, 24)
             return 'The member was muted for 24h.'
         elif strikes >= 3:
-            self.mute(member, 6)
+            await self.mute_func(ctx, member, 6)
             return 'The member was muted for 6h.'
 
     def embedMuted(self, hours: int = -1):
         title = 'You have been muted'
         if hours != -1:
-            title += 'for `'+str(hours)+'` hours'
+            title += ' for `'+str(hours)+'` hours'
         embed = discord.Embed(
             title = title,
             color = discord.Color.red()
@@ -111,34 +111,34 @@ class Moderation(commands.Cog):
         )
         return embed
 
-    async def ban(self, user: discord.User):
+    async def ban_func(self, ctx, user: discord.User):
         await ban(user)
         try:
             await member.send(embed = self.embedBanned())
         except:
             return
 
-    async def unban(self, user: discord.User):
+    async def unban_func(self, user: discord.User):
         await unban(user)
         return
 
-    async def mute(self, member: discord.Member, hrs: int = -1):
-        muted = guild.get_role(445398365606248448)
+    async def mute_func(self, ctx, member: discord.Member, hrs: int = -1):
+        muted = ctx.guild.get_role(445398365606248448)
         await member.add_roles(muted)
         try:
             await member.send(embed = self.embedMuted(hrs))
         except:
             return
 
-    async def unmute(self, member: discord.Member):
-        muted = guild.get_role(445398365606248448)
+    async def unmute_func(self, ctx, member: discord.Member):
+        muted = ctx.guild.get_role(445398365606248448)
         await member.remove_roles(muted)
         try:
             await member.send(embed = self.embedUnmuted())
         except:
             return
 
-    async def blindfold(self, member: discord.Member):
+    async def blindfold_func(self, ctx, member: discord.Member):
         role = guild.get_role(self.ids['BLINDFOLDED_ROLE'])
         await member.add_roles(role)
         try:
@@ -146,7 +146,7 @@ class Moderation(commands.Cog):
         except:
             return
 
-    async def unblindfold(self, member: discord.Member):
+    async def unblindfold_func(self, member: discord.Member):
         role = guild.get_role(self.ids['BLINDFOLDED_ROLE'])
         await member.remove_roles(role)
         try:
@@ -157,7 +157,13 @@ class Moderation(commands.Cog):
     def changeStrikes(self, member:discord.Member, strikes:int):
         if not self.modProfileExists(member.id):
             return False
-        self.dbConnection.updateProfile({"id": member.id}, {"$set": {"strikes": strikes}})
+        self.dbConnection.updateModProfile({"id": member.id}, {"$set": {"strikes": strikes}})
+        return True
+
+    def changeModLogReason(self, id, reason):
+        if self.dbConnection.findModLog({"_id": id}) is None:
+            return False
+        self.dbConnection.updateModLog({"_id": id}, {"$set": {"reason": reason}})
         return True
 
     def getRuleJSON(self, rule: int):
@@ -180,48 +186,76 @@ class Moderation(commands.Cog):
             await ctx.send(embed = self.meta.embedOops())
             return
 
-        await ctx.message.delete()
+        #await ctx.message.delete()
 
         if reason is None or reason == None:
-            reason = 'No reason provided'
+            reason = 'No custom message provided'
 
         profile = self.getModProfile(member)
         before_strikes = profile['strikes']
         after_strikes = profile['strikes'] + self.getAmtStrikesFromRule(rule)
+        if not (self.changeStrikes(member, after_strikes)):
+            await ctx.send(embed = self.meta.embedOops())
+            return
         self.dbConnection.insertModLog({'id': member.id, 'rule': rule, 'reason': reason, 'staff': ctx.author.id, 'date': self.meta.getFullDateTime()})
-        self.changeStrikes(member, after_strikes)
+
+        embed = discord.Embed(
+            color = discord.Color.red()
+        )
+        n = 'You\'ve been striked for: Rule `'+str(rule)+'`'
+        v = 'Strikes: `'+str(before_strikes)+'->'+str(after_strikes)+'`'
+        embed.add_field(name=n, value=v)
+        n = 'Rule `'+str(rule)+'` description'
+        v = self.getRuleJSON(rule)['DESC']
+        embed.add_field(name=n, value=v, inline=False)
+        n = 'Moderator\'s custom message'
+        v = reason
+        embed.add_field(name=n, value=v)
 
         try:
-            embed = discord.Embed(
-                title = 'Consider it done! ✅',
-                color = discord.Color.red()
-            )
-            n = 'You\'ve been striked for: Rule `'+str(rule)+'`'
-            v = 'Strikes: `'+str(before_strikes)+'->'+str(after_strikes)+'`'
-            embed.add_field(name=n, value=v)
-            n = 'Rule `'+str(rule)+'` description'
-            v = self.getRuleJSON['DESC']
-            embed.add_field(name=n, value=v)
-            n = 'Moderator\'s custom message'
-            v = reason
-            embed.add_field(name=n, value=v)
             await member.send(embed = embed)
         except:
-            ctx.send('Could not send them Strike message.')
+            await ctx.send('Could not send them Strike message.')
 
         action = 'No further action was taken.'
         if not (before_strikes == after_strikes):
-            action = self.checkStrikes(member)
+            a = await self.checkStrikes(ctx, member)
+            if (a is not None):
+                action = a
 
         embed = discord.Embed(
-            title = 'Consider it done! ✅',
             color = discord.Color.red()
         )
-        n = member.name + ' has been striked. `['+ str(before_strikes) + '->' + str(after_strikes)+']`'
-        v = 'Rule `'+str(rule)+'`: ```' + reason + '```'
+        n = 'New Strike'
+        v = member.mention + ' has been striked. `['+ str(before_strikes) + '->' + str(after_strikes)+']`'
+        v += '\n**Moderator:** ' + ctx.author.mention
+        v += '\nRule `'+str(rule)+'`: ```' + reason + '```'
         embed.add_field(name=n, value=v)
         embed.set_footer(text = action)
         await ctx.send(embed = embed)
+        await self.meta.sendEmbedToLog(ctx, embed)
+
+    @commands.command(aliases=['updatestrike', 'changestrike'])
+    async def editstrikes(self, ctx, member: discord.Member, strikes:int):
+        if not self.meta.isAdmin(ctx.author):
+            await ctx.send(embed = self.meta.embedOops())
+            return
+
+        embed = discord.Embed(
+            color = discord.Color.teal()
+        )
+
+        profile = self.getModProfile(member)
+        s = str(profile['strikes'])
+
+        n = 'Strike Count Change'
+        v = '' + ctx.author.mention + ' changed ' + member.mention + '\'s Strikes'
+        v += '\n`' + s + '->' + str(strikes) + '`'
+        embed.add_field(name = n, value = v)
+        self.changeStrikes(member, strikes)
+
+        await ctx.send(embed = embed)
+        await self.meta.sendEmbedToLog(ctx, embed)
 
     @commands.command(aliases=['deletestrike', 'delstrike'])
     async def removestrike(self, ctx, strikeID: objectid.ObjectId = None):
@@ -246,7 +280,7 @@ class Moderation(commands.Cog):
         profile = self.getModProfile(member)
         before_strikes = profile['strikes']
         after_strikes = before_strikes - self.getAmtStrikesFromRule(modlog['rule'])
-        self.changeStrikes(member, strikes)
+        self.changeStrikes(member, after_strikes)
 
         self.dbConnection.removeModLog({'_id' : strikeID})
 
@@ -256,6 +290,39 @@ class Moderation(commands.Cog):
             color = discord.Color.red()
         )
         await ctx.send(embed = embed)
+
+    @commands.command(aliases=['clearModLog'])
+    async def clearLog(self, ctx, member: discord.Member):
+        if not self.meta.isAdmin(ctx.author):
+            await ctx.send(embed = self.meta.embedOops())
+            return
+
+        docs = self.dbConnection.findModLogs({'id' : member.id})
+        for doc in docs:
+            self.dbConnection.removeModLog({'_id' : doc['_id']})
+
+        await ctx.send(embed = self.meta.embedDone())
+
+    @commands.command(aliases=['demute'])
+    async def unmute(self, ctx, member:discord.Member):
+        if not self.meta.isMod(ctx.author):
+            return
+        await self.unmute_func(ctx, member)
+        await ctx.send(embed = self.meta.embedDone())
+
+    @commands.command()
+    async def mute(self, ctx, member:discord.Member, hrs: int = -1):
+        if not self.meta.isMod(ctx.author):
+            return
+        await self.mute_func(ctx, member, hrs)
+        await ctx.send(embed = self.meta.embedDone())
+
+    @commands.command()
+    async def ban(self, ctx, member:discord.Member, hrs: int, *, reason):
+        if not self.meta.isAdmin(ctx.author):
+            return
+        await self.ban_func(ctx, member)
+        await ctx.send(embed = self.meta.embedDone())
 
     @commands.command(aliases=['mp', 'modlog', 'ml', 'log', 'strikes'])
     async def modprofile(self, ctx, member: discord.Member = None):
@@ -279,9 +346,10 @@ class Moderation(commands.Cog):
         logs = self.getModLogs(member)
         numLogs = logs.count()
         #they have no logs
-        if not self.modProfileExists(member.id) or numLogs == 0:
+        if not self.modProfileExists(member.id):
             embed = discord.Embed(
                 title = member.name + ' has no logs.',
+                description = 'Strikes: `'+str(self.getModProfile(member)['strikes'])+'`',
                 color = discord.Color.teal()
             )
             try:
@@ -315,6 +383,48 @@ class Moderation(commands.Cog):
         except:
             await ctx.send(embed = self.meta.embedOops())
         return
+
+    @commands.command(aliases=['strikecase', 'seestrike'])
+    async def case(self, ctx, case_id: objectid.ObjectId = None):
+        if not self.meta.isMod(ctx.author):
+            return
+
+        if case_id is None:
+            embed = discord.Embed(
+                description = 'Correct Usage: `+case caseID`.',
+                color = discord.Color.red()
+            )
+            ctx.send(embed = embed)
+            return
+
+        case = self.dbConnection.findModLog({'_id' : case_id})
+
+        embed = discord.Embed(
+            title = 'Case `'+str(case_id)+'`',
+            color = discord.Color.red()
+        )
+
+        n = 'Details'
+        v = '**Offender:** ' + self.meta.getMention(case['id'])
+        v += '\n**Moderator:** ' + self.meta.getMention(case['staff'])
+        v += '\n**Date:** ' + self.meta.formatDateTimeString(case['date'])
+        embed.add_field(name=n, value=v, inline=False)
+        n = 'Rule `' + str(case['rule']) + '`'
+        v = '**Custom message:** ' + case['reason']
+        embed.add_field(name=n, value=v)
+        embed.set_thumbnail(url = self.meta.getUserByID(self.client, case['id']).avatar_url)
+
+        await ctx.send(embed = embed)
+
+    @commands.command(aliases=['reason'])
+    async def updateCase(self, ctx, case_id: objectid.ObjectId, *, reason):
+        if not self.meta.isMod(ctx.author):
+            return
+
+        if (self.changeModLogReason(case_id, reason)):
+            await ctx.send(embed = self.meta.embedDone())
+        else:
+            await ctx.send(embed = self.meta.embedOops())
 
     @commands.command(aliases=['strikehelp', 'modsystem'])
     async def strikesystem(self, ctx):

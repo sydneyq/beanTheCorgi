@@ -65,6 +65,9 @@ class Database:
     def countModLogs(self, findCriteria):
         return self.db.modlog.count(findCriteria)
 
+    def updateModLog(self, updateCritera, change):
+        self.db.modlog.update(updateCritera, change)
+
     #modprofile
     def insertModProfile(self, toInsert):
         self.db.modprofile.insert(toInsert)
@@ -74,6 +77,9 @@ class Database:
 
     def removeModProfile(self, toRemove):
         self.db.modprofile.remove(toRemove)
+
+    def updateModProfile(self, updateCritera, change):
+        self.db.modprofile.update(updateCritera, change)
 
     #badges
     def findBadge(self, findCriteria):
