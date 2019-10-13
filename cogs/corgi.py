@@ -49,28 +49,35 @@ class Corgi(commands.Cog):
             await ctx.send(embed = self.embedCorgi(corgi))
 
     def getCorgi(self, corgi):
+        corgi = corgi.lower().capitalize()
         corgi = self.dbConnection.findMeta({"id": corgi})
         return corgi
 
     def embedCorgi(self, corgi):
-        corgi = self.getCorgi(corgi)
+        corgi_profile = self.getCorgi(corgi)
         str = ''
 
-        embed2 = discord.Embed(
-            title = 'Squad Listeners',
+        embed = discord.Embed(
+            title = corgi,
             color = discord.Color.teal()
         )
 
-        embed2.add_field(name=self.emojis['Tea'] + ' Tea Squad `('+str(tea_num)+')`',value=tea_names)
-        embed2.add_field(name=self.emojis['Coffee'] + ' Coffee Squad `('+str(coffee_num)+'`)',value=coffee_names)
+        mood = self.getMood(corgi)
 
-        if tea_num > coffee_num:
-            embed2.set_thumbnail(url = 'https://cdn.discordapp.com/attachments/591611902459641856/613918428293627914/teamteaBean.png')
-        elif coffee_num > tea_num:
-            embed2.set_thumbnail(url = 'https://cdn.discordapp.com/attachments/591611902459641856/613918442034298890/teamcoffeeBean.png')
-            
+        embed.set_image(url = self.getMoodImage(mood))
+
+        n = 'Mood: ' + mood
+        v = 'Keep your Squad Corgi happy buy `+buy`ing and `+feed`ing it Biscuits from the `+store`!'
+        embed.add_field(name = n, value = v)
         return embed
 
+    def getMood(corgi):
+        return
+
+    def getMoodImage(mood):
+        return
+
+    #on_message: 3 hours after last biscuit corgi has chance of becoming sad
 
 def setup(client):
     database_connection = Database()

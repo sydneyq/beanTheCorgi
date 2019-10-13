@@ -436,6 +436,22 @@ class Moderation(commands.Cog):
         await ctx.send(embed = embed)
         return
 
+    @commands.command()
+    async def rules(self, ctx):
+        embed = discord.Embed(
+            color = discord.Color.red()
+        )
+
+        n = 'Mind Café Rules'
+        v = ''
+        for rule in self.rules:
+            v += '\n**'+ str(rule["NUM"]) + ' - ' + rule['TITLE'] + '**'
+            v += ' | `'+str(rule['STRIKES'])+'` Strikes'
+        embed.add_field(name = n, value = v, inline = False)
+
+        await ctx.send(embed = embed)
+        return
+
 def setup(client):
     database_connection = Database()
     meta_class = Meta(database_connection)
