@@ -32,7 +32,6 @@ class Corgi(commands.Cog):
 
     @commands.command(aliases=['c'])
     async def corgi(self, ctx, corgi = None):
-        corgi = corgi.capitalize()
         isTea = True
         user = self.meta.getProfile(ctx.author)
         if corgi is None or not(corgi == 'Mocha' or corgi == 'Matcha'):
@@ -44,40 +43,157 @@ class Corgi(commands.Cog):
                     corgi = 'Mocha'
                 else:
                     corgi = 'Matcha'
-                await ctx.send(embed = self.embedCorgi(user['squad']))
-        else:
-            await ctx.send(embed = self.embedCorgi(corgi))
+        await ctx.send(embed = self.embedCorgi(corgi))
 
     def getCorgi(self, corgi):
-        corgi = corgi.lower().capitalize()
-        corgi = self.dbConnection.findMeta({"id": corgi})
-        return corgi
+        corgi_profile = self.dbConnection.findMeta({"id": corgi})
+        return corgi_profile
 
     def embedCorgi(self, corgi):
         corgi_profile = self.getCorgi(corgi)
         str = ''
 
-        embed = discord.Embed(
-            title = corgi,
-            color = discord.Color.teal()
-        )
+        v = 'Keep your Squad Corgi happy by `+feed`ing it Biscuits when they\'re sad or hungry!'
+        v += ' Biscuits cost 100 coins each.'
 
         mood = self.getMood(corgi)
-
-        embed.set_image(url = self.getMoodImage(mood))
-
-        n = 'Mood: ' + mood
-        v = 'Keep your Squad Corgi happy buy `+buy`ing and `+feed`ing it Biscuits from the `+store`!'
-        embed.add_field(name = n, value = v)
+        embed = discord.Embed(
+            title = corgi + ' is feeling `' + mood + '`',
+            description = v,
+            color = discord.Color.teal()
+        )
+        embed.set_thumbnail(url = self.getMoodImage(mood))
         return embed
 
-    def getMood(corgi):
+    def getMood(self, corgi):
+        mood = self.getCorgi(corgi)['mood']
+        if mood == 'hungry' or mood == 'sad':
+            return mood
+        elif mood == '' or random.random() < .1:
+            moods = ['awake',
+            'sleepy',
+            'playful',
+            'smiley',
+            'hype',
+            'a-okay',
+            'happy',
+            'excited',
+            'done',
+            'tired',
+            'sneaky']
+            mood = random.choice(moods)
+            self.setMood(corgi, mood)
+        return mood
+
+    def isHungry(self, corgi):
+        mood = self.getMood(corgi)
+        if mood == 'hungry' or mood == 'sad':
+            return True
+        return False
+
+    def getMoodImage(self, mood):
+        return self.corgi[mood]
+
+    @commands.command()
+    async def feed(self, ctx):
+        #get person's squad
+        user = self.meta.getProfile(ctx.author)
+        squad = user['squad']
+        corgi = 'Matcha'
+        if squad == '':
+            await ctx.send(embed = self.meta.embedOops())
+            return
+        else:
+            if squad == 'Coffee':
+                corgi = 'Mocha'
+        #check if corgi is sad or hungry
+        mood = self.getMood(corgi)
+        if not (mood == 'sad' or mood == 'hungry'):
+            embed = discord.Embed(
+                title = corgi + ' isn\'t hungry right now!',
+                description = 'Feed your Squad Corgi biscuits when they\'re hungry or sad!',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
+        #check if they have 100 coins
+        if user['coins'] < 100:
+            embed = discord.Embed(
+                title = 'You need 100 coins to buy a Biscuit!',
+                description = self.meta.printCurrency(ctx.author),
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
+            return
+        #subtract 100 from their total
+        self.meta.subCoins(ctx.author, 100)
+        #reset time on that corgi
+        self.setNewTime(corgi)
+        #show thankful corgi embed
+        embed = discord.Embed(
+            title = corgi + ' noms up the Biscuit!',
+            description = 'You\'ve gained `1` Cake for feeding ' + corgi + '!',
+            color = discord.Color.teal()
+        )
+        embed.set_image(url = self.getMoodImage('thankful'))
+        await ctx.send(embed = embed)
+        #change corgi mood to ''
+        self.setMood(corgi, '')
+        #give person a cake "candy" on profile
+        self.meta.addCake(ctx.author)
         return
 
-    def getMoodImage(mood):
+    def setNewTime(self, corgi):
+        self.dbConnection.updateMeta({"id": corgi}, {"$set": {"fed": self.meta.getDateTime()}})
         return
 
-    #on_message: 3 hours after last biscuit corgi has chance of becoming sad
+    def setMood(self, corgi, mood):
+        self.dbConnection.updateMeta({"id": corgi}, {"$set": {"mood": mood}})
+        return
+
+    async def makeCorgiHungry(self, corgi):
+        choices = ['hungry', 'sad']
+        mood = random.choice(choices)
+        self.setMood(corgi, mood)
+
+        embed = discord.Embed(
+            title = corgi + ' is feeling ' +mood+ '!',
+            description = '`+feed` your Squad Corgi to keep them happy!\nBiscuits cost 100 coins each.',
+            color = discord.Color.teal()
+        )
+        embed.set_image(url = self.getMoodImage(mood))
+
+        squad = 'Coffee'
+        if corgi == 'Matcha':
+            squad = 'Tea'
+        channel = self.meta.getSquadChannel(ctx, squad)
+        await channel.send(embed = embed)
+        return
+
+    def canMakeHungry(self, corgi):
+        if self.isHungry(corgi):
+            return False
+        profile = self.getCorgi(corgi)
+        fed = profile['fed']
+        if fed == '':
+            return True
+        elif not self.meta.hasBeenMinutes(60, fed, self.meta.getDateTime()):
+            return False
+        return True
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author.bot:
+            return
+        if isinstance(message.channel, discord.DMChannel):
+            return
+        if random.random() < .3:
+            if self.canMakeHungry('Mocha'):
+                await self.makeCorgiHungry('Mocha')
+            if self.canMakeHungry('Matcha'):
+                await self.makeCorgiHungry('Matcha')
+            else:
+                return
 
 def setup(client):
     database_connection = Database()

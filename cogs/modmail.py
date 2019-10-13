@@ -20,6 +20,9 @@ class ModMail(commands.Cog):
         user_id = self.meta.getChannelOwnerID(ctx.channel)
         user = discord.utils.get(self.client.get_all_members(), id=user_id)
 
+        if user is None:
+            await ctx.send('Sorry, I can\'t send your message. The user has left the server.')
+
         content = ctx.message.clean_content
         #if content.startswith('+'):
         content = content[content.find(' ') + 1:]

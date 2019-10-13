@@ -145,7 +145,7 @@ class Meta:
 
         profile = self.dbConnection.findProfile({"id": id})
         if profile is None:
-            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'gifts': 0, 'affinity':'', 'daily': '', 'badges':[], 'booster': 0,'companions' : [], 'soulmates' : []})
+            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'gifts': 0, 'affinity':'', 'daily': '', 'badges':[], 'booster': 0,'companions' : [], 'soulmates' : [], 'cakes': 0})
             profile = self.dbConnection.findProfile({"id": id})
 
         return profile
@@ -180,6 +180,47 @@ class Meta:
         badges.append(badge)
         self.dbConnection.updateProfile({"id": member.id}, {"$set": {"badges": badges}})
         return True
+
+    def subCake(self, member: discord.Member):
+        user = self.getProfile(member)
+        cakes = user['cakes']
+        cakes -= 1
+        if (cakes < 0):
+            return False
+        self.dbConnection.updateProfile({"id": member.id}, {"$set": {"cakes": cakes}})
+        return True
+
+    def addCake(self, member: discord.Member):
+        user = self.getProfile(member)
+        cakes = user['cakes']
+        cakes += 1
+        self.dbConnection.updateProfile({"id": member.id}, {"$set": {"cakes": cakes}})
+        return
+
+    def subCoins(self, member: discord.Member, amt:int):
+        user = self.getProfile(member)
+        coins = user['coins']
+        coins -= amt
+
+        #cannot afford
+        if coins < 0:
+            return False
+
+        self.dbConnection.updateProfile({"id": user['id']}, {"$set": {"coins": coins}})
+        return True
+
+    def addCoins(self, member: discord.Member, amt:int):
+        user = self.getProfile(member)
+        coins = user['coins']
+        coins += amt
+        self.dbConnection.updateProfile({"id": user['id']}, {"$set": {"coins": coins}})
+        return True
+
+    def printCurrency(self, member: discord.Member):
+        user = self.getProfile(member)
+        helped = user['helped']
+        coins = user['coins']
+        return 'You have:\t`' + str(helped) + '` Help Points ' + self.emojis['HelpPoint'] + '\t`' + str(coins) + '` Coins ' + self.emojis['Coin']
 
     def hasCompanion(self, member: discord.Member, companion):
         user = self.getProfile(member)
@@ -472,6 +513,12 @@ class Meta:
     def getMemberByID(self, ctx, id:int):
         return ctx.guild.get_member(id)
 
+    def getSquadChannel(self, ctx, squad):
+        id = self.ids['SQUAD1_CHANNEL']
+        if squad == 'Tea':
+            id = self.ids['SQUAD2_CHANNEL']
+        return ctx.guild.get_channel(id)
+
 class Global(commands.Cog):
 
     def __init__(self, client, database, meta):
@@ -494,8 +541,8 @@ class Global(commands.Cog):
         if self.meta.isBotOwner(ctx.author):
             guild = ctx.guild
             #self.dbConnection.renameColumn("given", "gifted")
-            #self.dbConnection.makeColumn("soulmates", [])
-            #self.dbConnection.removeColumn("spouse")
+            self.dbConnection.makeColumn("cakes", 0)
+            #self.dbConnection.removeColumn("cakes")
             '''
             profiles = self.dbConnection.findProfiles({})
             for profile in profiles:

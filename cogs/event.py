@@ -61,6 +61,63 @@ class Event(commands.Cog):
         with open(filename3) as json_file:
             self.ids = json.load(json_file)
 
+    @commands.command(aliases=[])
+    async def cake(self, ctx, member: discord.Member):
+        #check has cake
+        if not self.meta.subCake(ctx.author):
+            await ctx.send(embed = self.meta.embedOops())
+            return
+        if member.bot:
+            await ctx.send(embed = self.meta.embedOops())
+            return
+
+        titles = ['Sir',
+        'Knight',
+        'Madame',
+        'Prince',
+        'Charming',
+        'Flopping',
+        'Fuzzy',
+        'Colonel',
+        'President',
+        'Brother',
+        'Cakey']
+        prefixes = ['Sparkle',
+        'Wild',
+        'Fire-breathing',
+        'Googly',
+        'Bumper',
+        'Noodle',
+        'Scallop',
+        'Pumpkin',
+        'Pickle',
+        'Magical',
+        'Cake',
+        'Bob']
+        suffixes = ['Sparkles',
+        'Pixie',
+        'Unicorn',
+        'Slayer',
+        'Wizard',
+        'Pants',
+        'Wacky',
+        'Face',
+        'Doodle',
+        'Foot',
+        'Caked']
+        emojis = ['🍅', '💛', '🛀', '🍞', '😇', '😊', '🕵', '🍤', '🍢', '💒', '⌛', '🏩', '🐢', '🐑', '☁', '😗']
+        name = random.choice(titles) + ' ' + random.choice(prefixes) + ' ' + random.choice(suffixes) + ' ' + random.choice(emojis)
+
+        await member.edit(nick = name)
+
+        embed = discord.Embed(
+            title = ctx.author.name + ' played a trick on `' + member.name + '`!',
+            description = 'Their name is now: `'+name+'`',
+            color = discord.Color.teal()
+        )
+        await ctx.send(embed = embed)
+        return
+
     @commands.command(aliases=['2019'])
     async def badge2019(self, ctx):
         user = self.meta.getProfile(ctx.author)
