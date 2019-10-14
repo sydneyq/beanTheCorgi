@@ -94,33 +94,33 @@ class Triggers(commands.Cog):
         #mod added
         elif roleWasAdded(self.ids['MOD_ROLE']):
             e = embedRoleAdded('Mods')
-            await heaven.send(e)
-            await mods.send(e)
+            await heaven.send(embed = e)
+            await mods.send(embed = e)
         #mod removed
         elif roleWasRemoved(self.ids['MOD_ROLE']):
             e = embedRoleRemoved('Mods')
-            await heaven.send(e)
-            await mods.send(e)
+            await heaven.send(embed = e)
+            await mods.send(embed = e)
         #PM added
         elif roleWasAdded(self.ids['MARKETINGOFFICER_ROLE']):
             e = embedRoleAdded('Partnership Managers')
-            await heaven.send(e)
-            await marketing.send(e)
+            await heaven.send(embed = e)
+            await marketing.send(embed = e)
         #PM removed
         elif roleWasRemoved(self.ids['MARKETINGOFFICER_ROLE']):
             e = embedRoleRemoved('Partnership Managers')
-            await heaven.send(e)
-            await marketing.send(e)
+            await heaven.send(embed = e)
+            await marketing.send(embed = e)
         #EC added
         elif roleWasAdded(self.ids['EVENTCOORDINATOR_ROLE']):
             embedRoleAdded('Event Coordinators')
-            await heaven.send(e)
-            await events.send(e)
+            await heaven.send(embed = e)
+            await events.send(embed = e)
         #EC removed
         elif roleWasRemoved(self.ids['EVENTCOORDINATOR_ROLE']):
             e = embedRoleRemoved('Event Coordinators')
-            await heaven.send(e)
-            await events.send(e)
+            await heaven.send(embed = e)
+            await events.send(embed = e)
         #EC added
         elif roleWasAdded(self.ids['CERTIFIED_ROLE']):
             await casual.send(embedRoleAdded('Certified in Active Listening'))

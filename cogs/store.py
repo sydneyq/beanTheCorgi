@@ -327,6 +327,7 @@ class Store(commands.Cog):
                         if companion == 'Eevee':
                             if self.meta.hasAllEvolutionsOf(ctx.author, 'Eevee'):
                                 title += '\nAnd with this, you got all Eeveelutions! Here, take this badge: ' + self.meta.getBadge('EeveeLover')
+                                self.meta.addBadgeToProfile(ctx.author, 'EeveeLover')
 
                 #coin gift
                 elif item == 'Coin Gift':

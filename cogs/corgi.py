@@ -34,9 +34,19 @@ class Corgi(commands.Cog):
     async def corgi(self, ctx, corgi = None):
         isTea = True
         user = self.meta.getProfile(ctx.author)
-        if corgi is None or not(corgi == 'Mocha' or corgi == 'Matcha'):
+        if corgi is None or not(corgi.lower().capitalize() == 'Mocha' or corgi.lower().capitalize() == 'Matcha'):
             if user['squad'] == '':
-                await ctx.send(embed = self.meta.embedOops())
+                if corgi == '':
+                    await ctx.send(embed = self.meta.embedOops())
+                    return
+                else:
+                    if corgi == 'mocha' or corgi.lower() == 'tea':
+                        corgi = 'Mocha'
+                    elif corgi == 'matcha' or corgi.lower() == 'coffee':
+                        corgi = 'Matcha'
+                    else:
+                        await ctx.send(embed = self.meta.embedOops())
+                        return
             else:
                 if user['squad'] != 'Tea':
                     isTea = False
@@ -53,7 +63,7 @@ class Corgi(commands.Cog):
         corgi_profile = self.getCorgi(corgi)
         str = ''
 
-        v = 'Keep your Squad Corgi happy by `+feed`ing it Biscuits when they\'re sad or hungry!'
+        v = 'Keep your Squad Corgi happy by `+feed`ing them Biscuits when they\'re sad or hungry!'
         v += ' Biscuits cost 100 coins each.'
 
         mood = self.getMood(corgi)
@@ -69,7 +79,7 @@ class Corgi(commands.Cog):
         mood = self.getCorgi(corgi)['mood']
         if mood == 'hungry' or mood == 'sad':
             return mood
-        elif mood == '' or random.random() < .1:
+        elif mood == '' or random.random() < .05:
             moods = ['awake',
             'sleepy',
             'playful',
@@ -131,16 +141,16 @@ class Corgi(commands.Cog):
         self.setNewTime(corgi)
         #show thankful corgi embed
         embed = discord.Embed(
-            title = corgi + ' noms up the Biscuit!',
+            title = corgi + ' noms up '+ctx.author.name+'\'s Biscuit!',
             description = 'You\'ve gained `1` Cake for feeding ' + corgi + '!',
             color = discord.Color.teal()
         )
-        embed.set_image(url = self.getMoodImage('thankful'))
+        embed.set_thumbnail(url = self.getMoodImage('thankful'))
         await ctx.send(embed = embed)
         #change corgi mood to ''
         self.setMood(corgi, '')
         #give person a cake "candy" on profile
-        self.meta.addCake(ctx.author)
+        self.meta.addCake(ctx.author, 1)
         return
 
     def setNewTime(self, corgi):
@@ -151,7 +161,7 @@ class Corgi(commands.Cog):
         self.dbConnection.updateMeta({"id": corgi}, {"$set": {"mood": mood}})
         return
 
-    async def makeCorgiHungry(self, corgi):
+    async def makeCorgiHungry(self, guild, corgi):
         choices = ['hungry', 'sad']
         mood = random.choice(choices)
         self.setMood(corgi, mood)
@@ -161,12 +171,12 @@ class Corgi(commands.Cog):
             description = '`+feed` your Squad Corgi to keep them happy!\nBiscuits cost 100 coins each.',
             color = discord.Color.teal()
         )
-        embed.set_image(url = self.getMoodImage(mood))
+        embed.set_thumbnail(url = self.getMoodImage(mood))
 
         squad = 'Coffee'
         if corgi == 'Matcha':
             squad = 'Tea'
-        channel = self.meta.getSquadChannel(ctx, squad)
+        channel = self.meta.getSquadChannel(guild, squad)
         await channel.send(embed = embed)
         return
 
@@ -189,9 +199,9 @@ class Corgi(commands.Cog):
             return
         if random.random() < .3:
             if self.canMakeHungry('Mocha'):
-                await self.makeCorgiHungry('Mocha')
+                await self.makeCorgiHungry(message.guild, 'Mocha')
             if self.canMakeHungry('Matcha'):
-                await self.makeCorgiHungry('Matcha')
+                await self.makeCorgiHungry(message.guild, 'Matcha')
             else:
                 return
 

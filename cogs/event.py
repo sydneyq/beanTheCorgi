@@ -61,12 +61,37 @@ class Event(commands.Cog):
         with open(filename3) as json_file:
             self.ids = json.load(json_file)
 
+    @commands.command(aliases=['givecake'])
+    async def gcake(self, ctx, member: discord.Member):
+        if not self.meta.isBotOwner(ctx.author):
+            await ctx.send(embed = self.meta.embedOops())
+            return
+        else:
+            self.meta.addCake(member, 1)
+            await ctx.send(embed = self.meta.embedDone())
+            return
+
+    @commands.command(aliases=['takecake'])
+    async def tcake(self, ctx, member: discord.Member):
+        if not self.meta.isBotOwner(ctx.author):
+            await ctx.send(embed = self.meta.embedOops())
+            return
+        else:
+            self.meta.subCake(member, 1)
+            await ctx.send(embed = self.meta.embedDone())
+            return
+
     @commands.command(aliases=[])
     async def cake(self, ctx, member: discord.Member):
+        #can't cake admins
+        if self.meta.isAdmin(member):
+            await ctx.send(embed = self.meta.embedOops())
+            return
         #check has cake
         if not self.meta.subCake(ctx.author):
             await ctx.send(embed = self.meta.embedOops())
             return
+        #can't cake bots
         if member.bot:
             await ctx.send(embed = self.meta.embedOops())
             return
@@ -81,7 +106,9 @@ class Event(commands.Cog):
         'Colonel',
         'President',
         'Brother',
-        'Cakey']
+        'Cakey',
+        'Kooky',
+        'Fabulous']
         prefixes = ['Sparkle',
         'Wild',
         'Fire-breathing',
@@ -93,7 +120,9 @@ class Event(commands.Cog):
         'Pickle',
         'Magical',
         'Cake',
-        'Bob']
+        'Bob',
+        'Cupcake',
+        'Bork']
         suffixes = ['Sparkles',
         'Pixie',
         'Unicorn',
@@ -104,14 +133,15 @@ class Event(commands.Cog):
         'Face',
         'Doodle',
         'Foot',
-        'Caked']
-        emojis = ['🍅', '💛', '🛀', '🍞', '😇', '😊', '🕵', '🍤', '🍢', '💒', '⌛', '🏩', '🐢', '🐑', '☁', '😗']
+        'Caked',
+        'Socks']
+        emojis = ['🍅', '💛', '🛀', '🍞', '😇', '😊', '🕵', '🍤', '🍢', '💒', '⌛', '🏩', '🐢', '🐑', '☁', '😗', '😲', '🐬', '💐']
         name = random.choice(titles) + ' ' + random.choice(prefixes) + ' ' + random.choice(suffixes) + ' ' + random.choice(emojis)
 
         await member.edit(nick = name)
 
         embed = discord.Embed(
-            title = ctx.author.name + ' played a trick on `' + member.name + '`!',
+            title = ctx.author.name + ' caked `' + member.name + '`!',
             description = 'Their name is now: `'+name+'`',
             color = discord.Color.teal()
         )

@@ -181,19 +181,19 @@ class Meta:
         self.dbConnection.updateProfile({"id": member.id}, {"$set": {"badges": badges}})
         return True
 
-    def subCake(self, member: discord.Member):
+    def subCake(self, member: discord.Member, amt:int = 1):
         user = self.getProfile(member)
         cakes = user['cakes']
-        cakes -= 1
+        cakes -= amt
         if (cakes < 0):
             return False
         self.dbConnection.updateProfile({"id": member.id}, {"$set": {"cakes": cakes}})
         return True
 
-    def addCake(self, member: discord.Member):
+    def addCake(self, member: discord.Member, amt:int = 1):
         user = self.getProfile(member)
         cakes = user['cakes']
-        cakes += 1
+        cakes += amt
         self.dbConnection.updateProfile({"id": member.id}, {"$set": {"cakes": cakes}})
         return
 
@@ -513,11 +513,11 @@ class Meta:
     def getMemberByID(self, ctx, id:int):
         return ctx.guild.get_member(id)
 
-    def getSquadChannel(self, ctx, squad):
-        id = self.ids['SQUAD1_CHANNEL']
+    def getSquadChannel(self, guild, squad):
+        id = self.ids['SQUAD_COFFEE_CHANNEL']
         if squad == 'Tea':
-            id = self.ids['SQUAD2_CHANNEL']
-        return ctx.guild.get_channel(id)
+            id = self.ids['SQUAD_TEA_CHANNEL']
+        return guild.get_channel(id)
 
 class Global(commands.Cog):
 
