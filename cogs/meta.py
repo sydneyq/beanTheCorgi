@@ -26,6 +26,45 @@ class Meta:
         with open(filename3) as json_file:
             self.ids = json.load(json_file)
 
+    async def confirm(self, ctx, responder: discord.Member, *, msg = None):
+        if msg is None:
+            msg = 'Are you sure?'
+
+        embed = discord.Embed(
+            title = msg,
+            description = 'Please use the reactions of this message.'
+            color = discord.Color.teal()
+        )
+        msg = await ctx.send(embed = embed)
+        await msg.add_reaction('✅')
+        await msg.add_reaction('⛔')
+
+        emoji = ''
+        def check(reaction, user2):
+            nonlocal emoji
+            emoji = str(reaction.emoji)
+            return user2 == responder and (str(reaction.emoji) == '✅' or str(reaction.emoji) == '⛔')
+
+        try:
+            reaction, user2 = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
+        except asyncio.TimeoutError:
+            embed = discord.Embed(
+                title = msg,
+                description = 'Choice timed out.'
+                color = discord.Color.red()
+            )
+            await ctx.send(embed = embed)
+            return False
+        else:
+            if emoji == '⛔':
+                embed = discord.Embed(
+                    title = 'Action canceled.',
+                    color = discord.Color.red()
+                )
+                await ctx.send(embed = embed)
+                return False
+            return True
+
     async def sendEmbedToLog(self, ctx, embed):
         log = ctx.guild.get_channel(self.ids['LOG_CHANNEL'])
         await log.send(embed = embed)
@@ -145,7 +184,7 @@ class Meta:
 
         profile = self.dbConnection.findProfile({"id": id})
         if profile is None:
-            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'gifts': 0, 'affinity':'', 'daily': '', 'badges':[], 'booster': 0,'companions' : [], 'soulmates' : [], 'cakes': 0})
+            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'gifts': 0, 'affinity':'', 'daily': '', 'badges':[], 'booster': 0,'companions' : [], 'soulmates' : [], 'cakes': 0, 'gems': 0})
             profile = self.dbConnection.findProfile({"id": id})
 
         return profile
@@ -215,6 +254,30 @@ class Meta:
         coins += amt
         self.dbConnection.updateProfile({"id": user['id']}, {"$set": {"coins": coins}})
         return True
+
+    def subGems(self, member: discord.Member, amt:int):
+        user = self.getProfile(member)
+        gems = user['gems']
+        gems -= amt
+
+        #cannot afford
+        if gems < 0:
+            return False
+
+        self.dbConnection.updateProfile({"id": user['id']}, {"$set": {"gems": gems}})
+        return True
+
+    def addGems(self, member: discord.Member, amt:int):
+        user = self.getProfile(member)
+        gems = user['gems']
+        gems += amt
+        self.dbConnection.updateProfile({"id": user['id']}, {"$set": {"gems": gems}})
+        return True
+
+    def getGems(self, member: discord.Member):
+        user = self.getProfile(member)
+        gems = user['gems']
+        return gems
 
     def printCurrency(self, member: discord.Member):
         user = self.getProfile(member)
@@ -504,6 +567,16 @@ class Meta:
         'Vaporeon']
         return eeveelutions
 
+    def getRecorded(self):
+        list = self.getEeveelutions()
+        list.append('Ditto')
+        return list
+
+    def isRecorded(self, companion):
+        if companion in self.getRecorded():
+            return True
+        return False
+
     def getMention(self, id:int):
         return '<@' + str(id) + '>'
 
@@ -541,7 +614,7 @@ class Global(commands.Cog):
         if self.meta.isBotOwner(ctx.author):
             guild = ctx.guild
             #self.dbConnection.renameColumn("given", "gifted")
-            self.dbConnection.makeColumn("cakes", 0)
+            self.dbConnection.makeColumn("gems", 0)
             #self.dbConnection.removeColumn("cakes")
             '''
             profiles = self.dbConnection.findProfiles({})

@@ -65,6 +65,9 @@ class Currency(commands.Cog):
         cakes = user['cakes']
         embed.add_field(name=self.emojis['Cake'] + " Cakes", value='`' + str(cakes) + '`', inline=True)
 
+        gems = user['gems']
+        embed.add_field(name=self.emojis['Gem'] + " Gems", value='`' + str(gems) + '`', inline=True)
+
         embed.set_thumbnail(url = pic)
         await ctx.send(embed = embed)
 

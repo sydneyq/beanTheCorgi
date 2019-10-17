@@ -105,24 +105,31 @@ class Event(commands.Cog):
         'Fuzzy',
         'Colonel',
         'President',
-        'Brother',
+        'Best',
+        'Lovin\'',
         'Cakey',
         'Kooky',
-        'Fabulous']
-        prefixes = ['Sparkle',
+        'Fabulous',
+        'Spikey',
+        'Zoomin\'',
         'Wild',
         'Fire-breathing',
         'Googly',
-        'Bumper',
+        'Spooky']
+        prefixes = ['Sparkle',
+        'Ice Cream',
+        'Halloween',
+        'Candle',
         'Noodle',
         'Scallop',
         'Pumpkin',
         'Pickle',
-        'Magical',
+        'Dotted',
         'Cake',
-        'Bob',
         'Cupcake',
-        'Bork']
+        'Bork',
+        'Glitter',
+        'Party']
         suffixes = ['Sparkles',
         'Pixie',
         'Unicorn',
@@ -134,8 +141,10 @@ class Event(commands.Cog):
         'Doodle',
         'Foot',
         'Caked',
-        'Socks']
-        emojis = ['🍅', '💛', '🛀', '🍞', '😇', '😊', '🕵', '🍤', '🍢', '💒', '⌛', '🏩', '🐢', '🐑', '☁', '😗', '😲', '🐬', '💐']
+        'Socks',
+        'Eyes',
+        'Santa']
+        emojis = ['🍅', '💛', '😡', '🍞', '😇', '😊', '🥑', '🍤', '🐡', '💒', '🍬', '🗽', '🐢', '🐑', '☁', '😗', '😲', '🐬', '💐']
         name = random.choice(titles) + ' ' + random.choice(prefixes) + ' ' + random.choice(suffixes) + ' ' + random.choice(emojis)
 
         await member.edit(nick = name)
