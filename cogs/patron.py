@@ -43,9 +43,9 @@ class Patron(commands.Cog):
         v += '\nUnless you\'d like to be anonymous, please add your Discord username so we can give you the perks you deserve!'
         embed.add_field(name='Donate', value=v)
 
-        v = 'Everyone who donates at least a dollar gets the <@&634361703508738059> role and Patron badge ('+self.ids['Gem']+')!'
-        v += '\nFor every dollar donated, you get 150 Coins ('+self.ids['Coin']+').'
-        v += '\nFor every 2 dollars donated, you get 1 Gem ('+self.ids['Gem']+').'
+        v = 'Everyone who donates at least a dollar gets the <@&'+str(self.ids['PATRON_ROLE'])+'> role and Patron badge ('+self.ids['Gem']+')!'
+        v += '\nFor every dollar donated, you get 150 Coins ('+self.emojis['Coin']+').'
+        v += '\nFor every 3 dollars donated, you get 1 Gem ('+self.emojis['Gem']+').'
         v += '\nAfter donating, please allow us at least 24h to get the perks to you manually!'
         embed.add_field(name='Perks', value=v)
         embed.set_thumbnail(url = 'https://cdn.discordapp.com/attachments/388576512359530499/634359147814584350/mindcafe_animated.gif')
@@ -123,6 +123,24 @@ class Patron(commands.Cog):
 
         await log.send(msg)
 
+    @commands.command(aliases=['namepatron'])
+    async def newpatron(self, ctx, member: discord.Member, amt: float):
+        if not self.meta.isBotOwner(ctx.author):
+            return
+
+        role = ctx.guild.get_role(self.ids['PATRON_ROLE'])
+        await member.add_roles(role)
+
+        addgems = int(amt/3)
+        if addgems > 0:
+            self.meta.addGems(member, addgems)
+
+        coins = int(int(amt) * 150)
+        self.meta.addCoins(member, coins)
+
+        await ctx.send(embed = self.meta.embedDone())
+        return
+
     @commands.command(aliases=['gem', 'redeem'])
     async def redeemgem(self, ctx, *, companion):
         getStoreItem = self.meta.getStoreItem(input)
@@ -153,6 +171,9 @@ class Patron(commands.Cog):
                 return m.author == ctx.author
             msg = await self.client.wait_for('message', check=check)
             mention = msg.mentions[0]
+            if mention.bot:
+                await ctx.send(embed = self.meta.embedOops())
+                return
 
             isWanted = await self.meta.confirm(ctx, mention, mention.mention + ', do you accept this gift?')
             if not isWanted:
