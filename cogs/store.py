@@ -408,7 +408,7 @@ class Store(commands.Cog):
             return
 
     #members can gift coin companions or lotto tickets
-    @commands.command(aliases=['donate', 'give'])
+    @commands.command(aliases=['give'])
     async def gift(self, ctx, member: discord.Member, *, item = 'gift'):
         if ctx.author == member:
             embed = discord.Embed(

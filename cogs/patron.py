@@ -34,8 +34,8 @@ class Patron(commands.Cog):
     async def donate(self, ctx):
         embed = discord.Embed(
             title = 'Bean Patrons',
-            description = 'When you donate, you help us pay for Bean\'s servers/services and other great things for the Mind Café server!'
-            color = discord.Color.teal()
+            description = 'When you donate, you help us pay for Bean\'s servers/services and other great things for the Mind Café server!',
+            color = discord.Color.gold()
         )
 
         v = '**Venmo: @qrsydney**'
@@ -123,13 +123,15 @@ class Patron(commands.Cog):
 
         await log.send(msg)
 
-    @commands.command(aliases=['namepatron'])
+    @commands.command(aliases=['namepatron', 'createpatron', 'makepatron'])
     async def newpatron(self, ctx, member: discord.Member, amt: float):
         if not self.meta.isBotOwner(ctx.author):
             return
 
         role = ctx.guild.get_role(self.ids['PATRON_ROLE'])
         await member.add_roles(role)
+
+        self.meta.addBadgeToProfile(member, 'BeanPatron')
 
         addgems = int(amt/3)
         if addgems > 0:
@@ -192,5 +194,5 @@ class Patron(commands.Cog):
 
 def setup(client):
     database_connection = Database()
-    meta_class = Patron(database_connection)
-    client.add_cog(Currency(client, database_connection, meta_class))
+    meta_class = Meta(database_connection)
+    client.add_cog(Patron(client, database_connection, meta_class))

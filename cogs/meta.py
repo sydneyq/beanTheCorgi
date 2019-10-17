@@ -32,7 +32,7 @@ class Meta:
 
         embed = discord.Embed(
             title = msg,
-            description = 'Please use the reactions of this message.'
+            description = 'Please use the reactions of this message.',
             color = discord.Color.teal()
         )
         msg = await ctx.send(embed = embed)
@@ -50,7 +50,7 @@ class Meta:
         except asyncio.TimeoutError:
             embed = discord.Embed(
                 title = msg,
-                description = 'Choice timed out.'
+                description = 'Choice timed out.',
                 color = discord.Color.red()
             )
             await ctx.send(embed = embed)
