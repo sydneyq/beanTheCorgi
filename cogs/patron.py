@@ -39,15 +39,15 @@ class Patron(commands.Cog):
         )
 
         v = '**Venmo: @qrsydney**'
-        v += '\n**Paypal: (http://paypal.me/qsydney)[http://paypal.me/qsydney]**'
-        v += '\nUnless you\'d like to be anonymous, please add your Discord username so we can give you the perks you deserve!'
+        v += '\n**Paypal: http://paypal.me/qsydney**'
+        v += '\nUnless you\'d like to be anonymous, please add your Discord username and tag to the description so we can give you the perks you deserve!'
         embed.add_field(name='Donate', value=v)
 
-        v = 'Everyone who donates at least a dollar gets the <@&'+str(self.ids['PATRON_ROLE'])+'> role and Patron badge ('+self.ids['Gem']+')!'
-        v += '\nFor every dollar donated, you get 150 Coins ('+self.emojis['Coin']+').'
-        v += '\nFor every 3 dollars donated, you get 1 Gem ('+self.emojis['Gem']+').'
-        v += '\nAfter donating, please allow us at least 24h to get the perks to you manually!'
+        v = 'Everyone who donates at least a dollar gets the <@&'+str(self.ids['PATRON_ROLE'])+'> role and Patron badge ('+self.emojis['Gem']+')!'
+        v += '\nFor every $1 donated, you get 150 Coins ('+self.emojis['Coin']+').'
+        v += '\nFor every $5 donated, you get 1 Gem ('+self.emojis['Gem']+').'
         embed.add_field(name='Perks', value=v)
+        embed.set_footer(text = 'After donating, please allow us at least 24h to get the perks to you manually!')
         embed.set_thumbnail(url = 'https://cdn.discordapp.com/attachments/388576512359530499/634359147814584350/mindcafe_animated.gif')
         await ctx.send(embed = embed)
 
@@ -133,7 +133,7 @@ class Patron(commands.Cog):
 
         self.meta.addBadgeToProfile(member, 'BeanPatron')
 
-        addgems = int(amt/3)
+        addgems = int(amt/5)
         if addgems > 0:
             self.meta.addGems(member, addgems)
 
@@ -182,14 +182,63 @@ class Patron(commands.Cog):
                 return
 
         #give companion
-        if self.meta.isRecorded(companion):
-            self.meta.addCompanionToProfile(recipient, companion)
+        self.meta.addToDex(recipient, companion)
         self.dbConnection.updateProfile({"id": recipient.id}, {"$set": {"companion": companion}})
 
         #-1 gem from profile
         self.meta.subGems(ctx.author, 1)
 
         await ctx.send(embed = self.meta.embedDone())
+        return
+
+    @commands.command(aliases=['unlocked', 'perm', 'permanent', 'rc'])
+    async def redeemed(self, ctx, member: discord.Member = None):
+        if member == None:
+            member = ctx.author
+
+        user = self.meta.getProfile(member)
+
+        desc = ''
+        for c in user['redeemed']:
+            if desc == '':
+                desc = c
+            else:
+                desc += ', ' + c
+        if desc == '':
+            desc = 'N/A'
+        embed = discord.Embed(
+            title = member.name + '\'s Unlocked Companions',
+            description = desc,
+            color = discord.Color.gold()
+        )
+        embed.set_footer(text = 'These companions are permanent and never have to be paid for by the owner again!')
+        embed.set_thumbnail(url = member.avatar_url)
+        await ctx.send(embed = embed)
+        return
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author.bot:
+            return
+
+        if self.meta.isPatron(message.author):
+            msg = message.content
+            if self.meta.hasWord('hi', msg) or self.meta.hasWord('hello', msg) or self.meta.hasWord('hey', msg):
+                if random.random() < .01:
+                    name = '**' + message.author.name + '**'
+                    greetings = ['Hi there, Patron ' + name + '! I hope you\'re doing well.',
+                    'Wow, Patron ' + name + ', it\'s you! Hi!',
+                    'Good morning, Patron ' + name + '! I\'m sure it\'s morning somewhere...',
+                    'Today is going to be a good day, Patron ' + name + '! Go out there and conquer!',
+                    'Hi there Patron ' + name + ', have I ever told you how much I appreciate you?',
+                    'Patron ' + name + '! How are you today? I hope you\'re doing swell.',
+                    'Hey, Patron ' + name + '! *You* are absolutely *wonderful!*',
+                    'Patron ' + name + '! Just in time. It\'s great to see you!',
+                    'Hey there, Patron ' + name + '! Jarvis says hello too!',
+                    'Hello! Just a reminder that no matter what anyone else tells you, Patron ' + name + ', you are worthwhile. Never forget it!']
+                    await message.channel.send(greetings)
+                return
+            return
         return
 
 def setup(client):

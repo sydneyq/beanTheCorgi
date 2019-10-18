@@ -48,6 +48,7 @@ class Triggers(commands.Cog):
         events = guild.get_channel(594641130545741834)
         mods = guild.get_channel(592030367796690975)
         marketing = guild.get_channel(594641226330800153)
+        announcements = guild.get_channel(257760030034624513)
 
         def embedRoleAdded(role):
             embed = discord.Embed(
@@ -81,16 +82,16 @@ class Triggers(commands.Cog):
 
         #in-trial angel added
         if roleWasAdded(self.ids['TRIAL_ROLE']):
-            await heaven.send(embedRoleAdded('In-Trial Angels'))
+            await heaven.send(embed = mbedRoleAdded('In-Trial Angels'))
         #in-trial angel removed
         elif roleWasRemoved(self.ids['TRIAL_ROLE']):
-            await heaven.send(embedRoleRemoved('In-Trial Angels'))
+            await heaven.send(embed = embedRoleRemoved('In-Trial Angels'))
         #staff added
         elif roleWasAdded(self.ids['STAFF_ROLE']):
-            await heaven.send(embedRoleAdded('Angels'))
+            await heaven.send(embed = embedRoleAdded('Angels'))
         #staff removed
         elif roleWasRemoved(self.ids['STAFF_ROLE']):
-            await heaven.send(embedRoleRemoved('Angels'))
+            await heaven.send(embed = embedRoleRemoved('Angels'))
         #mod added
         elif roleWasAdded(self.ids['MOD_ROLE']):
             e = embedRoleAdded('Mods')
@@ -123,7 +124,10 @@ class Triggers(commands.Cog):
             await events.send(embed = e)
         #EC added
         elif roleWasAdded(self.ids['CERTIFIED_ROLE']):
-            await casual.send(embedRoleAdded('Certified in Active Listening'))
+            await casual.send(embed = embedRoleAdded('Certified in Active Listening'))
+        #patron added
+        elif roleWasAdded(self.ids['PATRON_ROLE']):
+            await announcements.send(embed = embedRoleAdded('Bean Patron'))
 
 def setup(client):
     database_connection = Database()

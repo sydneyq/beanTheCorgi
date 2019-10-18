@@ -37,11 +37,11 @@ class Store(commands.Cog):
 
         helped = user['helped']
         coins = user['coins']
-        companions = user['companions']
+        companions = user['dex']
 
         embed = discord.Embed(
             title = 'Store',
-            description = 'You have:\t`' + str(helped) + '` Help Points ' + self.emojis['HelpPoint'] + '\t`' + str(coins) + '` Coins ' + self.emojis['Coin'],
+            description = self.meta.printCurrency(ctx.author),
             color = discord.Color.teal()
         )
 
@@ -190,6 +190,11 @@ class Store(commands.Cog):
         json = getStoreItem['JSON']
         category = getStoreItem['type']
 
+        if json['name'] in user['redeemed']:
+            self.dbConnection.updateProfile({"id": id}, {"$set": {"companion": companion}})
+            await ctx.send(embed = self.meta.embedDone())
+            return
+
         def embedAfford():
             nonlocal helped
             nonlocal coins
@@ -234,7 +239,7 @@ class Store(commands.Cog):
                             companion = 'Ditto'
                             title = 'Consider it — Oh? **Ditto** was caught! 🌟'
                             self.meta.addBadgeToProfile(ctx.author, 'CaughtDitto')
-                            self.meta.addCompanionToProfile(ctx.author, companion)
+                            self.meta.addToDex(ctx.author, companion)
 
                     self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "companion": companion}})
             #items
@@ -321,7 +326,7 @@ class Store(commands.Cog):
                         return
                     else:
                         result = random.choice(evolve)
-                        self.meta.addCompanionToProfile(ctx.author, result)
+                        self.meta.addToDex(ctx.author, result)
                         self.dbConnection.updateProfile({"id": id}, {"$set": {"coins": coins, "companion": result}})
                         title += '\nYour companion is now a `' + result + '`!'
                         if companion == 'Eevee':

@@ -106,7 +106,7 @@ class Event(commands.Cog):
         'Colonel',
         'President',
         'Best',
-        'Lovin\'',
+        'McLovin\'',
         'Cakey',
         'Kooky',
         'Fabulous',

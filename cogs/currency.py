@@ -87,7 +87,7 @@ class Currency(commands.Cog):
             color = discord.Color.teal()
         )
 
-        companions = user['companions']
+        companions = user['dex']
         eeveelutions = self.meta.getEeveelutions()
         val = ''
         for e in eeveelutions:

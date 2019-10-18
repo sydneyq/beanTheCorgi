@@ -125,6 +125,11 @@ class Meta:
             return True
         return False
 
+    def isPatron(self, member: discord.Member):
+        if self.ids['PATRON_ROLE'] in [role.id for role in member.roles]:
+            return True
+        return False
+
     #verified
     def isVerified(self, member: discord.Member):
         if self.ids['VERIFIED_ROLE'] in [role.id for role in member.roles]:
@@ -184,7 +189,7 @@ class Meta:
 
         profile = self.dbConnection.findProfile({"id": id})
         if profile is None:
-            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'gifts': 0, 'affinity':'', 'daily': '', 'badges':[], 'booster': 0,'companions' : [], 'soulmates' : [], 'cakes': 0, 'gems': 0})
+            self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'gifts': 0, 'affinity':'', 'daily': '', 'badges':[], 'booster': 0,'dex' : [], 'soulmates' : [], 'cakes': 0, 'gems': 0, 'redeemed': []})
             profile = self.dbConnection.findProfile({"id": id})
 
         return profile
@@ -283,28 +288,46 @@ class Meta:
         user = self.getProfile(member)
         helped = user['helped']
         coins = user['coins']
-        return 'You have:\t`' + str(helped) + '` Help Points ' + self.emojis['HelpPoint'] + '\t`' + str(coins) + '` Coins ' + self.emojis['Coin']
+        gems = user['gems']
+        return 'You have:\t`' + str(helped) + '` Help Points ' + self.emojis['HelpPoint'] + ' `' + str(coins) + '` Coins ' + self.emojis['Coin'] + ' `' + str(gems) + '` Gems ' + self.emojis['Gem']
 
-    def hasCompanion(self, member: discord.Member, companion):
+    def inDex(self, member: discord.Member, companion):
         user = self.getProfile(member)
-        companions = user['companions']
+        companions = user['dex']
         if companion in companions:
             return True
         else:
             return False
 
-    def addCompanionToProfile(self, member: discord.Member, companion):
-        if self.hasCompanion(member, companion):
+    def addToDex(self, member: discord.Member, companion):
+        if self.inDex(member, companion):
             return False
         user = self.getProfile(member)
-        companions = user['companions']
+        companions = user['dex']
         companions.append(companion)
-        self.dbConnection.updateProfile({"id": member.id}, {"$set": {"companions": companions}})
+        self.dbConnection.updateProfile({"id": member.id}, {"$set": {"dex": companions}})
+        return True
+
+    def inRedeemed(self, member: discord.Member, companion):
+        user = self.getProfile(member)
+        companions = user['redeemed']
+        if companion in companions:
+            return True
+        else:
+            return False
+
+    def addToRedeemed(self, member: discord.Member, companion):
+        if self.inDex(member, companion):
+            return False
+        user = self.getProfile(member)
+        companions = user['redeemed']
+        companions.append(companion)
+        self.dbConnection.updateProfile({"id": member.id}, {"$set": {"redeemed": companions}})
         return True
 
     def hasAllEvolutionsOf(self, member: discord.Member, companion):
         user = self.getProfile(member)
-        companions = user['companions']
+        companions = user['dex']
         evolve = self.getStoreItem(companion)
         evolve = evolve['JSON']['evolve']
         for e in evolve:
@@ -613,8 +636,8 @@ class Global(commands.Cog):
     async def test(self, ctx):
         if self.meta.isBotOwner(ctx.author):
             guild = ctx.guild
-            #self.dbConnection.renameColumn("given", "gifted")
-            self.dbConnection.makeColumn("gems", 0)
+            self.dbConnection.renameColumn("companions", "dex")
+            self.dbConnection.makeColumn("redeemed", [])
             #self.dbConnection.removeColumn("cakes")
             '''
             profiles = self.dbConnection.findProfiles({})
