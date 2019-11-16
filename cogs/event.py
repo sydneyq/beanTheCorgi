@@ -252,7 +252,7 @@ class Event(commands.Cog):
         #auto-highfive
         if random.random() < .05:
             past_timestamp = self.dbConnection.findMeta({'id':'server'})['highfive']
-            if past_timestamp == '' or self.meta.hasBeenMinutes(20, past_timestamp, self.meta.getDateTime()):
+            if past_timestamp == '' or self.meta.hasBeenMinutes(60, past_timestamp, self.meta.getDateTime()):
                 self.dbConnection.updateMeta({'id':'server'}, {'$set': {'highfive': self.meta.getDateTime()}})
                 #casual = 593153723610693632 #cmd
                 casual = 257751892241809408

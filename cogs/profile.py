@@ -7,13 +7,15 @@ import os
 import asyncio
 import random
 import secret
+from .soulmates import Soulmates
 
 class Profile(commands.Cog):
 
-    def __init__(self, client, database, meta):
+    def __init__(self, client, database, meta, soulmates):
         self.client = client
         self.dbConnection = database
         self.meta = meta
+        self.soulmates = soulmates
 
         dirname = os.path.dirname(__file__)
         filename = os.path.join(dirname, 'docs/store.json')
@@ -164,12 +166,7 @@ class Profile(commands.Cog):
         embed.set_footer(text = 'Mind Café', icon_url = 'https://media.discordapp.net/attachments/591611902459641856/593267453363224588/Bean_Icon.png')
 
         #Marriage
-        soulmates = user['soulmates']
-        soulmates_print = ''
-        for soulmate in soulmates:
-            soulmates_print += '<@' + str(soulmate) + '> '
-        if soulmates_print == '':
-            soulmates_print = 'N/A'
+        soulmates_print = Soulmates.printSoulmates(member)
         embed.add_field(name="Soulmate(s)", value=soulmates_print, inline=True)
 
         #Companion
@@ -245,4 +242,5 @@ class Profile(commands.Cog):
 def setup(client):
     database_connection = Database()
     meta_class = Meta(database_connection)
-    client.add_cog(Profile(client, database_connection, meta_class))
+    soulmates_class = Soulmates(client, database_connection, meta_class)
+    client.add_cog(Profile(client, database_connection, meta_class, soulmates_class))

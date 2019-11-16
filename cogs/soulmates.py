@@ -7,14 +7,14 @@ import os
 import asyncio
 import random
 import secret
-from .supporter import Supporter
 
 class Soulmates(commands.Cog):
 
-    def __init__(self, client, database, meta):
+    def __init__(self, client, database, meta, supporter):
         self.client = client
         self.dbConnection = database
         self.meta = meta
+        self.supporter = supporter
 
         dirname = os.path.dirname(__file__)
         filename = os.path.join(dirname, 'docs/store.json')
@@ -90,20 +90,24 @@ class Soulmates(commands.Cog):
 
         return done
 
+    def printSoulmates(self, member: discord.Member):
+        sms = ''
+        soulmates = self.getSoulmates(member)
+        if soulmates is not None:
+            for soulmate in soulmates:
+                desc += self.meta.getMention(soulmate) + '\n'
+        if sms == '':
+            sms = 'N/A'
+        return sms
+
     @commands.command(aliases=['spouses', 'spouse', 'soulmate', 'marriages', 'sm', 'sms'])
     async def soulmates(self, ctx, member: discord.Member = None):
         if member is None:
             member = ctx.author
-        soulmates = self.getSoulmates(member)
 
-        num = self.meta.getNumSoulmates(member)
-        soulmate_spots = self.meta.getSoulmateSpots(member)
-        desc = ''
-
-        for soulmate in soulmates:
-            desc += self.meta.getMention(soulmate) + '\n'
-        if desc == '':
-            desc = 'N/A'
+        num = self.getNumSoulmates(member)
+        soulmate_spots = self.getSoulmateSpots(member)
+        desc = self.printSoulmates(member)
 
         embed = discord.Embed(
             title = member.name + '\'s Soulmates `[' + str(num) + '/' + str(soulmate_spots)  + ']`',
@@ -139,7 +143,7 @@ class Soulmates(commands.Cog):
             await ctx.send(embed = embed)
             return
 
-        if not self.meta.canAddSoulmate(ctx.author) or not self.meta.canAddSoulmate(member):
+        if not self.canAddSoulmate(ctx.author) or not self.canAddSoulmate(member):
             embed = discord.Embed(
                 title = 'One of you doesn\'t have enough soulmate spots!',
                 color = discord.Color.teal()
@@ -178,7 +182,7 @@ class Soulmates(commands.Cog):
                 await ctx.send(embed = embed)
                 return
 
-            confirmed = self.meta.addSoulmate(ctx.author, member)
+            confirmed = self.addSoulmate(ctx.author, member)
             if not (confirmed):
                 await ctx.send(embed = self.meta.embedOops())
                 return
@@ -204,7 +208,8 @@ class Soulmates(commands.Cog):
             await ctx.send(embed = self.meta.embedOops())
             return
 
-        ans = await self.meta.confirm(ctx.author, 'Divorce ' + member.name + '?')
+        msg = 'Divorce ' + member.name + '?'
+        ans = await self.meta.confirm(ctx, self.client, ctx.author, msg)
 
         if not ans:
             return
@@ -232,4 +237,4 @@ class Soulmates(commands.Cog):
 def setup(client):
     database_connection = Database()
     meta_class = Meta(database_connection)
-    client.add_cog(Soulmates(client, database_connection, meta_class))
+    client.add_cog(Soulmates(client, database_connection, meta_clas))

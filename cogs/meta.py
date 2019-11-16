@@ -6,6 +6,7 @@ from database import Database
 import datetime
 import json
 import os
+import asyncio
 
 class Meta:
 
@@ -41,7 +42,7 @@ class Meta:
         )
         return embed
 
-    async def confirm(self, ctx, responder: discord.Member, *, msg = None):
+    async def confirm(self, context, client, responder: discord.Member, msg = None):
         if msg is None:
             msg = 'Are you sure?'
 
@@ -50,7 +51,7 @@ class Meta:
             description = 'Please use the reactions of this message.',
             color = discord.Color.teal()
         )
-        msg = await ctx.send(embed = embed)
+        msg = await context.send(embed = embed)
         await msg.add_reaction('✅')
         await msg.add_reaction('⛔')
 
@@ -61,14 +62,14 @@ class Meta:
             return user2 == responder and (str(reaction.emoji) == '✅' or str(reaction.emoji) == '⛔')
 
         try:
-            reaction, user2 = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
+            reaction, user2 = await client.wait_for('reaction_add', timeout=60.0, check=check)
         except asyncio.TimeoutError:
             embed = discord.Embed(
                 title = msg,
                 description = 'Choice timed out.',
                 color = discord.Color.red()
             )
-            await ctx.send(embed = embed)
+            await context.send(embed = embed)
             return False
         else:
             if emoji == '⛔':
@@ -76,7 +77,7 @@ class Meta:
                     title = 'Action canceled.',
                     color = discord.Color.red()
                 )
-                await ctx.send(embed = embed)
+                await context.send(embed = embed)
                 return False
             return True
 
