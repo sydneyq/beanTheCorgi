@@ -138,7 +138,7 @@ class Profile(commands.Cog):
             embed.set_author(name = name, icon_url = 'https://www.caffesociety.co.uk/assets/recipe-images/latte-small.jpg')
         else:
             v = 'No Squad yet. Use `+squad tea/coffee` to join one!'
-            if (squad != '' || squad == 'Squadless'):
+            if (squad != '' or squad == 'Squadless'):
                 v = squad
 
             embed = discord.Embed(color = discord.Color.teal())

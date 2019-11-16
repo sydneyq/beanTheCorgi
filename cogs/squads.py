@@ -136,12 +136,12 @@ class Squads(commands.Cog):
 
         t = ''
         for person in squads['Tea']:
-            t += self.meta.getMention(person) + ' '
+            t += self.meta.getMention(person) + '\n'
         embed.add_field(name='Tea Squad', value=t)
 
         c = ''
         for person in squads['Coffee']:
-            c += self.meta.getMention(person) + ' '
+            c += self.meta.getMention(person) + '\n'
         embed.add_field(name='Coffee Squad', value=c)
 
         return embed
@@ -153,30 +153,78 @@ class Squads(commands.Cog):
         return
 
     #re-assign temp squads
-    @commands.command(aliases=['tempsquad', 'tempstaffsquads'])
-    async def tempsquads(self, ctx):
-        #give them squad role
+    @commands.command(aliases=['reassigntempsquads', 'retempsquad', 'newtempsquads'])
+    async def retempsquads(self, ctx):
         guild = ctx.guild
         staff_role = guild.get_role(self.ids['STAFF_ROLE'])
-        staff = staff_role.members()
+        staff = staff_role.members
         tea_role = guild.get_role(self.ids['SQUAD_TEA_ROLE'])
         coffee_role = guild.get_role(self.ids['SQUAD_COFFEE_ROLE'])
 
-        #remove ability for staff to see both squad channels
+        #no admins
+        remove = []
+        for staff_member in staff:
+            if self.meta.isAdmin(staff_member):
+                remove.append(staff_member)
+        for r in remove:
+            staff.remove(r)
 
-        #make lists of both tea & coffee, try to split even
+        #remove ability for staff to see both squad channels
+        tea_channel = guild.get_channel(self.ids['SQUAD_TEA_CHANNEL'])
+        coffee_channel = guild.get_channel(self.ids['SQUAD_COFFEE_CHANNEL'])
+        await tea_channel.set_permissions(staff_role, read_messages=False)
+        await coffee_channel.set_permissions(staff_role, read_messages=False)
+
+        #make lists of both tea & coffee
+        random.shuffle(staff)
+        index = 0
+        c = []
+        t = []
+        while index < len(staff):
+            t.append(staff[index])
+            index += 1
+            if index < len(staff):
+                c.append(staff[index])
+                index += 1
+
+        #give them squad role
+        c_ids = []
+        t_ids = []
+
+        for x in c:
+            await x.add_roles(coffee_role)
+            c_ids.append(x.id)
+
+        for x in t:
+            await x.add_roles(tea_role)
+            t_ids.append(x.id)
 
         #assign to new meta.temp_squads
+        self.dbConnection.updateMeta({"id": 'temp_squads'}, {"$set": {"Coffee": c_ids}})
+        self.dbConnection.updateMeta({"id": 'temp_squads'}, {"$set": {"Tea": t_ids}})
 
         #send embed of temp squads
         await ctx.send(embed = self.embedTempSquads())
         return
 
     #disband temp squads (remove squad roles and return access)
-    @commands.command()
+    @commands.command(aliases=['untempsquads'])
     async def disbandtempsquads(self, ctx):
         #remove all squad roles
+        guild = ctx.guild
+        staff_role = guild.get_role(self.ids['STAFF_ROLE'])
+        staff = staff_role.members
+        tea_role = guild.get_role(self.ids['SQUAD_TEA_ROLE'])
+        coffee_role = guild.get_role(self.ids['SQUAD_COFFEE_ROLE'])
+        for staff_member in staff:
+            await staff_member.remove_roles(coffee_role, tea_role)
         #give staff ability to see both squad channels again
+        tea_channel = guild.get_channel(self.ids['SQUAD_TEA_CHANNEL'])
+        coffee_channel = guild.get_channel(self.ids['SQUAD_COFFEE_CHANNEL'])
+        await tea_channel.set_permissions(staff_role, read_messages=True)
+        await coffee_channel.set_permissions(staff_role, read_messages=True)
+        
+        await ctx.send(embed = self.meta.embedDone())
         return
 
     @commands.command(aliases=['adminsquad'])
