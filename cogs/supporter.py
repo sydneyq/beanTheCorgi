@@ -8,7 +8,7 @@ import json
 import os
 import asyncio
 
-class Support(commands.Cog):
+class Supporter(commands.Cog):
 
     def __init__(self, client, database, meta):
         self.client = client
@@ -45,7 +45,7 @@ class Support(commands.Cog):
 
         profile = self.dbConnection.findSupporterProfile({"id": id})
         if profile is None:
-            self.dbConnection.insertSupporterProfile({'id': id, 'active':True, 'allows_dm':True, 'allows_public':True, 'nsfw': False, 'ping_offline': True, 'ping_topics_only': False, 'allows_all_topics': True, 'topics': [], 'badges':[], 'helppts': 0})
+            self.dbConnection.insertSupporterProfile({'id': id, 'active':True, 'allows_dm':True, 'allows_public':True, 'ping_offline': True, 'triggers': [], 'badges':[], 'helppts': 0})
             profile = self.dbConnection.findSupporterProfile({"id": id})
 
         return profile
@@ -125,15 +125,10 @@ class Support(commands.Cog):
         #Options
         op = ''
         if (supporter['active']):
-            op += f"**Allows NSFW topics:** {supporter['nsfw']}"
             op += f"\n**Allows Support DMs:** {supporter['allows_dm']}"
             op += f"\n**Allows Support Tickets:** {supporter['allows_public']}"
             op += f"\n**Can be pinged while offline:** {supporter['ping_offline']}"
-            op += f"\n**Ping for Topics only:** {supporter['ping_topics_only']}"
-            if not(supporter['allows_all_topics']):
-                op += f"\n**Topics:** {supporter['topics']}"
-            else:
-                op += f"\n**Topics:** All"
+            op += f"\n**Don\'t Tag for These Topics:** {supporter['triggers']}"
         else:
             op = 'Not currently open to supporting.'
         embed.add_field(name='Settings', value=op, inline=False)
@@ -230,4 +225,4 @@ class Support(commands.Cog):
 def setup(client):
     database_connection = Database()
     meta_class = Meta(database_connection)
-    client.add_cog(Support(client, database_connection, meta_class))
+    client.add_cog(Supporter(client, database_connection, meta_class))

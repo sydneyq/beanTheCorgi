@@ -7,6 +7,7 @@ import os
 import asyncio
 import random
 import secret
+from .supporter import Supporter
 
 class Soulmates(commands.Cog):
 
@@ -29,20 +30,78 @@ class Soulmates(commands.Cog):
         with open(filename3) as json_file:
             self.ids = json.load(json_file)
 
-    @commands.command(aliases=['spouses', 'spouse', 'soulmate', 'marriages', 'sm'])
+    def getSoulmateSpots(self, member: discord.Member):
+        user = self.meta.getProfile(member)
+        #user = self.meta.getSupporterProfile(member)
+        spots = 1 + int(int(user['helped'])/10)
+        #spots = 1 + int(int(user['HelpPoints'])/10)
+        return spots
+
+    def getSoulmates(self, member:discord.Member):
+        s1 = self.dbConnection.findSoulmatePairs({"s1": member.id})
+        s2 = self.dbConnection.findSoulmatePairs({"s2": member.id})
+        soulmates = []
+        for s in s1:
+            soulmates.append(s['s2'])
+        for s in s2:
+            soulmates.append(s['s1'])
+        return soulmates
+
+    def getNumSoulmates(self, member: discord.Member):
+        sms = self.getSoulmates(member)
+        return len(sms)
+
+    def areSoulmates(self, member: discord.Member, member2: discord.Member):
+        sms = self.getSoulmates(member)
+        if member2.id in sms:
+            return True
+        return False
+
+    def canAddSoulmate(self, member: discord.Member):
+        if self.getSoulmateSpots(member) > self.getNumSoulmates(member):
+            return True
+        return False
+
+    def addSoulmate(self, member: discord.Member, member2: discord.Member):
+        #don't have spots
+        if (not self.canAddSoulmate(member)) or (not self.canAddSoulmate(member2)) :
+            return False
+        #already soulmates
+        if self.areSoulmates(member, member2):
+            return False
+
+        self.dbConnection.insertSoulmatePair({'s1': member.id, 's2': member2.id})
+        return True
+
+    def removeSoulmate(self, member: discord.Member, member2: discord.Member):
+        s1 = self.dbConnection.findSoulmatePairs({"s1": member.id})
+        s2 = self.dbConnection.findSoulmatePairs({"s2": member.id})
+        done = True
+
+        try:
+            self.dbConnection.removeSoulmatePair({"s1": member.id, "s2": member2.id})
+        except:
+            done = False
+
+        try:
+            self.dbConnection.removeSoulmatePair({"s1": member2.id, "s2": member.id})
+        except:
+            done = False
+
+        return done
+
+    @commands.command(aliases=['spouses', 'spouse', 'soulmate', 'marriages', 'sm', 'sms'])
     async def soulmates(self, ctx, member: discord.Member = None):
         if member is None:
             member = ctx.author
-
-        user = self.meta.getProfile(member)
-        soulmates = user['soulmates']
+        soulmates = self.getSoulmates(member)
 
         num = self.meta.getNumSoulmates(member)
         soulmate_spots = self.meta.getSoulmateSpots(member)
         desc = ''
 
         for soulmate in soulmates:
-            desc += '<@' + str(soulmate) + '>\n'
+            desc += self.meta.getMention(soulmate) + '\n'
         if desc == '':
             desc = 'N/A'
 
@@ -80,11 +139,6 @@ class Soulmates(commands.Cog):
             await ctx.send(embed = embed)
             return
 
-        id = ctx.author.id
-
-        user = self.meta.getProfile(ctx.author)
-        memberProfile = self.meta.getProfile(member)
-
         if not self.meta.canAddSoulmate(ctx.author) or not self.meta.canAddSoulmate(member):
             embed = discord.Embed(
                 title = 'One of you doesn\'t have enough soulmate spots!',
@@ -98,9 +152,7 @@ class Soulmates(commands.Cog):
             description = 'React to this message with a ❤ for yes, 💔 for no.\nYou have 60 seconds to decide!',
             color = discord.Color.teal()
         )
-        await ctx.send(embed = embed)
-
-        msg = ctx.channel.last_message
+        msg = await ctx.send(embed = embed)
         await msg.add_reaction('❤')
         await msg.add_reaction('💔')
 
@@ -114,7 +166,7 @@ class Soulmates(commands.Cog):
         try:
             reaction, user2 = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
         except asyncio.TimeoutError:
-            await ctx.channel.send('Timed out.')
+            await ctx.send(embed = self.meta.embed('Marriage Time Out', 'Your partner didn\'t respond within 60 seconds!'))
             return
         else:
             if emoji == '💔':
@@ -147,70 +199,35 @@ class Soulmates(commands.Cog):
             await ctx.send(embed = embed)
 
     @commands.command()
-    async def divorce(self, ctx, member: discord.Member = None):
-        id = ctx.author.id
-        user = self.meta.getProfile(ctx.author)
-
-        soulmates = user['soulmates']
-
-        if len(soulmates) == 0:
+    async def divorce(self, ctx, member: discord.Member):
+        if not self.areSoulmates(ctx.author, member):
             await ctx.send(embed = self.meta.embedOops())
             return
 
-        if member is None:
-            member = soulmates[0]
-            member = self.client.get_user(member)
+        ans = await self.meta.confirm(ctx.author, 'Divorce ' + member.name + '?')
+
+        if not ans:
+            return
+
+        if (self.removeSoulmate(ctx.author, member)):
+            await ctx.send(embed = self.meta.embedDone())
         else:
-            if member.id not in soulmates:
-                await ctx.send(embed = self.meta.embedOops())
-                return
+            await ctx.send(embed = self.meta.embedOops())
+        return
 
-        spouse_name = 'soulmate'
-        spouseExists = False
-        if self.meta.profileDoesExist(member.id):
-            spouseExists = True
-            spouse_name = self.client.get_user(member.id).name
-
-        embed = discord.Embed(
-            title = 'Divorce ' + spouse_name + '?',
-            description = 'React to this message with a ✅ for yes, ⛔ for no.\nYou have 60 seconds to decide!',
-            color = discord.Color.teal()
-        )
-        await ctx.send(embed = embed)
-
-        msg = ctx.channel.last_message
-        await msg.add_reaction('✅')
-        await msg.add_reaction('⛔')
-
-        emoji = ''
-
-        def check(reaction, user):
-            nonlocal emoji
-            emoji = str(reaction.emoji)
-            return user == ctx.author and (str(reaction.emoji) == '✅' or str(reaction.emoji) == '⛔')
+    @commands.Cog.listener()
+    async def on_member_remove(self, member):
+        id = member.id
 
         try:
-            reaction, user = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
-        except asyncio.TimeoutError:
-            await channel.send('Timed out.')
-            return
-        else:
-            if emoji == '⛔':
-                embed = discord.Embed(
-                    title = 'Divorce canceled.',
-                    color = discord.Color.teal()
-                )
-                await ctx.send(embed = embed)
-                return
+            self.dbConnection.removeSoulmatePair({"s1": id})
+        except:
+            pass
 
-            self.meta.removeSoulmate(ctx.author, member)
-
-            embed = discord.Embed(
-                title = 'Divorced ' + spouse_name + '.',
-                color = discord.Color.teal()
-            )
-            await ctx.send(embed = embed)
-            return
+        try:
+            self.dbConnection.removeSoulmatePair({"s2": id})
+        except:
+            pass
 
 def setup(client):
     database_connection = Database()

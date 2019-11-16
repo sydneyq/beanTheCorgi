@@ -33,6 +33,25 @@ class Database:
     def countProfiles(self, findCriteria):
         return self.db.profile.count(findCriteria)
 
+    #soulmate
+    def insertSoulmatePair(self, toInsert):
+        self.db.soulmate.insert(toInsert)
+
+    def findSoulmatePair(self, findCriteria):
+        return self.db.soulmate.find_one(findCriteria)
+
+    def findSoulmatePairs(self, findCriteria):
+        return self.db.soulmate.find(findCriteria)
+
+    def updateSoulmatePair(self, updateCritera, change):
+        self.db.soulmate.update(updateCritera, change)
+
+    def removeSoulmatePair(self, toRemove):
+        self.db.soulmate.remove(toRemove)
+
+    def countSoulmatePairs(self, findCriteria):
+        return self.db.soulmate.count(findCriteria)
+
     #supporter profile
     def insertSupporterProfile(self, toInsert):
         self.db.supporter.insert(toInsert)

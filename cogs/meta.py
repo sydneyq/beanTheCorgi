@@ -518,59 +518,6 @@ class Meta:
 
         return False
 
-    def getSoulmateSpots(self, member: discord.Member):
-        user = self.getProfile(member)
-        spots = 1 + int(int(user['helped'])/10)
-        return spots
-
-    def getNumSoulmates(self, member: discord.Member):
-        user = self.getProfile(member)
-        soulmates = user['soulmates']
-        if soulmates is None:
-            num = 0
-        else:
-            num = len(soulmates)
-        return num
-
-    def canAddSoulmate(self, member: discord.Member):
-        if self.getSoulmateSpots(member) > self.getNumSoulmates(member):
-            return True
-        return False
-
-    def addSoulmate(self, member: discord.Member, member2: discord.Member):
-        user = self.getProfile(member)
-        user2 = self.getProfile(member2)
-        soulmates = user['soulmates']
-        soulmates2 = user2['soulmates']
-
-        #don't have spots
-        if (not self.canAddSoulmate(member)) or (not self.canAddSoulmate(member2)) :
-            return False
-        #already soulmates
-        if (member2.id in soulmates or member.id in soulmates2):
-            return False
-
-        soulmates.append(member2.id)
-        self.dbConnection.updateProfile({"id": member.id}, {"$set": {"soulmates": soulmates}})
-        soulmates2.append(member.id)
-        self.dbConnection.updateProfile({"id": member2.id}, {"$set": {"soulmates": soulmates2}})
-        return True
-
-    def removeSoulmate(self, member: discord.Member, member2: discord.Member):
-        user = self.getProfile(member)
-        soulmates = list(user['soulmates'])
-        soulmates = soulmates.remove(member2.id)
-        if soulmates is None:
-            soulmates = []
-        self.dbConnection.updateProfile({"id": member.id}, {"$set": {"soulmates": soulmates}})
-
-        user2 = self.getProfile(member2)
-        soulmates2 = list(user2['soulmates'])
-        soulmates2 = soulmates2.remove(member.id)
-        if soulmates2 is None:
-            soulmates2 = []
-        self.dbConnection.updateProfile({"id": member2.id}, {"$set": {"soulmates": soulmates2}})
-
     def getChannelOwnerID(self, channel: discord.TextChannel):
         if not '-' in channel.name:
             return -1
