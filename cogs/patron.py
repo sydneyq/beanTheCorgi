@@ -224,7 +224,7 @@ class Patron(commands.Cog):
         if self.meta.isPatron(message.author):
             msg = message.content
             if self.meta.hasWord('hi', msg) or self.meta.hasWord('hello', msg) or self.meta.hasWord('hey', msg):
-                if random.random() < .01:
+                if random.random() < .05:
                     name = '**' + message.author.name + '**'
                     greetings = ['Hi there, Patron ' + name + '! I hope you\'re doing well.',
                     'Wow, Patron ' + name + ', it\'s you! Hi!',
@@ -236,7 +236,7 @@ class Patron(commands.Cog):
                     'Patron ' + name + '! Just in time. It\'s great to see you!',
                     'Hey there, Patron ' + name + '! Jarvis says hello too!',
                     'Hello! Just a reminder that no matter what anyone else tells you, Patron ' + name + ', you are worthwhile. Never forget it!']
-                    await message.channel.send(greetings)
+                    await message.channel.send(random.choice(greetings))
                 return
             return
         return

@@ -521,15 +521,7 @@ class Store(commands.Cog):
                 description = 'Buy `' + c['name'] + '` for <@' + str(member_discord.id) + '>?\nReact to this message with a ✅ for yes, ⛔ for no.\nYou have 60 seconds to decide!',
                 color = discord.Color.teal()
             )
-            await ctx.send(embed = embed)
-
-            msgs = []
-            async for msg in ctx.channel.history(limit=1):
-                if (msg.author.id == 592436047175221259 or msg.author.id == 432038389663924225):
-                    msgs.append(msg)
-                    break
-
-            msg = msgs[0]
+            msg = await ctx.send(embed = embed)
             await msg.add_reaction('✅')
             await msg.add_reaction('⛔')
 
@@ -556,15 +548,7 @@ class Store(commands.Cog):
                     description = '<@' + str(member_discord.id) + '>, would you like `' + c['name'] + '` to be your new Companion?\nReact to this message with a ✅ for yes, ⛔ for no.\nYou have 60 seconds to decide!',
                     color = discord.Color.teal()
                 )
-                await ctx.send(embed = embed)
-
-                msgs = []
-                async for msg in ctx.channel.history(limit=1):
-                    if (msg.author.id == 592436047175221259 or msg.author.id == 432038389663924225):
-                        msgs.append(msg)
-                        break
-
-                msg = msgs[0]
+                msg = await ctx.send(embed = embed)
                 await msg.add_reaction('✅')
                 await msg.add_reaction('⛔')
 

@@ -298,6 +298,62 @@ class Event(commands.Cog):
 
                     await channel.send(embed = embed2)
                 return
+
+        #auto-typeracer
+        if random.random() < .1:
+            #check timestamp
+            past_timestamp = self.dbConnection.findMeta({'id':'server'})['typeracer']
+            if past_timestamp == '' or self.meta.hasBeenMinutes(30, past_timestamp, self.meta.getDateTime()):
+                self.dbConnection.updateMeta({'id':'server'}, {'$set': {'typeracer': self.meta.getDateTime()}})
+                casual = 257751892241809408
+                casual2 = 599757443362193408
+                #casual = 593153723610693632 #cmd
+                #casual2 = 593153723610693632 #cmd
+                #vc_chat = 595384066618949692
+                channels = [casual, casual2]
+                channel = random.choice(channels)
+                channel = message.guild.get_channel(channel)
+
+                string = random.choice(self.typeracer_strings)
+                amt = 50
+                altered = ''
+
+                punctuation = ['!', '@', '&', '.']
+                for ch in string:
+                    altered += ch + random.choice(punctuation)
+
+                altered = altered[:-1]
+
+                embed = discord.Embed(
+                    title = 'Game On: Typeracer! | Win ' + str(amt) + ' Coins!',
+                    #title = 'Game On: Squad Racers!',
+                    color = discord.Color.teal()
+                )
+
+                embed.add_field(name='Be the first to type the sentence without any punctuation or symbols!',
+                value='`' + altered + '`')
+                await channel.send(embed = embed)
+
+                def check(m):
+                    return m.content.lower() == string and m.channel == channel
+
+                msg = await self.client.wait_for('message', check=check)
+
+                user = self.meta.getProfile(msg.author)
+
+                coins = user['coins'] + amt
+                self.dbConnection.updateProfile({"id": msg.author.id}, {"$set": {"coins": coins}})
+
+                embed2 = discord.Embed(
+                    title = msg.author.name + ', you\'ve just earned `' + str(amt) + '` coins!',
+                    description = 'Your total: `' + str(coins) + '` coins',
+                    color = discord.Color.teal()
+                )
+
+                await channel.send(embed = embed2)
+                return
+            else:
+                return
         else:
             return
 

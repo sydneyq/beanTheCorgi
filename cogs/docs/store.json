@@ -114,6 +114,11 @@
             "src":"http://31.media.tumblr.com/tumblr_m1igknqbmB1qc2jhfo6_250.gif"
         },
         {
+            "name":"Fire Wolf Pup",
+            "price":100,
+            "src":"https://cdn.discordapp.com/attachments/613793874137186334/626960371093209090/image0.gif"
+        },
+        {
             "name":"Niffler",
             "price":200,
             "src":"http://www.thesassologist.com/wp-content/uploads/2018/05/Niffler.gif"
@@ -132,6 +137,12 @@
             "name":"Alolan Vulpix",
             "price":300,
             "src":"https://i.pinimg.com/originals/ba/16/cb/ba16cb34f3e58f486f2657b6ec6beace.gif"
+        },
+        {
+            "name":"Wumpus",
+            "price":500,
+            "src":"https://cdn.dribbble.com/users/383772/screenshots/4932223/starcraftdribbble.gif",
+            "evolve":[]
         }
     ],
 
@@ -203,6 +214,12 @@
             "evolve":["Pikachu"]
         },
         {
+            "name":"Rockruff",
+            "price":300,
+            "src":"https://i.kym-cdn.com/photos/images/original/001/225/593/0fc.gif",
+            "evolve":["Midday Lycanroc", "Midnight Lycanroc", "Dusk Lycanroc"]
+        },
+        {
             "name":"Riolu",
             "price":500,
             "src":"https://pa1.narvii.com/5711/d6b6ffc10e4d5340c5f8d90c252aeff1a9ba743a_hq.gif",
@@ -231,6 +248,12 @@
             "price":500,
             "src":"https://i.kym-cdn.com/photos/images/original/001/306/029/2aa.gif",
             "evolve":["Solgaleo", "Lunala"]
+        },
+        {
+            "name":"Isabelle",
+            "price":500,
+            "src":"https://thumbs.gfycat.com/AthleticFairAngelfish-small.gif",
+            "evolve":["Stormy Isabelle"]
         }
     ],
 
@@ -438,6 +461,26 @@
         {
             "name":"Gengar",
             "src":"https://media1.giphy.com/media/VTtTC0C7Hp9ug/source.gif",
+            "evolve":[]
+        },
+        {
+            "name":"Midday Lycanroc",
+            "src":"https://78.media.tumblr.com/55f15bcf7b024bfef55a494a7de2def9/tumblr_orygeu2nlO1qgs3bao1_500.gif",
+            "evolve":[]
+        },
+        {
+            "name":"Dusk Lycanroc",
+            "src":"https://archive-media-0.nyafuu.org/vp/image/1528/54/1528544514336.gif",
+            "evolve":[]
+        },
+        {
+            "name":"Midnight Lycanroc",
+            "src":"https://66.media.tumblr.com/fe6817ddfc013317dad487f16a44c4aa/tumblr_orywam1iFV1r9cclvo2_500.gif",
+            "evolve":[]
+        },
+        {
+            "name":"Stormy Isabelle",
+            "src":"https://66.media.tumblr.com/14cd24e1bd700102508c4d2b66a7d989/tumblr_pkokwoicNF1u438yjo1_400.gifv",
             "evolve":[]
         }
     ],

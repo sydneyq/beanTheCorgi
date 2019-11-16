@@ -1,0 +1,38 @@
+[
+    {
+        "name":"Active Supporter",
+        "var":"active",
+        "default":true,
+        "symbol":"🔰"
+    },
+    {
+        "name":"Allow DMs",
+        "var":"allows_dm",
+        "default":true,
+        "symbol":"💖"
+    },
+    {
+        "name":"Allow Support Tickets",
+        "var":"allows_public",
+        "default":true,
+        "symbol":"💞"
+    },
+    {
+        "name":"Allows Ping Offline",
+        "var":"ping_offline",
+        "default":true,
+        "symbol":"🔔"
+    },
+    {
+        "name":"Ping for Topics Only",
+        "var":"ping_topics_only",
+        "default":false,
+        "symbol":"📌"
+    },
+    {
+        "name":"Topics",
+        "var":"topics",
+        "default":[],
+        "symbol":"🦋"
+    }
+]

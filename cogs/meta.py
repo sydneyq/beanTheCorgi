@@ -26,6 +26,21 @@ class Meta:
         with open(filename3) as json_file:
             self.ids = json.load(json_file)
 
+    def embed(self, title, desc, color = None):
+        if color is None:
+            color = discord.Color.teal()
+        elif color == 'red':
+            color = discord.Color.red()
+        elif color == 'gold':
+            color = discord.Color.gold()
+
+        embed = discord.Embed(
+            title = title,
+            description = desc,
+            color = color
+        )
+        return embed
+
     async def confirm(self, ctx, responder: discord.Member, *, msg = None):
         if msg is None:
             msg = 'Are you sure?'
@@ -191,6 +206,12 @@ class Meta:
         if profile is None:
             self.dbConnection.insertProfile({'id': id, 'squad': '', 'helped': 0, 'coins': 50, 'companion': '', 'gifts': 0, 'affinity':'', 'daily': '', 'badges':[], 'booster': 0,'dex' : [], 'soulmates' : [], 'cakes': 0, 'gems': 0, 'redeemed': []})
             profile = self.dbConnection.findProfile({"id": id})
+
+        squad = profile['squad']
+        if self.isAdmin(member):
+            profile['squad'] = 'Admin'
+        elif self.isStaff(member):
+            profile['squad'] = 'Staff'
 
         return profile
 

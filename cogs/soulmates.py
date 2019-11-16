@@ -115,6 +115,7 @@ class Soulmates(commands.Cog):
             reaction, user2 = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
         except asyncio.TimeoutError:
             await ctx.channel.send('Timed out.')
+            return
         else:
             if emoji == '💔':
                 embed = discord.Embed(
@@ -192,6 +193,7 @@ class Soulmates(commands.Cog):
             reaction, user = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
         except asyncio.TimeoutError:
             await channel.send('Timed out.')
+            return
         else:
             if emoji == '⛔':
                 embed = discord.Embed(

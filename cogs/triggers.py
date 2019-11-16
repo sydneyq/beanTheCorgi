@@ -89,6 +89,9 @@ class Triggers(commands.Cog):
         #staff added
         elif roleWasAdded(self.ids['STAFF_ROLE']):
             await heaven.send(embed = embedRoleAdded('Angels'))
+            tea_role = guild.get_role(self.ids['SQUAD_TEA_ROLE'])
+            coffee_role = guild.get_role(self.ids['SQUAD_COFFEE_ROLE'])
+            await ctx.author.remove_roles(coffee_role, tea_role)
         #staff removed
         elif roleWasRemoved(self.ids['STAFF_ROLE']):
             await heaven.send(embed = embedRoleRemoved('Angels'))
