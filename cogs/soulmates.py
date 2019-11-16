@@ -10,11 +10,10 @@ import secret
 
 class Soulmates(commands.Cog):
 
-    def __init__(self, client, database, meta, supporter):
+    def __init__(self, client, database, meta):
         self.client = client
         self.dbConnection = database
         self.meta = meta
-        self.supporter = supporter
 
         dirname = os.path.dirname(__file__)
         filename = os.path.join(dirname, 'docs/store.json')
@@ -63,6 +62,8 @@ class Soulmates(commands.Cog):
         return False
 
     def addSoulmate(self, member: discord.Member, member2: discord.Member):
+        if member.bot or member2.bot or member == member2:
+            return False
         #don't have spots
         if (not self.canAddSoulmate(member)) or (not self.canAddSoulmate(member2)) :
             return False
@@ -237,4 +238,4 @@ class Soulmates(commands.Cog):
 def setup(client):
     database_connection = Database()
     meta_class = Meta(database_connection)
-    client.add_cog(Soulmates(client, database_connection, meta_clas))
+    client.add_cog(Soulmates(client, database_connection, meta_class))

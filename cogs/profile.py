@@ -166,7 +166,7 @@ class Profile(commands.Cog):
         embed.set_footer(text = 'Mind Café', icon_url = 'https://media.discordapp.net/attachments/591611902459641856/593267453363224588/Bean_Icon.png')
 
         #Marriage
-        soulmates_print = Soulmates.printSoulmates(member)
+        soulmates_print = self.soulmates.printSoulmates(member)
         embed.add_field(name="Soulmate(s)", value=soulmates_print, inline=True)
 
         #Companion
