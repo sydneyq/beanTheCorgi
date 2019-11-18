@@ -140,6 +140,7 @@ class Patron(commands.Cog):
         coins = int(int(amt) * 150)
         self.meta.addCoins(member, coins)
 
+        await ctx.guild.get_channel(self.ids['ANNOUNCEMENTS_CHANNEL']).send(embed = self.meta.embed(member.name + ' just donated!', 'Thanks so much for helping us maintain and improve the server.', 'gold'))
         await ctx.send(embed = self.meta.embedDone())
         return
 

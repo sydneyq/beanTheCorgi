@@ -37,13 +37,15 @@ class Soulmates(commands.Cog):
         return spots
 
     def getSoulmates(self, member:discord.Member):
-        s1 = self.dbConnection.findSoulmatePairs({"s1": member.id})
-        s2 = self.dbConnection.findSoulmatePairs({"s2": member.id})
+        s1 = self.dbConnection.findSoulmatePairs({"s1": str(member.id)})
+        s2 = self.dbConnection.findSoulmatePairs({"s2": str(member.id)})
         soulmates = []
-        for s in s1:
-            soulmates.append(s['s2'])
-        for s in s2:
-            soulmates.append(s['s1'])
+        if s1 is not None:
+            for s in s1:
+                soulmates.append(s['s2'])
+        if s2 is not None:
+            for s in s2:
+                soulmates.append(s['s1'])
         return soulmates
 
     def getNumSoulmates(self, member: discord.Member):
@@ -61,6 +63,8 @@ class Soulmates(commands.Cog):
             return True
         return False
 
+    #s1 & s2 are stored as strings because of mongodb's int64 truncating
+    #https://dzone.com/articles/long-numbers-are-truncated-in-mongodb-shell
     def addSoulmate(self, member: discord.Member, member2: discord.Member):
         if member.bot or member2.bot or member == member2:
             return False
@@ -71,21 +75,21 @@ class Soulmates(commands.Cog):
         if self.areSoulmates(member, member2):
             return False
 
-        self.dbConnection.insertSoulmatePair({'s1': member.id, 's2': member2.id})
+        self.dbConnection.insertSoulmatePair({'s1': str(member.id), 's2': str(member2.id)})
         return True
 
     def removeSoulmate(self, member: discord.Member, member2: discord.Member):
-        s1 = self.dbConnection.findSoulmatePairs({"s1": member.id})
-        s2 = self.dbConnection.findSoulmatePairs({"s2": member.id})
+        s1 = self.dbConnection.findSoulmatePairs({"s1": str(member.id)})
+        s2 = self.dbConnection.findSoulmatePairs({"s2": str(member.id)})
         done = True
 
         try:
-            self.dbConnection.removeSoulmatePair({"s1": member.id, "s2": member2.id})
+            self.dbConnection.removeSoulmatePair({"s1": str(member.id), "s2": str(member2.id)})
         except:
             done = False
 
         try:
-            self.dbConnection.removeSoulmatePair({"s1": member2.id, "s2": member.id})
+            self.dbConnection.removeSoulmatePair({"s1": str(member2.id), "s2": str(member.id)})
         except:
             done = False
 
@@ -96,7 +100,7 @@ class Soulmates(commands.Cog):
         soulmates = self.getSoulmates(member)
         if soulmates is not None:
             for soulmate in soulmates:
-                desc += self.meta.getMention(soulmate) + '\n'
+                sms += self.meta.getMention(soulmate) + '\n'
         if sms == '':
             sms = 'N/A'
         return sms
@@ -154,7 +158,7 @@ class Soulmates(commands.Cog):
 
         embed = discord.Embed(
             title = ctx.author.name + ' proposed to ' + member.name + '!',
-            description = 'React to this message with a ❤ for yes, 💔 for no.\nYou have 60 seconds to decide!',
+            description = member.name + ', react to this message with a ❤ for yes, 💔 for no.\nYou have 60 seconds to decide!',
             color = discord.Color.teal()
         )
         msg = await ctx.send(embed = embed)
@@ -226,12 +230,12 @@ class Soulmates(commands.Cog):
         id = member.id
 
         try:
-            self.dbConnection.removeSoulmatePair({"s1": id})
+            self.dbConnection.removeSoulmatePair({"s1": str(id)})
         except:
             pass
 
         try:
-            self.dbConnection.removeSoulmatePair({"s2": id})
+            self.dbConnection.removeSoulmatePair({"s2": str(id)})
         except:
             pass
 

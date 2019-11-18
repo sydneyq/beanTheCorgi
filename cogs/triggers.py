@@ -129,8 +129,8 @@ class Triggers(commands.Cog):
         elif roleWasAdded(self.ids['CERTIFIED_ROLE']):
             await casual.send(embed = embedRoleAdded('Certified in Active Listening'))
         #patron added
-        elif roleWasAdded(self.ids['PATRON_ROLE']):
-            await announcements.send(embed = embedRoleAdded('Bean Patron'))
+        #elif roleWasAdded(self.ids['PATRON_ROLE']):
+        #    await announcements.send(embed = embedRoleAdded('Bean Patron'))
 
 def setup(client):
     database_connection = Database()
