@@ -351,12 +351,13 @@ class Support(commands.Cog):
             embed2.add_field(name = 'Help Repping',
             value = 'Want to thank someone for supporting you? `+helpedby @user` gives them a Help point!')
 
-            await newChannel.send(embed = embed2)
+            msg = await newChannel.send(embed = embed2)
+            await msg.pin()
 
             await log.send('New Support Ticket created by <@' + str(message.author.id) + '>. ' + '<#' + str(newChannel.id) + '>')
             if (topic != ''):
                 msg = await newChannel.send("Topic: " + topic)
-            await msg.pin()
+                await msg.pin()
 
 def setup(client):
     database_connection = Database()
