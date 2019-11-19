@@ -2,7 +2,7 @@
     {
         "name":"Active Supporter",
         "var":"active",
-        "default":true,
+        "default":false,
         "symbol":"🔰"
     },
     {
@@ -24,15 +24,9 @@
         "symbol":"🔔"
     },
     {
-        "name":"Ping for Topics Only",
-        "var":"ping_topics_only",
-        "default":false,
-        "symbol":"📌"
-    },
-    {
-        "name":"Topics",
-        "var":"topics",
+        "name":"Triggers",
+        "var":"triggers",
         "default":[],
-        "symbol":"🦋"
+        "symbol":"🔫"
     }
 ]

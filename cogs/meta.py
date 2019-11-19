@@ -127,6 +127,8 @@ class Meta:
     def isMod(self, member: discord.Member):
         if self.isBotOwner(member):
             return True
+        if self.isAdmin(member):
+            return True
         if self.ids['MOD_ROLE'] in [role.id for role in member.roles]:
             return True
         return False

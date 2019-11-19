@@ -45,7 +45,7 @@ class Supporter(commands.Cog):
 
         profile = self.dbConnection.findSupporterProfile({"id": id})
         if profile is None:
-            self.dbConnection.insertSupporterProfile({'id': id, 'active':True, 'allows_dm':True, 'allows_public':True, 'ping_offline': True, 'triggers': [], 'badges':[], 'helppts': 0})
+            self.dbConnection.insertSupporterProfile({'id': id, 'active':False, 'allows_dm':True, 'allows_public':True, 'ping_offline': True, 'triggers': [], 'badges':[], 'helppts': 0})
             profile = self.dbConnection.findSupporterProfile({"id": id})
 
         return profile
@@ -137,24 +137,24 @@ class Supporter(commands.Cog):
 
     @commands.command(aliases=['ssettings', 'sset'])
     async def supportersettings(self, ctx):
-        embed = discord.Embed(
-            title = 'Which setting would you like to change?',
-            description = '🔰 - Active\n⚠ - NSFW\n💖 - Allow Support DMs\n💞 - Allow Support Tickets\n🔔 - Ping Offline\n📌 - Ping Topics Only\n🦋 - Topics\n⛔ - Cancel',
-            color = discord.Color.teal()
-        )
-        msg = await ctx.send(embed = embed)
-
+        desc = ''
+        symbols = []
         for setting in self.settings:
-            await msg.add_reaction(setting['symbol'])
-        await msg.add_reaction('⛔')
+            desc += setting['symbol'] + ' - ' + setting['name'] + '\n'
+            symbols.append(setting['symbol'])
+        symbols.append('⛔')
+
+        msg = await ctx.send(embed = self.meta.embed('Which setting would you like to change?', desc))
+
+        for symbol in symbols:
+            await msg.add_reaction(symbol)
 
         emoji = ''
 
         def check(reaction, user):
             nonlocal emoji
             emoji = str(reaction.emoji)
-            reactions = ['🔰', '⚠', '💖', '💞', '🔔', '📌', '🦋', '⛔']
-            return user == ctx.author and (str(reaction.emoji) in reactions)
+            return user == ctx.author and (str(reaction.emoji) in symbols)
 
         try:
             reaction, user = await self.client.wait_for('reaction_add', timeout=60.0, check=check)
@@ -162,11 +162,7 @@ class Supporter(commands.Cog):
             await ctx.send('Settings toggle timed out.')
         else:
             if emoji == '⛔':
-                embed = discord.Embed(
-                    title = 'Settings toggle canceled.',
-                    color = discord.Color.teal()
-                )
-                await ctx.send(embed = embed)
+                await ctx.send(embed = self.meta.embed('Cancellation','Settings toggle canceled.'))
                 return
 
             s = ''

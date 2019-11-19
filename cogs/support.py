@@ -72,12 +72,16 @@ class Support(commands.Cog):
 
     #support-ticket certified only
     @commands.command(aliases=['deny'])
-    async def remove(self, ctx, member: discord.Member = None):
+    async def remove(self, ctx, member: discord.Member):
         channel = ctx.message.channel
         guild = self.client.get_guild(257751892241809408)
         userID = int(channel.name[channel.name.rfind('-')+1:])
 
-        if ctx.message.author.id == userID or 'Mods' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
+        if self.meta.isMod(member):
+            await ctx.send(embed = self.meta.embedOops())
+            return
+
+        if ctx.message.author.id == userID or self.meta.isMod(ctx.author) or self.meta.isCertified(ctx.author):
             if channel.name.startswith('s-'):
                 channel = ctx.message.channel
                 guild = self.client.get_guild(257751892241809408) #Mind Café
@@ -116,7 +120,7 @@ class Support(commands.Cog):
                 await ctx.send(embed = embed)
         else:
             embed = discord.Embed(
-                title = 'Sorry, only the Support Ticket Owner and Moderators+ are able to use that command.',
+                title = 'Sorry, only the Support Ticket Owner, Certifieds, and Moderators+ are able to use that command.',
                 color = discord.Color.teal()
             )
             await ctx.send(embed = embed)
@@ -283,12 +287,8 @@ class Support(commands.Cog):
     #support-ticket create channel
     @commands.command()
     async def support(self, ctx, *, topic = ''):
-        if ('blindfolded' in [role.name.lower() for role in ctx.message.author.roles]):
-            embed = discord.Embed(
-                title = 'Sorry, those with the Blindfolded role are not able to create support channels.',
-                color = discord.Color.teal()
-            )
-            await ctx.send(embed = embed)
+        if self.meta.isRestricted(ctx.author):
+            await ctx.send(embed = self.meta.embed('Oops!', 'Sorry, those with the Blindfolded role are not able to create support channels.'))
             return
 
         if ('support' in ctx.message.channel.name):
@@ -323,7 +323,7 @@ class Support(commands.Cog):
             if (topic != ''):
                 await newChannel.edit(topic = topic)
 
-            if ('nsfw' in topic.lower()):
+            if ('nsfw' in topic.lower() or self.meta.hasWord(topic.lower(), 'tw')):
                 await newChannel.edit(nsfw = True)
                 role = guild.get_role(257751892241809408)
                 spiritsRole = guild.get_role(591398086635552788)
@@ -338,12 +338,12 @@ class Support(commands.Cog):
 
             embed2 = discord.Embed(
                 title = 'Support Ticket Help',
-                description = 'Only Support Ticket Owners and Moderators+ may use commands.',
+                description = 'Only Support Ticket Owners, sometimes Certifieds, and Moderators+ may use commands.',
                 color = discord.Color.teal()
             )
 
             embed2.add_field(name = 'Control Commands',
-            value = '`+archive`\t\tArchive this channel when finished\n`+switch`\t\tChange this channel to NSFW')
+            value = '`+archive`\t\tArchive this channel when finished\n`+switch`\t\tChange this channel to NSFW or TW')
 
             embed2.add_field(name = 'Access Commands',
             value = '`+certified`\t\tMake the channel accessible to only Certifieds\n`+lockdown`\t\tRemove all public access to type in the channel\n`+invite <@user>`\t\tAllow a specific person to type in the channel\n`+remove <@user>`\t\tDisallow a specific person to type in the channel\n`+reset`\t\tReset the channel to default access')
@@ -355,7 +355,8 @@ class Support(commands.Cog):
 
             await log.send('New Support Ticket created by <@' + str(message.author.id) + '>. ' + '<#' + str(newChannel.id) + '>')
             if (topic != ''):
-                await newChannel.send("Topic: " + topic)
+                msg = await newChannel.send("Topic: " + topic)
+            await msg.pin()
 
 def setup(client):
     database_connection = Database()

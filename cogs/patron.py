@@ -221,6 +221,8 @@ class Patron(commands.Cog):
     async def on_message(self, message):
         if message.author.bot:
             return
+        if isinstance(message.channel, discord.DMChannel):
+            return
 
         if self.meta.isPatron(message.author):
             msg = message.content
