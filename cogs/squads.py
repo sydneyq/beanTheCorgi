@@ -150,11 +150,15 @@ class Squads(commands.Cog):
     @commands.command(aliases=['tempsquad', 'tempstaffsquads'])
     async def tempsquads(self, ctx):
         await ctx.send(embed = self.embedTempSquads())
-        return
+        returns
 
     #re-assign temp squads
     @commands.command(aliases=['reassigntempsquads', 'retempsquad', 'newtempsquads'])
     async def retempsquads(self, ctx):
+        if not self.meta.isBotOwner(ctx.author):
+            await ctx.send(embed = self.meta.embedOops())
+            return
+
         guild = ctx.guild
         staff_role = guild.get_role(self.ids['STAFF_ROLE'])
         staff = staff_role.members
@@ -223,7 +227,7 @@ class Squads(commands.Cog):
         coffee_channel = guild.get_channel(self.ids['SQUAD_COFFEE_CHANNEL'])
         await tea_channel.set_permissions(staff_role, read_messages=True)
         await coffee_channel.set_permissions(staff_role, read_messages=True)
-        
+
         await ctx.send(embed = self.meta.embedDone())
         return
 

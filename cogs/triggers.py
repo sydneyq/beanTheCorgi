@@ -117,7 +117,7 @@ class Triggers(commands.Cog):
             await marketing.send(embed = e)
         #EC added
         elif roleWasAdded(self.ids['EVENTCOORDINATOR_ROLE']):
-            embedRoleAdded('Event Coordinators')
+            e = embedRoleAdded('Event Coordinators')
             await heaven.send(embed = e)
             await events.send(embed = e)
         #EC removed
@@ -131,6 +131,22 @@ class Triggers(commands.Cog):
         #patron added
         #elif roleWasAdded(self.ids['PATRON_ROLE']):
         #    await announcements.send(embed = embedRoleAdded('Bean Patron'))
+
+        @commands.Cog.listener()
+        async def on_message(self, message):
+            if message.author.bot:
+                return
+            msg = message.content.lower()
+            channel = message.channel
+            t = ''
+            d = ''
+
+            if 'how do i get' in msg and 'coins' in msg:
+                t = 'How to get Coins'
+                d = '[+] Join in on server events that offer coins!'
+                d += '\n[+] Use the `daily` command if you have a Companion!'
+                d += '\n[+] Catch a highfive when Bean asks for one!'
+                await channel.send(embed = e)
 
 def setup(client):
     database_connection = Database()

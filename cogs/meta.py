@@ -181,10 +181,13 @@ class Meta:
         )
         return embed
 
-    def embedOops(self):
+    def embedOops(self, desc = None):
+        if desc is None:
+            desc = 'Something went wrong.'
         embed = discord.Embed(
-            title = 'Oops! Something went wrong.',
-            color = discord.Color.teal()
+            title = 'Oops!',
+            description = desc,
+            color = discord.Color.red()
         )
         return embed
 
