@@ -252,6 +252,15 @@ class Meta:
         self.dbConnection.updateProfile({"id": member.id}, {"$set": {"badges": badges}})
         return True
 
+    def getTempSquad(self, member: discord.Member):
+        temp_squads = self.dbConnection.findMeta({'id':'temp_squads'})
+        if member.id in temp_squads['Tea']:
+            return 'Tea'
+        elif member.id in temp_squads['Coffee']:
+            return 'Coffee'
+        else:
+            return ''
+
     def subCake(self, member: discord.Member, amt:int = 1):
         user = self.getProfile(member)
         cakes = user['cakes']

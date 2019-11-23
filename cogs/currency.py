@@ -251,11 +251,13 @@ class Currency(commands.Cog):
         for doc in squadDocs:
             self.dbConnection.updateProfile({'id': doc['id']}, {"$set": {"coins": (doc['coins']+amt)}})
 
-        embed = discord.Embed(
-            title = 'Consider it done! ✅',
-            color = discord.Color.teal()
-        )
-        await ctx.send(embed = embed)
+        squads = self.dbConnection.findMeta({'id':'temp_squads'})
+        for staff in squads[squad]:
+            user = self.meta.getProfile(self.meta.getMemberByID(ctx, staff))
+            coins = user['coins']
+            self.dbConnection.updateProfile({'id': staff}, {"$set": {"coins": coins+amt}})
+
+        await ctx.send(embed = self.meta.embedDone())
 
         #finding log channel
         guild = ctx.guild

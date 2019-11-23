@@ -150,7 +150,7 @@ class Squads(commands.Cog):
     @commands.command(aliases=['tempsquad', 'tempstaffsquads'])
     async def tempsquads(self, ctx):
         await ctx.send(embed = self.embedTempSquads())
-        returns
+        return
 
     #re-assign temp squads
     @commands.command(aliases=['reassigntempsquads', 'retempsquad', 'newtempsquads'])
