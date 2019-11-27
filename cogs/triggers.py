@@ -12,6 +12,7 @@ class Triggers(commands.Cog):
     def __init__(self, client, database, meta):
         self.client = client
         self.dbConnection = database
+        self.meta = meta
 
         dirname = os.path.dirname(__file__)
         filename = os.path.join(dirname, 'docs/store.json')
@@ -132,21 +133,21 @@ class Triggers(commands.Cog):
         #elif roleWasAdded(self.ids['PATRON_ROLE']):
         #    await announcements.send(embed = embedRoleAdded('Bean Patron'))
 
-        @commands.Cog.listener()
-        async def on_message(self, message):
-            if message.author.bot:
-                return
-            msg = message.content.lower()
-            channel = message.channel
-            t = ''
-            d = ''
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author.bot:
+            return
+        msg = message.content.lower()
+        channel = message.channel
+        t = ''
+        d = ''
 
-            if 'how do i get' in msg and 'coins' in msg:
-                t = 'How to get Coins'
-                d = '[+] Join in on server events that offer coins!'
-                d += '\n[+] Use the `daily` command if you have a Companion!'
-                d += '\n[+] Catch a highfive when Bean asks for one!'
-                await channel.send(embed = e)
+        if 'how do i get coins' in msg:
+            t = 'How to get Coins ' + self.emojis['Coin']
+            d = '**[+]** Join in on server events that offer coins!'
+            d += '\n**[+]** Use the `daily` command if you have a Companion!'
+            d += '\n**[+]** Catch a highfive when Bean asks for one!'
+            await channel.send(embed = self.meta.embed(t,d))
 
 def setup(client):
     database_connection = Database()

@@ -62,8 +62,8 @@ class TempEvent(commands.Cog):
         #tea_words = ['leaf', 'teapot']
         #coffee_words = ['latte', 'creamer']
 
-        tea_words = ['bear', #1
-        'snow', #2
+        tea_words = ['crash', #1
+        '', #2
         'finally', #3
         'glee', #4
         'world', #5
@@ -77,8 +77,8 @@ class TempEvent(commands.Cog):
         'hire', #13
         'mind', #14
         'prince']
-        coffee_words = ['drop', #1
-        'hero', #2
+        coffee_words = ['print', #1
+        '', #2
         'march', #3
         'yesterday', #4
         'fix', #5

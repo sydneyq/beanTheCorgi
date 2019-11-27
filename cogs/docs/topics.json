@@ -1,46 +1,42 @@
 [
     {
-        "name":"All",
-        "id":0,
+        "name":"Anxiety",
+        "id":10
     },
     {
-        "name":"Anxiety",
-        "id":10,
-    }
-    {
         "name":"Bullying",
-        "id":20,
+        "id":20
     },
     {
         "name":"Depression",
-        "id":30,
+        "id":30
     },
     {
         "name":"Family Stress",
-        "id":40,
+        "id":40
     },
     {
         "name":"Loneliness",
-        "id":50,
+        "id":50
     },
     {
-        "name":"Neurological Disorders / Illnesses",
-        "id":60,
+        "name":"Neurological Disorders/Illnesses",
+        "id":60
     },
     {
-        "name":"Physical Disorders / Illnesses",
-        "id":70,
+        "name":"Physical Disorders/Illnesses",
+        "id":70
     },
     {
-        "name":"Psychological Disorders / Illnesses",
-        "id":80,
+        "name":"Psychological Disorders/Illnesses",
+        "id":80
     },
     {
         "name":"Relationships",
-        "id":90,
+        "id":90
     },
     {
         "name":"Work/School/Finances",
-        "id":100,
+        "id":100
     }
 ]
