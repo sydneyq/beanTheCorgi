@@ -115,6 +115,18 @@ class Meta:
             return True
         return False
 
+    #isDirector
+    def isDirector(self, member: discord.Member):
+        if self.isBotOwner(member):
+            return True
+        if self.ids['DIRECTOR_ROLE'] in [role.id for role in member.roles]:
+            return True
+        return False
+
+    #isMgmt
+    def isMgmt(self, member: discord.Member):
+        return self.isAdmin(member) or self.isDirector(member)
+
     #isStaff
     def isStaff(self, member: discord.Member):
         if self.isBotOwner(member):
@@ -646,21 +658,32 @@ class Global(commands.Cog):
     @commands.command()
     async def echo(self, ctx, channel: discord.TextChannel, *, message):
         author = ctx.message.author
-        if self.meta.isMod(author) and self.meta.isStaff(author):
+        isMod = True if self.meta.isMod(author) else False
+        isStaff = True if self.meta.isStaff(author) else False
+        isOfficialMod = True if isMod and isStaff else False
+        isMgmt = True if self.meta.isMgmt(author) else False
 
-            if not self.meta.isAdmin(author):
-                if ctx.channel.id != self.ids['MOD_CHANNEL']:
-                    await ctx.send(embed = self.meta.embedOops())
-                    return
-
-            e = self.meta.embed('A Mind Café Staff Member Says:', message, 'red')
-            await channel.send(embed = e)
-
-            await ctx.message.delete()
-            embed.set_footer(text=ctx.author.name, icon_url = ctx.author.avatar_url)
-            await ctx.guild.get_channel(self.ids['MOD_CHANNEL']).send(embed = e)
-        else:
+        if not isOfficialMod and not isMgmt:
             await ctx.send(embed = self.meta.embedOops())
+            return
+
+        if not isMgmt:
+            if ctx.channel.id != self.ids['MOD_CHANNEL']:
+                await ctx.send(embed = self.meta.embedOops())
+                return
+
+        #check if they have permission to talk in that channel first
+        if not author.permissions_in(channel).send_messages():
+            await ctx.send(embed = self.meta.embedOops())
+            return
+
+        e = self.meta.embed('A Mind Café Staff Member Says:', message, 'red')
+        await channel.send(embed = e)
+
+        await ctx.message.delete()
+        embed.set_footer(text=ctx.author.name, icon_url = ctx.author.avatar_url)
+        await ctx.guild.get_channel(self.ids['MOD_CHANNEL']).send(embed = e)
+        return
 
     @commands.command()
     async def verify(self, ctx, *, squad = None):
