@@ -426,16 +426,6 @@ class Moderation(commands.Cog):
         else:
             await ctx.send(embed = self.meta.embedOops())
 
-    @commands.command(aliases=['strikehelp', 'modsystem'])
-    async def strikesystem(self, ctx):
-        embed = discord.Embed(
-            title = 'Moderation Strike System',
-            description = 'See the spreadsheet here: https://docs.google.com/spreadsheets/d/1t3ppHecBITclZdoQ7t-VQMdBHsQ_-5tepOvdw3qLQlU',
-            color = discord.Color.red()
-        )
-        await ctx.send(embed = embed)
-        return
-
     @commands.command()
     async def rules(self, ctx):
         embed = discord.Embed(

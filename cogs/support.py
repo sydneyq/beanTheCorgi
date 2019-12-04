@@ -343,7 +343,7 @@ class Support(commands.Cog):
             )
 
             embed2.add_field(name = 'Control Commands',
-            value = '`+archive`\t\tArchive this channel when finished\n`+switch`\t\tChange this channel to NSFW or TW')
+            value = '`+archive`\t\tArchive this channel when finished\n`+switch`\t\tChange this channel to Trigger Warning (TW)')
 
             embed2.add_field(name = 'Access Commands',
             value = '`+certified`\t\tMake the channel accessible to only Certifieds\n`+lockdown`\t\tRemove all public access to type in the channel\n`+invite <@user>`\t\tAllow a specific person to type in the channel\n`+remove <@user>`\t\tDisallow a specific person to type in the channel\n`+reset`\t\tReset the channel to default access')

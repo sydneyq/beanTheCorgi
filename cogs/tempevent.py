@@ -54,159 +54,60 @@ class TempEvent(commands.Cog):
 
         await ctx.send(embed = embed2)
 
-    @commands.command(aliases=['influence', 'justsayit', 'repeatafterme'])
-    async def influencer(self, ctx, influencer_channel: discord.TextChannel):
-        if not self.meta.isBotOwner(ctx.author):
+    #rules, rules, rules
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        #don't start yet
+        return
+
+        if message.author.bot:
             return
 
-        #tea_words = ['leaf', 'teapot']
-        #coffee_words = ['latte', 'creamer']
+        if random.random() < .1:
+            past_timestamp = self.dbConnection.findMeta({'id':'server'})['event']
+            if past_timestamp == '' or self.meta.hasBeenMinutes(15, past_timestamp, self.meta.getDateTime()):
+                self.dbConnection.updateMeta({'id':'server'}, {'$set': {'event': self.meta.getDateTime()}})
+                channels = [257751892241809408, 599757443362193408]
 
-        tea_words = ['crash', #1
-        '', #2
-        'finally', #3
-        'glee', #4
-        'world', #5
-        'dino', #6
-        'under', #7
-        'realize', #8
-        'eyes', #9
-        'design', #10
-        'talk', #11
-        'thor', #12
-        'hire', #13
-        'mind', #14
-        'prince']
-        coffee_words = ['print', #1
-        '', #2
-        'march', #3
-        'yesterday', #4
-        'fix', #5
-        'romance', #6
-        'time', #7
-        'netflix', #8
-        'salad', #9
-        'along', #10
-        'invent', #11
-        'watch', #12
-        'forget', #13
-        'pikachu', #14
-        'website']
+                #event_channel = 593153723610693632 #cmd
+                event_channel = random.choice(channels)
+                channel = message.guild.get_channel(event_channel)
 
-        guild = ctx.guild
-        tea_index = 0
-        coffee_index = 0
-        tea_channel = guild.get_channel(self.ids['SQUAD_TEA_CHANNEL'])
-        coffee_channel = guild.get_channel(self.ids['SQUAD_COFFEE_CHANNEL'])
-        #tea_channel = guild.get_channel(self.ids['WORKSHOP_CHANNEL'])
-        #coffee_channel = guild.get_channel(self.ids['WORKSHOP_CHANNEL'])
-        tea_icon = 'https://cdn.discordapp.com/attachments/591611902459641856/613918428293627914/teamteaBean.png'
-        coffee_icon = 'https://cdn.discordapp.com/attachments/591611902459641856/613918442034298890/teamcoffeeBean.png'
+                num = random.randint(1, len(self.rules))
+                rule = self.rules[num]
 
-        def embedNext(squad, word):
-            nonlocal tea_icon
-            nonlocal coffee_icon
+                title = 'Rules, Rules, Rules!'
+                desc = 'Be the first to say the corresponding rule number to earn coins!'
+                e = self.meta.embed(title, desc, 'gold')
+                n = 'What `rule number` does this rule title or desciption belong to?'
+                v = random.choice({rule['TITLE'], rule['DESC']})
+                v = f'`{v}`'
+                e.add_field(name=n, value=v)
+                e.set_footer(text='Expires in 60 seconds.')
+                await channel.send(embed = embed, delete_after=60)
 
-            url = tea_icon
-            if squad == 'Coffee':
-                url = coffee_icon
+                def check(m):
+                    return m.content.lower() == str(num) and m.channel == channel
 
-            embed = discord.Embed(
-                title = 'Game On: Influencer!',
-                description = 'Get the other team to say your word! Be careful, they\'ll be trying to get one of your members to say theirs!',
-                color = discord.Color.teal()
-            )
-            embed.add_field(name='Your new word is: `' + word + '`', value='If the word is in another word or mixed capitals, it still counts!')
-            embed.set_thumbnail(url = url)
-            return embed
-
-        def embedGotcha(squad, message, word):
-            nonlocal tea_icon
-            nonlocal coffee_icon
-
-            url = tea_icon
-            enemy_squad = 'Coffee'
-
-            if squad == 'Coffee':
-                url = coffee_icon
-                enemy_squad = 'Tea'
-
-            embed = discord.Embed(
-                title = squad + ' got ' + message.author.name + ' from ' + enemy_squad + ' to say their word, `' + word + '`!',
-                description = '+1 point to ' + squad + '!\n' + message.jump_url,
-                color = discord.Color.teal()
-            )
-            embed.add_field(name='Current Points', value='Tea Squad: `' + str(self.tea_score) + '`\nCoffee Squad: `' + str(self.coffee_score) + '`')
-            embed.set_thumbnail(url = url)
-            return embed
-
-        def embedWon(squad):
-            nonlocal tea_icon
-            nonlocal coffee_icon
-
-            url = tea_icon
-            enemy_squad = 'Coffee'
-
-            if squad == 'Coffee':
-                url = coffee_icon
-                enemy_squad = 'Tea'
-
-            embed = discord.Embed(
-                title = squad + ' got ' + enemy_squad + ' to say all their words!',
-                description = 'Congratulations to the ' + squad + ' Squad! ' + self.emojis['Trophy'],
-                color = discord.Color.teal()
-            )
-            embed.set_thumbnail(url = url)
-            return embed
-
-        await tea_channel.send(embed = embedNext('Tea', tea_words[tea_index]))
-        await coffee_channel.send(embed = embedNext('Coffee', coffee_words[coffee_index]))
-
-        while (tea_index < len(tea_words) and coffee_index < len(coffee_words)):
-            tea_trigger = False
-            coffee_trigger = False
-
-            def check(m):
-                #tea got a coffee to say it?
-                nonlocal tea_trigger
-                tea_trigger = tea_words[tea_index] in m.content.lower()
-                #coffee got a tea to say it?
-                nonlocal coffee_trigger
-                coffee_trigger = coffee_words[coffee_index] in m.content.lower()
-                #check is in public channel
-                return (tea_trigger or coffee_trigger) and m.channel.category_id == 363477215377358848
-
-            msg = await self.client.wait_for('message', check=check)
-
-            user = self.meta.getProfile(msg.author)
-            squad = user['squad']
-
-            if self.meta.isStaff(msg.author):
-                squad = self.meta.getTempSquad(msg.author)
-
-            if squad == '':
-                continue
-            if tea_trigger and squad == 'Coffee':
-                self.tea_score += 1
-                await msg.channel.send(embed = embedGotcha('Tea', msg, tea_words[tea_index]))
-                await influencer_channel.send(embed = embedGotcha('Tea', msg, tea_words[tea_index]))
-                tea_index += 1
-                if tea_index >= len(tea_words):
-                    await influencer_channel.send(embed = embedWon('Tea'))
-                await tea_channel.send(embed = embedNext('Tea', tea_words[tea_index]))
-                continue
-            elif coffee_trigger and squad == 'Tea':
-                self.coffee_score += 1
-                await msg.channel.send(embed = embedGotcha('Coffee', msg, coffee_words[coffee_index]))
-                await influencer_channel.send(embed = embedGotcha('Coffee', msg, coffee_words[coffee_index]))
-                coffee_index += 1
-                if coffee_index >= len(coffee_words):
-                    await influencer_channel.send(embed = embedWon('Coffee'))
+                try:
+                    msg = await self.client.wait_for('message', timeout=60.0, check=check)
+                except asyncio.TimeoutError:
                     return
-                await coffee_channel.send(embed = embedNext('Coffee', coffee_words[coffee_index]))
-                continue
-            else:
-                continue
+                else:
+                    amt = random.choice(25, 50, 75)
+                    user = self.meta.getProfile(msg.author)
+
+                    coins = user['coins'] + amt
+                    self.dbConnection.updateProfile({"id": msg.author.id}, {"$set": {"coins": coins}})
+
+                    embed2 = discord.Embed(
+                        title = msg.author.name + ', you\'ve just earned `' + str(amt) + '` coins!',
+                        description = 'Your total: `' + str(coins) + '` coins',
+                        color = discord.Color.teal()
+                    )
+
+                    await channel.send(embed = embed2)
+            return
 
 def setup(client):
     database_connection = Database()

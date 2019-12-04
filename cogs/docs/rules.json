@@ -20,14 +20,14 @@
     {
         "NUM":3,
         "STRIKES":2,
-        "TITLE":"We are a SFW server",
-        "DESC":"Anything outside of the NSFW-labeled channels should be non-explicit. In the NSFW channels, nudity and pornography are not permitted."
+        "TITLE":"We are a SFW, TW (Trigger Warning)-labeled restricted server",
+        "DESC":"We do not allow nudity, porn, gore, graphically described NSFW or TW content, or any images that are NSFW or TW. Those statements also apply to the content of any links posted in the server. Anything that may be commonly triggering (TW) such as self-harm or sex should be in TW-labeled channels only."
     },
     {
         "NUM":4,
         "STRIKES":2,
         "TITLE":"Be respectful",
-        "DESC":"Drama and insults are to be kept outside of the server. We also won't stand for any discrimination or \"jokes\" against others about their race, religion, sexuality, gender, political views, and more."
+        "DESC":"Drama and insults are to be kept outside of the server. We also won't stand for any discrimination, slurs, or \"jokes\" against others about their race, religion, sexuality, gender, political views, and more."
     },
     {
         "NUM":5,
@@ -44,8 +44,8 @@
     {
         "NUM":7,
         "STRIKES":1,
-        "TITLE":"No unnecessary or unallowed pinging",
-        "DESC":"Do not ping roles without reason, and spam pinging roles or members is strictly prohibited. All roles except for Help roles and Staff roles should not be pinged by non-staff."
+        "TITLE":"No unnecessary/unallowed pinging or general spam/flood",
+        "DESC":"Do not ping roles without reason, and spam pinging roles or members is strictly prohibited. All roles except for Help roles and Staff roles should not be pinged by non-staff. General spamming or flooding in chatrooms will also be moderated."
     },
     {
         "NUM":8,
@@ -81,7 +81,7 @@
         "NUM":13,
         "STRIKES":3,
         "TITLE":"Discord Above All, Hail Discord",
-        "DESC":"In addition to the rules above, we enforce Discord's (ToS)[https://discordapp.com/terms] and (Guidelines)[https://discordapp.com/guidelines]."
+        "DESC":"In addition to our other rules, we enforce Discord's (ToS)[https://discordapp.com/terms] and (Guidelines)[https://discordapp.com/guidelines]. It is your responsibility to be informed about them."
     },
     {
         "NUM":14,

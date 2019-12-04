@@ -645,23 +645,22 @@ class Global(commands.Cog):
 
     @commands.command()
     async def echo(self, ctx, channel: discord.TextChannel, *, message):
-        if (self.meta.isAdmin(ctx.message.author)):
+        author = ctx.message.author
+        if self.meta.isMod(author) and self.meta.isStaff(author):
 
-            embed = discord.Embed(
-                title = 'A Mind Café Staff Member Says:',
-                description = message,
-                color = discord.Color.teal()
-            )
+            if not self.meta.isAdmin(author):
+                if ctx.channel.id != self.ids['MOD_CHANNEL']:
+                    await ctx.send(embed = self.meta.embedOops())
+                    return
 
-            #await channel.send("**Staff Member:** " + message)
-            #self.client.send_message(channel, embed=embed)
-            await channel.send(embed = embed)
+            e = self.meta.embed('A Mind Café Staff Member Says:', message, 'red')
+            await channel.send(embed = e)
+
+            await ctx.message.delete()
+            embed.set_footer(text=ctx.author.name, icon_url = ctx.author.avatar_url)
+            await ctx.guild.get_channel(self.ids['MOD_CHANNEL']).send(embed = e)
         else:
-            embed = discord.Embed(
-                title = 'Sorry, you don\'t have permission to do that!',
-                color = discord.Color.teal()
-            )
-            await ctx.send(embed = embed)
+            await ctx.send(embed = self.meta.embedOops())
 
     @commands.command()
     async def verify(self, ctx, *, squad = None):

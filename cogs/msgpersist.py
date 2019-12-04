@@ -25,22 +25,20 @@ class MsgPersist(commands.Cog):
                     msgs.append(msg)
                     break
 
-            msgs = msgs[:1]
-
-            if message.channel.name == 'no-reply':
+            if message.channel.id == 298171110695108618:
                 await message.channel.delete_messages(msgs)
 
-                embed.add_field(name = 'Welcome to #no-reply!',
+                embed.add_field(name = 'Welcome to no-reply!',
                 value = '**Reminder that replying to anyone about what they say in here can result in a warning or sanction.**\nRespect others\' wishes when they\'d like to yell into the void.')
                 embed.set_footer(text = 'Do not reply to anything here!')
                 embed.set_thumbnail(url = 'https://cdn.discordapp.com/emojis/597263007608733709.png')
 
                 await message.channel.send(embed = embed)
 
-            if message.channel.name == 'nsfw-no-reply':
+            if message.channel.id == 445668581372330005:
                 await message.channel.delete_messages(msgs)
 
-                embed.add_field(name = 'Welcome to #nsfw-no-reply!',
+                embed.add_field(name = 'Welcome to trigger warning no-reply!',
                 value = '**Reminder that replying to anyone about what they say in here can result in a warning or sanction.**\nRespect others\' wishes when they\'d like to yell into the void.')
                 embed.set_footer(text = 'Do not reply to anything here!')
                 embed.set_thumbnail(url = 'https://cdn.discordapp.com/emojis/597263007608733709.png')
