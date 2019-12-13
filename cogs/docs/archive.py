@@ -1,3 +1,59 @@
+    #rules, rules, rules
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author.bot:
+            return
+        if isinstance(message.channel, discord.DMChannel):
+            return
+
+        if random.random() < .1:
+            past_timestamp = self.dbConnection.findMeta({'id':'server'})['event']
+            if past_timestamp == '' or self.meta.hasBeenMinutes(20, past_timestamp, self.meta.getDateTime()):
+                self.dbConnection.updateMeta({'id':'server'}, {'$set': {'event': self.meta.getDateTime()}})
+                channels = [257751892241809408, 599757443362193408]
+
+                #channel_id = 593153723610693632 #cmd
+                channel_id = random.choice(channels)
+                channel = message.guild.get_channel(channel_id)
+
+                num = random.randint(1, len(self.rules))
+                rule = self.rules[num]
+
+                title = 'Rules, Rules, Rules!'
+                desc = 'Be the first to say the corresponding rule number to earn coins!'
+                e = self.meta.embed(title, desc, 'gold')
+                n = 'What `rule number` does this rule title or desciption belong to?'
+                v = random.choice([rule['TITLE'], rule['DESC']])
+                v = f'`{v}`'
+                e.add_field(name=n, value=v)
+                e.set_footer(text='Expires in 20 seconds.')
+                await channel.send(embed = e)
+
+                def check(m):
+                    return m.content.lower() == str(num) and m.channel == channel
+
+                try:
+                    msg = await self.client.wait_for('message', timeout=20.0, check=check)
+                except asyncio.TimeoutError:
+                    await channel.send(embed = self.meta.embed('Expired','20 seconds have passed!'))
+                    return
+                else:
+                    amt = 25
+                    user = self.meta.getProfile(msg.author)
+
+                    coins = user['coins'] + amt
+                    self.dbConnection.updateProfile({"id": msg.author.id}, {"$set": {"coins": coins}})
+
+                    embed2 = discord.Embed(
+                        title = msg.author.name + ', you\'ve just earned `' + str(amt) + '` coins!',
+                        description = 'Your total: `' + str(coins) + '` coins',
+                        color = discord.Color.teal()
+                    )
+
+                    await channel.send(embed = embed2)
+                    return
+            return
+
     @commands.command(aliases=['pts', 'points'])
     async def listeners(self, ctx):
         tea_num = 0
@@ -314,7 +370,7 @@
                 continue
             else:
                 continue
-    
+
     #original influencer
     @commands.command(aliases=['influence', 'justsayit', 'repeatafterme'])
     async def influencer(self, ctx):

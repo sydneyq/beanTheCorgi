@@ -31,11 +31,15 @@ class Support(commands.Cog):
     #support-ticket reset
     @commands.command(aliases=['resetST'])
     async def reset(self, ctx):
-        channel = ctx.message.channel
-        guild = self.client.get_guild(257751892241809408)
-        userID = int(channel.name[channel.name.rfind('-')+1:])
+        isAdmin = self.meta.isAdmin(ctx.author)
+        isMod = self.meta.isMod(ctx.author)
+        isCertified = self.meta.isCertified(ctx.author)
+        isChannelOwner = self.meta.isChannelOwner(ctx.author, ctx.channel)
+        log = ctx.guild.get_channel(self.ids['LOG_CHANNEL'])
+        channel = ctx.channel
+        guild = ctx.guild
 
-        if ctx.message.author.id == userID or 'Mods' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
+        if isMod or isCertified or isChannelOwner:
             if channel.name.startswith('s-'):
                 channel = ctx.message.channel
                 guild = self.client.get_guild(257751892241809408) #Mind Café
@@ -73,54 +77,51 @@ class Support(commands.Cog):
     #support-ticket certified only
     @commands.command(aliases=['deny'])
     async def remove(self, ctx, member: discord.Member):
-        channel = ctx.message.channel
-        guild = self.client.get_guild(257751892241809408)
-        userID = int(channel.name[channel.name.rfind('-')+1:])
+        isAdmin = self.meta.isAdmin(ctx.author)
+        isMod = self.meta.isMod(ctx.author)
+        isCertified = self.meta.isCertified(ctx.author)
+        isChannelOwner = self.meta.isChannelOwner(ctx.author, ctx.channel)
+        log = ctx.guild.get_channel(self.ids['LOG_CHANNEL'])
+        channel = ctx.channel
+        guild = ctx.guild
 
-        if self.meta.isMod(member):
+        if not isMod or isCertified or isChannelOwner:
             await ctx.send(embed = self.meta.embedOops())
             return
 
-        if ctx.message.author.id == userID or self.meta.isMod(ctx.author) or self.meta.isCertified(ctx.author):
-            if channel.name.startswith('s-'):
-                channel = ctx.message.channel
-                guild = self.client.get_guild(257751892241809408) #Mind Café
-                userID = int(channel.name[channel.name.rfind('-')+1:])
-                category = 0
-                log = 0
-                message = ctx.message
+        if self.meta.isMod(member) or self.meta.isCertified(member or isChannelOwner(member, ctx.channel):
+            await ctx.send(embed = self.meta.embedOops())
+            return
 
-                #finding log channel
-                for ch in guild.text_channels:
-                    if ch.name.lower() == 'log':
-                        log = guild.get_channel(ch.id)
-                        break
+        if not channel.name.startswith('s-') and not isAdmin:
+                await ctx.send(embed = self.meta.embedOops())
+                return
+        channel = ctx.message.channel
+        guild = self.client.get_guild(257751892241809408) #Mind Café
+        userID = int(channel.name[channel.name.rfind('-')+1:])
+        category = 0
+        log = 0
+        message = ctx.message
 
-                newChannel = channel
+        #finding log channel
+        for ch in guild.text_channels:
+            if ch.name.lower() == 'log':
+                log = guild.get_channel(ch.id)
+                break
 
-                if (member != None):
-                    await newChannel.set_permissions(member, send_messages=False)
+        newChannel = channel
 
-                    embed = discord.Embed(
-                        title = 'Removed ' + str(member.name) + '! ✅',
-                        color = discord.Color.teal()
-                    )
-                    await ctx.send(embed = embed)
-                else:
-                    embed = discord.Embed(
-                        title = 'Please pass in a member you\'d like to remove.',
-                        color = discord.Color.teal()
-                    )
-                    await ctx.send(embed = embed)
-            else:
-                embed = discord.Embed(
-                    title = 'This doesn\'t seem to be a Support Ticket channel...',
-                    color = discord.Color.teal()
-                )
-                await ctx.send(embed = embed)
+        if (member != None):
+            await newChannel.set_permissions(member, send_messages=False)
+
+            embed = discord.Embed(
+                title = 'Removed ' + str(member.name) + '! ✅',
+                color = discord.Color.teal()
+            )
+            await ctx.send(embed = embed)
         else:
             embed = discord.Embed(
-                title = 'Sorry, only the Support Ticket Owner, Certifieds, and Moderators+ are able to use that command.',
+                title = 'Please pass in a member you\'d like to remove.',
                 color = discord.Color.teal()
             )
             await ctx.send(embed = embed)
@@ -128,11 +129,15 @@ class Support(commands.Cog):
     #support-ticket certified only
     @commands.command(aliases=['invite'])
     async def add(self, ctx, member: discord.Member = None):
-        channel = ctx.message.channel
-        guild = self.client.get_guild(257751892241809408)
-        userID = int(channel.name[channel.name.rfind('-')+1:])
+        isAdmin = self.meta.isAdmin(ctx.author)
+        isMod = self.meta.isMod(ctx.author)
+        isCertified = self.meta.isCertified(ctx.author)
+        isChannelOwner = self.meta.isChannelOwner(ctx.author, ctx.channel)
+        log = ctx.guild.get_channel(self.ids['LOG_CHANNEL'])
+        channel = ctx.channel
+        guild = ctx.guild
 
-        if ctx.message.author.id == userID or 'Mods' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
+        if isMod or isCertified or isChannelOwner:
             if channel.name.startswith('s-'):
                 channel = ctx.message.channel
                 guild = self.client.get_guild(257751892241809408) #Mind Café
@@ -179,11 +184,15 @@ class Support(commands.Cog):
     #support-ticket lockdown
     @commands.command(aliases=['lockdown', 'lockST', 'lockdownST'])
     async def lock(self, ctx):
-        channel = ctx.message.channel
-        guild = self.client.get_guild(257751892241809408)
-        userID = int(channel.name[channel.name.rfind('-')+1:])
+        isAdmin = self.meta.isAdmin(ctx.author)
+        isMod = self.meta.isMod(ctx.author)
+        isCertified = self.meta.isCertified(ctx.author)
+        isChannelOwner = self.meta.isChannelOwner(ctx.author, ctx.channel)
+        log = ctx.guild.get_channel(self.ids['LOG_CHANNEL'])
+        channel = ctx.channel
+        guild = ctx.guild
 
-        if ctx.message.author.id == userID or 'Mods' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
+        if isMod or isCertified or isChannelOwner:
             if channel.name.startswith('s-'):
                 channel = ctx.message.channel
                 guild = self.client.get_guild(257751892241809408) #Mind Café
@@ -231,13 +240,17 @@ class Support(commands.Cog):
             await ctx.send(embed = embed)
 
     #support-ticket certified only
-    @commands.command(aliases=['certifiedST'])
-    async def certified(self, ctx):
-        channel = ctx.message.channel
-        guild = self.client.get_guild(257751892241809408)
-        userID = int(channel.name[channel.name.rfind('-')+1:])
+    @commands.command()
+    async def peerlock(self, ctx):
+        isAdmin = self.meta.isAdmin(ctx.author)
+        isMod = self.meta.isMod(ctx.author)
+        isCertified = self.meta.isCertified(ctx.author)
+        isChannelOwner = self.meta.isChannelOwner(ctx.author, ctx.channel)
+        log = ctx.guild.get_channel(self.ids['LOG_CHANNEL'])
+        channel = ctx.channel
+        guild = ctx.guild
 
-        if ctx.message.author.id == userID or 'Mods' in [role.name for role in ctx.message.author.roles] or 'mechanic' in [role.name for role in ctx.message.author.roles]:
+        if isMod or isCertified or isChannelOwner:
             if channel.name.startswith('s-'):
                 channel = ctx.message.channel
                 guild = self.client.get_guild(257751892241809408) #Mind Café
@@ -338,7 +351,7 @@ class Support(commands.Cog):
 
             embed2 = discord.Embed(
                 title = 'Support Ticket Help',
-                description = 'Only Support Ticket Owners, sometimes Certifieds, and Moderators+ may use commands.',
+                description = 'Only Support Ticket Owners, Peer Listeners, and Moderators+ may use commands.',
                 color = discord.Color.teal()
             )
 
@@ -346,7 +359,7 @@ class Support(commands.Cog):
             value = '`+archive`\t\tArchive this channel when finished\n`+switch`\t\tChange this channel to Trigger Warning (TW)')
 
             embed2.add_field(name = 'Access Commands',
-            value = '`+certified`\t\tMake the channel accessible to only Certifieds\n`+lockdown`\t\tRemove all public access to type in the channel\n`+invite <@user>`\t\tAllow a specific person to type in the channel\n`+remove <@user>`\t\tDisallow a specific person to type in the channel\n`+reset`\t\tReset the channel to default access')
+            value = '`+lockdown`\t\tRemove all public access to type in the channel\n`+invite <@user>`\t\tAllow a specific person to type in the channel\n`+remove <@user>`\t\tDisallow a specific person to type in the channel\n`+reset`\t\tReset the channel to default access')
 
             embed2.add_field(name = 'Help Repping',
             value = 'Want to thank someone for supporting you? `+helpedby @user` gives them a Help point!')

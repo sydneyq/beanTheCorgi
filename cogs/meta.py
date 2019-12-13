@@ -673,7 +673,7 @@ class Global(commands.Cog):
                 return
 
         #check if they have permission to talk in that channel first
-        if not author.permissions_in(channel).send_messages():
+        if not author.permissions_in(channel).send_messages:
             await ctx.send(embed = self.meta.embedOops())
             return
 
@@ -681,7 +681,7 @@ class Global(commands.Cog):
         await channel.send(embed = e)
 
         await ctx.message.delete()
-        embed.set_footer(text=ctx.author.name, icon_url = ctx.author.avatar_url)
+        e.set_footer(text='' + ctx.author.name + ' in ' + channel.name, icon_url = ctx.author.avatar_url)
         await ctx.guild.get_channel(self.ids['MOD_CHANNEL']).send(embed = e)
         return
 
@@ -711,7 +711,6 @@ class Global(commands.Cog):
             await casual.send(msg)
             #delete command
             await ctx.message.delete()
-            print(squad)
             if squad != None:
                 id = member.id
                 user = self.meta.getProfile(member)
@@ -830,8 +829,11 @@ class Global(commands.Cog):
     async def archive(self, ctx):
         isAdmin = self.meta.isAdmin(ctx.author)
         isMod = self.meta.isMod(ctx.author)
+        isCertified = self.meta.isCertified(ctx.author)
+        isChannelOwner = self.meta.isChannelOwner(ctx.author, ctx.channel)
         log = ctx.guild.get_channel(self.ids['LOG_CHANNEL'])
         channel = ctx.channel
+        guild = ctx.guild
 
         category = 0
         for c in ctx.guild.categories:
@@ -840,7 +842,7 @@ class Global(commands.Cog):
 
         if self.meta.isSupportChannel(channel):
             isChannelOwner = self.meta.isChannelOwner(ctx.author, ctx.channel)
-            if not isChannelOwner and not isMod:
+            if not isChannelOwner and not isMod and not isCertified:
                 await ctx.send(embed = self.meta.embedNoAccess())
                 return
 

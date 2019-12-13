@@ -21,7 +21,7 @@
         "NUM":3,
         "STRIKES":2,
         "TITLE":"We are a SFW, TW (Trigger Warning)-labeled restricted server",
-        "DESC":"We do not allow nudity, porn, gore, graphically described NSFW or TW content, or any images that are NSFW or TW. Those statements also apply to the content of any links posted in the server. Anything that may be commonly triggering (TW) such as self-harm or sex should be in TW-labeled channels only."
+        "DESC":"We do not allow nudity, porn, gore, graphically described NSFW or TW content, or any images that are NSFW or TW. Those statements also apply to the content of any links posted in the server. Anything that may be commonly triggering (TW) such as surgery or sex should be in TW-labeled channels only."
     },
     {
         "NUM":4,
@@ -33,7 +33,7 @@
         "NUM":5,
         "STRIKES":2,
         "TITLE":"You do NOT talk about Fight Club",
-        "DESC":"For non-moderators+, anything posted in support channels should not be posted outside of them, and we ask that listeners also not share specific details from support DMs."
+        "DESC":"For non-moderators+, anything posted in support channels should not be posted outside of them, and we ask that supporters also not share specific details from support DMs."
     },
     {
         "NUM":6,
@@ -51,7 +51,7 @@
         "NUM":8,
         "STRIKES":1,
         "TITLE":"No-Reply channels",
-        "DESC":"Do not reply to any posts in these channels. No content can be directed towards or contain content from any current members in Mind Café; this includes pictures, even if they are censored."
+        "DESC":"Do not reply to any posts in these channels. No content can be directed towards, mention, or contain content from any current members in Mind Café; this includes pictures, even if they are censored."
     },
     {
         "NUM":9,
@@ -88,5 +88,11 @@
         "STRIKES":0,
         "TITLE":"No begging",
         "DESC":"Badgering people for roles, positions, currency, etc. is not enjoyable! Earn your stats, earn your privileges."
+    },
+    {
+        "NUM":15,
+        "STRIKES":1,
+        "TITLE":"Casual channels",
+        "DESC":"Trigger changes are enforced in Inclusivity Casual unless someone has too many triggers or a very common topic as their trigger. In Inclusivity Casual, we aim to be able to include all participants. If your discussion is deemed by a staff member to be exclusive, please move your discussion to a different channel or change your discussion to include others."
     }
 ]

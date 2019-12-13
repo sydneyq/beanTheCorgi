@@ -29,6 +29,7 @@ class Announce(commands.Cog):
     @commands.command()
     async def msg_verify(self, ctx):
         if self.meta.isAdmin(ctx.author):
+            await ctx.message.delete()
             embed = discord.Embed(
                 color = discord.Color.teal(),
                 title = '**Welcome to Mind Café!**',
@@ -43,15 +44,12 @@ class Announce(commands.Cog):
 
             await ctx.send(embed = embed)
         else:
-            embed = discord.Embed(
-                title = 'Sorry, you don\'t have permission to do that!',
-                color = discord.Color.teal()
-            )
-            await ctx.send(embed = embed)
+            await ctx.send(embed = self.meta.embedOops())
 
     @commands.command()
     async def msg_about(self, ctx):
         if self.meta.isAdmin(ctx.author):
+            await ctx.message.delete()
             embed = discord.Embed(
                 color = discord.Color.teal(),
                 title = '**Welcome to Mind Café!**',
@@ -68,40 +66,34 @@ class Announce(commands.Cog):
 
             await ctx.send(embed = embed)
         else:
-            embed = discord.Embed(
-                title = 'Sorry, you don\'t have permission to do that!',
-                color = discord.Color.teal()
-            )
-            await ctx.send(embed = embed)
+            await ctx.send(embed = self.meta.embedOops())
 
     @commands.command()
     async def msg_rules(self, ctx):
         if self.meta.isAdmin(ctx.author):
-            title = '**Mind Café Server Rules!**',
+            await ctx.message.delete()
+            title = 'Mind Café Server Rules!'
             desc = 'Need help? Message a moderator (<@&592070664169455616>) or Bean for ModMail! We operate on a point-based offense system. [Click here to see the spreadsheet for points and sanctions.](https://docs.google.com/spreadsheets/d/1t3ppHecBITclZdoQ7t-VQMdBHsQ_-5tepOvdw3qLQlU/edit#gid=0)'
             e = self.meta.embed(title, desc)
 
-            e.set_footer(text = 'By joining and participating in our server you agree to abide by our server rules and respect our staff decisions.')
+            e.set_footer(text = 'By participating in our server you agree to abide by our server rules and respect our staff decisions.')
             await ctx.send(embed = e)
 
             for num in range(1, len(self.rules)):
                 await ctx.send(embed = self.print_rule(num))
         else:
-            embed = discord.Embed(
-                title = 'Sorry, you don\'t have permission to do that!',
-                color = discord.Color.teal()
-            )
-            await ctx.send(embed = embed)
+            await ctx.send(embed = self.meta.embedOops())
 
-    def print_rule(self, num):
+    def print_rule(self, num:int):
         rule = self.rules[num]
-        title = f'`{num}:` {rule['TITLE']}'
+        title = f"`{num}:` {rule['TITLE']}"
         desc = rule['DESC']
         e = self.meta.embed(title, desc, 'red')
         return e
 
     @commands.command()
-    async def rule(self, ctx, num):
+    async def rule(self, ctx, num:int):
+        num = int(num)
         if num < 0:
             await ctx.send(self.meta.embedOops())
             return

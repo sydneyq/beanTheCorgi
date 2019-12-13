@@ -44,7 +44,7 @@ class Triggers(commands.Cog):
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
         guild = self.client.get_guild(257751892241809408)
-        casual = guild.get_channel(257751892241809408)
+        updates = guild.get_channel(655191315130089493)
         heaven = guild.get_channel(594657206251814963)
         events = guild.get_channel(594641130545741834)
         mods = guild.get_channel(592030367796690975)
@@ -90,6 +90,7 @@ class Triggers(commands.Cog):
         #staff added
         elif roleWasAdded(self.ids['STAFF_ROLE']):
             await heaven.send(embed = embedRoleAdded('Angels'))
+            await updates.send(embed = embedRoleAdded('Angels'))
             tea_role = guild.get_role(self.ids['SQUAD_TEA_ROLE'])
             coffee_role = guild.get_role(self.ids['SQUAD_COFFEE_ROLE'])
             await ctx.author.remove_roles(coffee_role, tea_role)
@@ -126,12 +127,12 @@ class Triggers(commands.Cog):
             e = embedRoleRemoved('Event Coordinators')
             await heaven.send(embed = e)
             await events.send(embed = e)
-        #EC added
+        #PL added
         elif roleWasAdded(self.ids['CERTIFIED_ROLE']):
-            await casual.send(embed = embedRoleAdded('Certified in Active Listening'))
-        #patron added
-        #elif roleWasAdded(self.ids['PATRON_ROLE']):
-        #    await announcements.send(embed = embedRoleAdded('Bean Patron'))
+            await updates.send(embed = embedRoleAdded('Peer Listeners'))
+        #listener added
+        elif roleWasAdded(self.ids['LISTENER_ROLE']):
+            await updates.send(embed = embedRoleAdded('Listeners'))
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -147,6 +148,11 @@ class Triggers(commands.Cog):
             d = '**[+]** Join in on server events that offer coins!'
             d += '\n**[+]** Use the `daily` command if you have a Companion!'
             d += '\n**[+]** Catch a highfive when Bean asks for one!'
+            await channel.send(embed = self.meta.embed(t,d))
+        elif 'how do i get a companion' in msg:
+            t = 'How to get a Companion'
+            d = '**[+]** Buy one with Coins in the Store `+store c`!'
+            d += '\n**[+]** Get enough Help Points for a Helped Companion `+store h`'
             await channel.send(embed = self.meta.embed(t,d))
 
 def setup(client):
